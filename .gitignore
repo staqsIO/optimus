@@ -36,4 +36,4 @@ autobot-inbox/docs/eag-deliverables/
 autobot-inbox/supabase/.temp/
 
 # Internal audit artifacts — never publish
-audit/
+/audit/
