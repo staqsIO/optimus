@@ -3,6 +3,8 @@
 Optimus is a governed agent organization where every operational role is an AI agent, supervised by a human board of directors. Contributions come from both agents and humans. All changes flow through GitHub with infrastructure-enforced governance (SPEC P2).
 
 > **Status: reference implementation, small board.** Optimus is published as a reference implementation of the governance patterns described in `SPEC.md` and `CONSTITUTION.md`, not as a project with a dedicated open-source maintenance team. The human board is two people (see `README.md`), and most day-to-day review is done by an AI reviewer agent, not a large volunteer maintainer pool. That means: response times on issues and PRs can be slow, some contributions may be redirected toward discussion rather than a merge, and a few of the CI/merge mechanics below (see "Note for external contributors") were built for an internal agent pipeline and don't fully accommodate outside contributors yet. Issues and Discussions are open — triage is **best-effort**, typically within a week, with no guaranteed turnaround. Bug reports, design feedback, and small, well-scoped PRs are the most likely to get timely attention; issues labeled `good first issue` are curated starting points.
+>
+> **This public repo is a synced mirror.** Day-to-day development happens in a private repository; the public repo is refreshed **per-milestone** via a redaction-checked export, so history here is coarse snapshots rather than individual commits. External PRs are still reviewed and merged here — a maintainer then upstreams the merged change into the private repo so the next sync doesn't undo it. If a sync lands between your PR and its upstreaming, a maintainer will restore it; mention it on the PR if your merged change ever disappears.
 
 ## Branch Naming
 
@@ -53,13 +55,11 @@ All checks are required on `develop`. PRs will not merge until every check passe
 
 A few of these mechanics were built around an internal agent pipeline and currently need a maintainer's help to clear, rather than something you can satisfy yourself:
 
-- **`agent-approved` label / `agent-signoff` check.** This repo's merge gate requires an `agent-approved` label, normally applied by an internal reviewer agent after an ACCEPT/SHIP review. External contributors can't apply this label themselves — a board member will apply it (or trigger the review) once your PR looks ready. If your PR is otherwise green and waiting, that's most likely why; feel free to ping the PR asking for a look.
+- **`agent-approved` label / `agent-signoff` check.** In the private development repo, the merge gate requires an `agent-approved` label applied by an internal reviewer agent after an ACCEPT/SHIP review. On this public mirror the `agent-signoff` check **skips automatically** — external PRs gate on ordinary human maintainer review instead, since fork PRs can never receive the internal label.
 - **CODEOWNERS is notification, not a hard gate.** `require_code_owner_reviews` is intentionally off in branch protection (the sole remaining board reviewer can't self-approve their own PRs), so CODEOWNERS auto-requests a reviewer but does not block merge by itself. Don't take a missing CODEOWNERS approval as a sign your PR is stuck — the `agent-signoff` check above is the actual gate.
 - **Some checks need repository secrets forks don't get.** A couple of CI jobs (e.g. `smoke`, checks that talk to a live database or external API) rely on secrets that GitHub does not expose to `pull_request`-triggered workflows on forked repos. If one of these fails or is skipped on your PR through no fault of your diff, say so in the PR description — a maintainer can re-run it internally.
 
 ## CODEOWNERS Tiers
-
-> Note: the CODEOWNERS file itself lives in the private development repository and is not part of this public snapshot. The tiers below document how development is governed there.
 
 Two enforcement tiers govern who must approve changes. GitHub CODEOWNERS enforces this structurally (P2).
 
