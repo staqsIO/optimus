@@ -110,3 +110,5 @@ Core principle: boring infrastructure (P4). Approved dependencies include `pg`, 
 - **Module system:** ES modules (`"type": "module"`)
 - **SQL:** Parameterized queries only, no ORM
 - **Governing spec:** `SPEC.md` (see the version noted at the top of that file — it's under active revision, so this list intentionally doesn't pin a version)
+
+<!-- fork-PR CI verification: this comment tests that fork PRs run test/lint lanes and skip secret-dependent jobs. -->
