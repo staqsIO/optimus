@@ -22,7 +22,7 @@
  * to work_item.metadata. We read them back and map onto the output_schema.
  */
 
-import { withAgentScope } from '../../../lib/db.js';
+import { openAgentScope } from '../../../lib/runtime/agents/agent-scope.js';
 import { intakeLoop } from '../../../agents/executor-intake/index.js';
 import {
   createSyntheticWorkItem,
@@ -80,7 +80,7 @@ export default async function classifyMessageWrapper(input = {}) {
   // Pull the persisted classification & routing off the work item.
   // STAQPRO-524: row was inserted under withAgentScope('executor-intake'),
   // so SELECT must run under the same scope to be visible post-FORCE-RLS.
-  const intakeScope = await withAgentScope('executor-intake');
+  const intakeScope = await openAgentScope('executor-intake');
   let wiR;
   try {
     wiR = await intakeScope(

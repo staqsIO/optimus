@@ -1,5 +1,6 @@
 import { createHash } from 'crypto';
-import { query, withAgentScope } from '../db.js';
+import { query } from '../db.js';
+import { openAgentScope } from '../runtime/agent-scope.js';
 import { publishEvent } from '../runtime/infrastructure.js';
 import { emit } from '../runtime/event-bus.js';
 
@@ -47,7 +48,7 @@ export function registerBlueprintRoutes(routes) {
     // the natural identity for these checks and the follow-up GET handlers
     // below. `created_by='board'` remains for audit lineage. One scoped
     // connection covers the whole handler (OPT-166 P3-B3).
-    const scopedQuery = await withAgentScope('executor-blueprint');
+    const scopedQuery = await openAgentScope('executor-blueprint');
     let result;
     try {
       // Rate limit: per-IP (3/24h)
@@ -159,7 +160,7 @@ export function registerBlueprintRoutes(routes) {
     // OPT-166 P3-B3: same agent-owned rows as POST /api/blueprint/submit
     // above (assigned_to='executor-blueprint'). Scope to the same identity
     // so this read stays visible once 126-force-rls is live (INERT today).
-    const scopedQuery = await withAgentScope('executor-blueprint');
+    const scopedQuery = await openAgentScope('executor-blueprint');
     let result;
     let queueResult;
     try {
@@ -224,7 +225,7 @@ export function registerBlueprintRoutes(routes) {
     }
 
     // OPT-166 P3-B3: same agent-owned rows as POST /api/blueprint/submit above.
-    const scopedQuery = await withAgentScope('executor-blueprint');
+    const scopedQuery = await openAgentScope('executor-blueprint');
     try {
       await scopedQuery(
         `UPDATE agent_graph.work_items
@@ -246,7 +247,7 @@ export function registerBlueprintRoutes(routes) {
     const jobId = parts[parts.length - 1];
 
     // OPT-166 P3-B3: same agent-owned rows as POST /api/blueprint/submit above.
-    const scopedQuery = await withAgentScope('executor-blueprint');
+    const scopedQuery = await openAgentScope('executor-blueprint');
     let result;
     try {
       result = await scopedQuery(

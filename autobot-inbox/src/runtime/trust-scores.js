@@ -29,13 +29,23 @@ import { query } from '../../../lib/db.js';
  */
 export async function refreshTrustScores() {
   try {
-    await query('REFRESH MATERIALIZED VIEW CONCURRENTLY agent_graph.agent_trust_scores');
+    // REFRESH requires MV *ownership*, which the post-flip agent pool does not
+    // (and must not) have — the SECURITY DEFINER wrapper (migration 202) runs
+    // the refresh with owner privileges and handles the CONCURRENTLY fallback
+    // internally.
+    await query('SELECT agent_graph.refresh_agent_trust_scores()');
     return { refreshed: true, concurrent: true };
   } catch (err) {
-    // CONCURRENTLY requires a populated view + unique index. On first run after a
-    // fresh create the view is already populated, but be defensive.
-    await query('REFRESH MATERIALIZED VIEW agent_graph.agent_trust_scores');
-    return { refreshed: true, concurrent: false };
+    // Pre-202 database (function absent): refresh directly, with the
+    // CONCURRENTLY-requires-populated-view fallback.
+    if (!/refresh_agent_trust_scores/.test(err.message || '')) throw err;
+    try {
+      await query('REFRESH MATERIALIZED VIEW CONCURRENTLY agent_graph.agent_trust_scores');
+      return { refreshed: true, concurrent: true };
+    } catch {
+      await query('REFRESH MATERIALIZED VIEW agent_graph.agent_trust_scores');
+      return { refreshed: true, concurrent: false };
+    }
   }
 }
 

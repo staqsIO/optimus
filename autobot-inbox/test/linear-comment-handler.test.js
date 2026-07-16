@@ -320,7 +320,7 @@ describe('handleLinearComment', () => {
             rows: [{
               id: 'wi-old',
               assigned_to: 'claw-workshop',
-              metadata: { target_repo: 'staqsIO/optimus' },
+              metadata: { target_repo: 'staqsIO/optimus-private' },
             }],
           };
         }
@@ -335,7 +335,7 @@ describe('handleLinearComment', () => {
 
       const arg = noopCreateWorkItem.mock.calls[0].arguments[0];
       assert.equal(arg.assignedTo, 'claw-workshop');
-      assert.equal(arg.metadata.target_repo, 'staqsIO/optimus');
+      assert.equal(arg.metadata.target_repo, 'staqsIO/optimus-private');
     });
 
     it('defaults to executor-coder when no existing work item', async () => {

@@ -96,7 +96,7 @@ async function promoteToPR(campaign, config, agentId) {
   }
 
   // Parse target repo
-  const targetRepo = config.target_repo || 'staqsIO/optimus';
+  const targetRepo = config.target_repo || 'staqsIO/optimus-private';
   const [owner, repo] = targetRepo.split('/');
 
   const prTitle = `[campaign] ${campaign.goal_description?.slice(0, 60) || campaign.id}`;

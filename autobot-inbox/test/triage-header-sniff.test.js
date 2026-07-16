@@ -264,7 +264,7 @@ describe('classifyMachineNotification (STAQPRO-562)', () => {
       const r = classifyMachineNotification({
         channel: 'github',
         eventType: 'push',
-        linkedWorkItemId: 'pr:staqsIO/optimus#42',
+        linkedWorkItemId: 'pr:staqsIO/optimus-private#42',
       });
       assert.equal(r, null);
     });
@@ -273,7 +273,7 @@ describe('classifyMachineNotification (STAQPRO-562)', () => {
       const r = classifyMachineNotification({
         channel: 'github',
         eventType: 'pull_request_review',
-        linkedWorkItemId: 'pr:staqsIO/optimus#42',
+        linkedWorkItemId: 'pr:staqsIO/optimus-private#42',
       });
       assert.equal(r, null);
     });
@@ -373,7 +373,7 @@ describe('classifyGithubNoise (STAQPRO-563)', () => {
 
   it('List-ID containing github.com → noise (header trigger)', () => {
     const r = classifyGithubNoise('whatever@example.com', {
-      'list-id': 'staqsIO/optimus <optimus.staqsIO.github.com>',
+      'list-id': 'staqsIO/optimus-private <optimus.staqsIO.github.com>',
     });
     assert.equal(r.category, 'noise');
     assert.equal(r.reason, 'github_noise:list_id');

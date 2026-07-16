@@ -86,7 +86,7 @@ function normalizeCoderResult(raw) {
 async function handler(task, context, agent) {
   const metadata = context.workItem?.metadata || {};
   const proposalId = metadata.ticket_proposal_id;
-  const targetRepo = metadata.target_repo || 'staqsIO/optimus';
+  const targetRepo = metadata.target_repo || 'staqsIO/optimus-private';
 
   // Validate target_repo format
   const repoParts = targetRepo.split('/');

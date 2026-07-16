@@ -962,7 +962,7 @@ async function handleWorkshopTrigger(issue, createWorkItem) {
         if (!targetRepo && classification.target_repo) {
           if (classification.target_repo === 'new-repo') {
             playbookId = 'scaffold-repo';
-            targetRepo = 'staqsIO/optimus'; // execution context for scaffold
+            targetRepo = 'staqsIO/optimus-private'; // execution context for scaffold
             console.log(`[linear-ingest] Classifier detected new-repo → scaffold-repo playbook`);
           } else if (classification.confidence >= 0.8) {
             targetRepo = classification.target_repo;
@@ -998,7 +998,7 @@ async function handleWorkshopTrigger(issue, createWorkItem) {
 
   if (!targetRepo && isRepoCreating) {
     // scaffold-repo ignores the cloned repo — use optimus as execution context
-    targetRepo = 'staqsIO/optimus';
+    targetRepo = 'staqsIO/optimus-private';
     console.log(`[linear-ingest] Playbook ${playbookId} creates a new repo — using ${targetRepo} as execution context`);
   }
   if (!targetRepo) {

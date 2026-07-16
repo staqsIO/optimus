@@ -1,6 +1,6 @@
 {
   "copilotReview": true,
-  "repos": ["staqsIO/optimus", "f8ai/formul8-platform", "f8ai/formul8-metrc-platform", "f8ai/formul8-ai-dashboard", "staqsIO/staqs-splash", "staqsIO/ag-webapp"],
+  "repos": ["staqsIO/optimus-private", "f8ai/formul8-platform", "f8ai/formul8-metrc-platform", "f8ai/formul8-ai-dashboard", "staqsIO/staqs-splash", "staqsIO/ag-webapp"],
   "autoFixLabels": ["auto-fix"],
   "intentLabels": {
     "spec-gap": { "agent": "executor-research", "tier": "strategic" },

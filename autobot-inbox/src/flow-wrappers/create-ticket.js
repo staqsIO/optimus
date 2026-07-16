@@ -33,7 +33,7 @@
  * plus work_item.metadata.ticket_result.
  */
 
-import { withAgentScope } from '../../../lib/db.js';
+import { openAgentScope } from '../../../lib/runtime/agents/agent-scope.js';
 import { ticketLoop } from '../agents/executor-ticket.js';
 import {
   createSyntheticWorkItem,
@@ -104,7 +104,7 @@ export default async function createTicketWrapper(input = {}) {
   // STAQPRO-524: action_proposals + work_items are FORCE'd by migration 126;
   // SELECTs must run under the same agent scope used at INSERT time
   // ('executor-ticket' from createSyntheticWorkItem above).
-  const ticketScope = await withAgentScope('executor-ticket');
+  const ticketScope = await openAgentScope('executor-ticket');
   let propR, wiR;
   try {
     [propR, wiR] = await Promise.all([

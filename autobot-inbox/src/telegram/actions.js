@@ -140,7 +140,7 @@ async function executeAction({ tool, input }) {
 
     case 'create_github_issue': {
       const { createIssue } = await import('../github/issues.js');
-      const repoStr = input.repo || 'staqsIO/optimus';
+      const repoStr = input.repo || 'staqsIO/optimus-private';
       const repo = repoStr.includes('/') ? repoStr : `staqsIO/${repoStr}`;
       const [owner, name] = repo.split('/');
       const issue = await createIssue({ owner, repo: name, title: input.title, body: input.body, labels: input.labels });

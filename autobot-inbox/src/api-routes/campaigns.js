@@ -120,7 +120,7 @@ export function registerCampaignRoutes(routes, cachedQuery, _cache, { withViewer
 
       // System-mod campaigns default to PR promotion if none specified
       if (isSystemMod && !metadata.promotion) {
-        metadata.promotion = { type: 'pr', target_repo: 'staqsIO/optimus' };
+        metadata.promotion = { type: 'pr', target_repo: 'staqsIO/optimus-private' };
         metadata.campaign_type = 'system_mod';
       }
 

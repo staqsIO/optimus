@@ -81,7 +81,7 @@ const TOOLS = [
     input_schema: {
       type: 'object',
       properties: {
-        repo: { type: 'string', description: 'Repository (e.g. "optimus" or "staqsIO/optimus"). Defaults to staqsIO/optimus if omitted.' },
+        repo: { type: 'string', description: 'Repository (e.g. "optimus" or "staqsIO/optimus-private"). Defaults to staqsIO/optimus-private if omitted.' },
         title: { type: 'string', description: 'Issue title' },
         body: { type: 'string', description: 'Issue body (markdown)' },
         labels: { type: 'array', items: { type: 'string' }, description: 'Labels to apply' },
@@ -187,7 +187,7 @@ function formatActionSummary(tool, input) {
     case 'start_research':
       return `Research: ${input.content?.slice(0, 80)}${input.content?.length > 80 ? '...' : ''}`;
     case 'create_github_issue': {
-      const repo = input.repo || 'staqsIO/optimus';
+      const repo = input.repo || 'staqsIO/optimus-private';
       return `Create issue in ${repo}: "${input.title}"`;
     }
     case 'create_directive':

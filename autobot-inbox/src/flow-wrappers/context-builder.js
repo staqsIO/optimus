@@ -14,7 +14,8 @@
  *   - One path to the DB: lib/db.js (respects Docker Postgres vs PGlite).
  */
 
-import { query, withAgentScope } from '../../../lib/db.js';
+import { query } from '../../../lib/db.js';
+import { openAgentScope } from '../runtime/agent-scope.js';
 
 const NOREPLY_PATTERNS = /^(noreply|no-reply|no_reply|donotreply|notifications?|mailer-daemon|postmaster)@/i;
 
@@ -53,11 +54,10 @@ export async function createSyntheticWorkItem({ type, title, assignedTo, metadat
   // executor-ticket, etc.) — that agent is the one doing the work and the
   // one that will read the row back via SELECT under its own scope.
   //
-  // Pass `assignedTo` as a plain string. withAgentScope emits a STAQPRO-263
-  // warning under REQUIRE_AGENT_JWT=false (current rollout state) and will
-  // throw under enforcement. Follow-up: mint per-agent JWTs at flow-engine
-  // boundary so this can carry a verified token — separate work item.
-  const scopedQuery = await withAgentScope(assignedTo);
+  // OPT-166: openAgentScope mints (and caches) a real per-agent JWT so this
+  // works under REQUIRE_AGENT_JWT=true; it falls back to the plain-id path
+  // only when JWT key material is unavailable (tests/CLI).
+  const scopedQuery = await openAgentScope(assignedTo);
   let result;
   try {
     result = await scopedQuery(
@@ -198,7 +198,7 @@ export async function markSyntheticComplete(workItemId, assignedTo = null) {
   if (!workItemId) return;
   try {
     if (assignedTo) {
-      const scopedQuery = await withAgentScope(assignedTo);
+      const scopedQuery = await openAgentScope(assignedTo);
       try {
         await scopedQuery(
           `UPDATE agent_graph.work_items SET status = 'completed', updated_at = now() WHERE id = $1`,
@@ -227,7 +227,7 @@ export async function markSyntheticFailed(workItemId, reason = null, assignedTo 
   if (!workItemId) return;
   try {
     if (assignedTo) {
-      const scopedQuery = await withAgentScope(assignedTo);
+      const scopedQuery = await openAgentScope(assignedTo);
       try {
         await scopedQuery(
           `UPDATE agent_graph.work_items SET status = 'failed', updated_at = now(),

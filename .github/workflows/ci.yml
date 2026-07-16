@@ -489,7 +489,7 @@ jobs:
     # their own remote, never to this repo's develop ref), but add an
     # explicit repository guard as belt-and-suspenders since this job waits
     # on the Railway preview deploy and probes it with API_SECRET.
-    if: github.event_name == 'push' && github.ref == 'refs/heads/develop' && github.repository == 'staqsIO/optimus'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop' && github.repository == 'staqsIO/optimus-private'
     needs: [test, migrate]
     runs-on: ubuntu-latest
     steps:

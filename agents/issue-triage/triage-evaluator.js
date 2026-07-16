@@ -49,7 +49,7 @@ async function getRepoDescriptions() {
     REPO_DESCRIPTIONS = config.repoDescriptions || {};
   } catch {
     REPO_DESCRIPTIONS = {
-      'staqsIO/optimus': 'Optimus governed agent organization — Node.js monorepo with agents, board UI, RAG pipeline',
+      'staqsIO/optimus-private': 'Optimus governed agent organization — Node.js monorepo with agents, board UI, RAG pipeline',
       'f8ai/formul8-platform': 'Formul8 cannabis compliance platform — polyrepo, Express + Next.js + tRPC + Prisma',
       'f8ai/formul8-metrc-platform': 'Metrc track-and-trace integration platform, state cannabis compliance API',
       'staqsIO/staqs-splash': 'Staqs Inc marketing website',

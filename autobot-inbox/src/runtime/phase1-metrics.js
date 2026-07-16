@@ -202,7 +202,7 @@ export async function collectPhase1Metrics() {
       const token = await getGitHubToken();
       for (const pr of prListResult.rows) {
         try {
-          const [owner, repo] = (pr.target_repo || 'staqsIO/optimus').split('/');
+          const [owner, repo] = (pr.target_repo || 'staqsIO/optimus-private').split('/');
           const res = await fetchWithTimeout(
             `https://api.github.com/repos/${owner}/${repo}/pulls/${pr.github_pr_number}`,
             { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' } }

@@ -312,7 +312,7 @@ describe('createTicketWrapper', () => {
            (action_type, work_item_id, body, linear_issue_url, github_issue_url, target_repo)
          VALUES ('ticket_create', $1, $2, $3, $4, $5) RETURNING id`,
         [task.work_item_id, '## Description\nButton does not work\n', null,
-         'https://github.com/staqsIO/optimus/issues/42', 'staqsIO/optimus'],
+         'https://github.com/staqsIO/optimus-private/issues/42', 'staqsIO/optimus-private'],
       );
       await query(
         `UPDATE agent_graph.work_items
@@ -326,8 +326,8 @@ describe('createTicketWrapper', () => {
             severity: 'medium',
             linear_url: null,
             github_issue_number: 42,
-            github_issue_url: 'https://github.com/staqsIO/optimus/issues/42',
-            target_repo: 'staqsIO/optimus',
+            github_issue_url: 'https://github.com/staqsIO/optimus-private/issues/42',
+            target_repo: 'staqsIO/optimus-private',
           },
         }), task.work_item_id],
       );
@@ -338,14 +338,14 @@ describe('createTicketWrapper', () => {
         emailBody: 'The submit button does nothing',
         from: 'user@example.com',
         subject: 'Bug report',
-        targetRepo: 'staqsIO/optimus',
+        targetRepo: 'staqsIO/optimus-private',
       });
       assert.equal(result.title, 'Button does not work');
       assert.equal(result.category, 'bug');
       assert.equal(result.severity, 'medium');
-      assert.equal(result.githubUrl, 'https://github.com/staqsIO/optimus/issues/42');
+      assert.equal(result.githubUrl, 'https://github.com/staqsIO/optimus-private/issues/42');
       assert.equal(result.linearUrl, null);
-      assert.equal(result.targetRepo, 'staqsIO/optimus');
+      assert.equal(result.targetRepo, 'staqsIO/optimus-private');
       assert.match(result.description, /Button does not work/);
     } finally {
       ticketLoop.handler = originalHandler;

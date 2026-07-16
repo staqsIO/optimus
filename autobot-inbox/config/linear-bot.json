@@ -14,7 +14,7 @@
   "workshopAutoApprove": true,
   "defaultTargetRepo": null,
   "repoMapping": {
-    "repo:optimus": "staqsIO/optimus",
+    "repo:optimus": "staqsIO/optimus-private",
     "repo:formul8": "f8ai/formul8-platform",
     "repo:formul8-metrc": "f8ai/formul8-metrc-platform",
     "repo:formul8-ai-dashboard": "f8ai/formul8-ai-dashboard",
@@ -25,11 +25,11 @@
     "repo:staqs-board": "staqsIO/staqs-board",
     "qwik-formul8": "f8ai/qwik-formul8",
     "repo:autocsr": "staqsIO/AutoCSR",
-    "new-repo": "staqsIO/optimus"
+    "new-repo": "staqsIO/optimus-private"
   },
   "projectMapping": {
-    "Optimus": "staqsIO/optimus",
-    "Optimus Phase 1 — MVP Completion": "staqsIO/optimus",
+    "Optimus": "staqsIO/optimus-private",
+    "Optimus Phase 1 — MVP Completion": "staqsIO/optimus-private",
     "Formul8": "f8ai/formul8-platform",
     "Staqs - Staqs.io Site Redesign": "staqsIO/staqs-splash",
     "Staqs - Portal Dashboard": "staqsIO/staqs-board",
@@ -37,10 +37,10 @@
     "AutoCSR  - Ongoing Website Maintenance": "staqsIO/AutoCSR"
   },
   "teamMapping": {
-    "Staqs Internal Projects": "staqsIO/optimus",
+    "Staqs Internal Projects": "staqsIO/optimus-private",
     "Formul8": "f8ai/formul8-platform",
     "FrontPoint Security": "staqsIO/frontpoint-security",
-    "Development": "staqsIO/optimus"
+    "Development": "staqsIO/optimus-private"
   },
   "boardMembers": [
     { "name": "Eric Gang", "linearId": "00000000-0000-0000-0000-000000000001" },
@@ -51,7 +51,7 @@
   "replyBudgetUsd": 3,
   "replyCooldownMs": 60000,
   "repoDescriptions": {
-    "staqsIO/optimus": "Agent orchestration system, task graph, inbox pipeline, constitutional governance",
+    "staqsIO/optimus-private": "Agent orchestration system, task graph, inbox pipeline, constitutional governance",
     "f8ai/formul8-platform": "Cannabis compliance platform — polyrepo with 11 sub-projects, Express + Next.js + tRPC + Prisma",
     "f8ai/formul8-metrc-platform": "Metrc track-and-trace integration platform, state cannabis compliance API",
     "f8ai/formul8-ai-dashboard": "AI-powered analytics dashboard for cannabis dispensary operations",

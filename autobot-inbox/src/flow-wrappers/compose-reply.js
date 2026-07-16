@@ -26,7 +26,7 @@
  * onto the tool's output_schema.
  */
 
-import { withAgentScope } from '../../../lib/db.js';
+import { openAgentScope } from '../../../lib/runtime/agents/agent-scope.js';
 import { responderLoop } from '../agents/executor-responder.js';
 import {
   createSyntheticWorkItem,
@@ -99,7 +99,7 @@ export default async function composeReplyWrapper(input = {}) {
   // which relaxes the message_id NOT NULL requirement for this draft.
   // STAQPRO-524: action_proposals is FORCE'd by migration 126; SELECT must
   // run under the same agent scope used at INSERT time.
-  const responderScope = await withAgentScope('executor-responder');
+  const responderScope = await openAgentScope('executor-responder');
   let draftR;
   try {
     draftR = await responderScope(

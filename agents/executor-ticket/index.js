@@ -16,10 +16,10 @@ const log = createChildLogger({ agent: 'executor-ticket' });
  */
 
 const DEFAULT_REPO_OWNER = process.env.DEFAULT_REPO_OWNER || 'staqsIO';
-const DEFAULT_REPO_NAME = process.env.DEFAULT_REPO_NAME || 'optimus';
+const DEFAULT_REPO_NAME = process.env.DEFAULT_REPO_NAME || 'optimus-private';
 
 if (!process.env.DEFAULT_REPO_OWNER || !process.env.DEFAULT_REPO_NAME) {
-  log.warn(' DEFAULT_REPO_OWNER/DEFAULT_REPO_NAME not set — falling back to staqsIO/optimus');
+  log.warn(' DEFAULT_REPO_OWNER/DEFAULT_REPO_NAME not set — falling back to staqsIO/optimus-private');
 }
 
 /**

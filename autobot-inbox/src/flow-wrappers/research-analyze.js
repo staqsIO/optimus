@@ -24,7 +24,7 @@
  * Post-run extraction: the handler writes research_result to work_item.metadata.
  */
 
-import { withAgentScope } from '../../../lib/db.js';
+import { openAgentScope } from '../../../lib/runtime/agents/agent-scope.js';
 import { researchLoop } from '../agents/executor-research.js';
 import {
   createSyntheticWorkItem,
@@ -78,7 +78,7 @@ export default async function researchAnalyzeWrapper(input = {}) {
 
   // Extract research_result from work_item.metadata
   // STAQPRO-524: work_items is FORCE'd; read under the same agent scope.
-  const researchScope = await withAgentScope('executor-research');
+  const researchScope = await openAgentScope('executor-research');
   let wiR;
   try {
     wiR = await researchScope(

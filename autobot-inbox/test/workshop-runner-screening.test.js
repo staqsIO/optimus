@@ -53,7 +53,7 @@ const REPLY_METADATA = {
 const IMPLEMENT_METADATA = {
   linear_issue_id: 'lin-1',
   linear_identifier: 'ENG-1',
-  target_repo: 'staqsIO/optimus',
+  target_repo: 'staqsIO/optimus-private',
 };
 
 function makeCampaignRow(metadata) {

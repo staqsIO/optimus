@@ -32,7 +32,7 @@ jobs:
     # have no access to these org secrets — a failing red cron on someone's
     # fork is just noise, and a fork with its own copies of these secrets
     # shouldn't be hitting our prod endpoint anyway).
-    if: github.repository == 'staqsIO/optimus'
+    if: github.repository == 'staqsIO/optimus-private'
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:

@@ -23,7 +23,7 @@
  * mapped to the tool's output_schema.
  */
 
-import { withAgentScope } from '../../../lib/db.js';
+import { openAgentScope } from '../../../lib/runtime/agents/agent-scope.js';
 import { strategistLoop } from '../agents/strategist.js';
 import {
   createSyntheticWorkItem,
@@ -101,7 +101,7 @@ export default async function scorePriorityWrapper(input = {}) {
 
   // Pull the strategy_result stored on work_item.metadata.
   // STAQPRO-524: work_items is FORCE'd; read under the same agent scope.
-  const strategistScope = await withAgentScope('strategist');
+  const strategistScope = await openAgentScope('strategist');
   let wiR;
   try {
     wiR = await strategistScope(

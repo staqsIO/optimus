@@ -65,11 +65,11 @@ The markdown body after the frontmatter is injected as the system prompt for the
 
 ## Repo Mapping Reference
 
-The `new-repo` label maps to `staqsIO/optimus` as an execution context — the playbook ignores this repo and creates a new one. All other repo labels map to their target repos for in-place work:
+The `new-repo` label maps to `staqsIO/optimus-private` as an execution context — the playbook ignores this repo and creates a new one. All other repo labels map to their target repos for in-place work:
 
 | Label | GitHub Repo |
 |-------|-------------|
-| `repo:optimus` | staqsIO/optimus |
+| `repo:optimus` | staqsIO/optimus-private |
 | `repo:formul8` | f8ai/formul8-platform |
 | `repo:staqs-splash` | staqsIO/staqs-splash |
 | `repo:ag-webapp` | staqsIO/ag-webapp |
@@ -77,6 +77,6 @@ The `new-repo` label maps to `staqsIO/optimus` as an execution context — the p
 | `repo:frontpoint` | staqsIO/frontpoint-security |
 | `repo:staqs-board` | staqsIO/staqs-board |
 | `qwik-formul8` | f8ai/qwik-formul8 |
-| `new-repo` | staqsIO/optimus (execution context only) |
+| `new-repo` | staqsIO/optimus-private (execution context only) |
 
 See `config/linear-bot.json` for the canonical mapping.

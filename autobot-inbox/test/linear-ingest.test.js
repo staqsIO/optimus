@@ -423,7 +423,7 @@ describe('handleLinearWebhook', () => {
       assert.equal(result.skipped, undefined);
       const workItemArg = noopCreateWorkItem.mock.calls[0].arguments[0];
       // repo:optimus label wins over project mapping to staqs-splash
-      assert.equal(workItemArg.metadata.target_repo, 'staqsIO/optimus');
+      assert.equal(workItemArg.metadata.target_repo, 'staqsIO/optimus-private');
     });
 
     it('should prioritize tier 2 (project) over tier 3 (team)', async () => {
@@ -443,7 +443,7 @@ describe('handleLinearWebhook', () => {
       assert.equal(result.skipped, undefined);
       const workItemArg = noopCreateWorkItem.mock.calls[0].arguments[0];
       // project "Optimus" wins over team "Formul8"
-      assert.equal(workItemArg.metadata.target_repo, 'staqsIO/optimus');
+      assert.equal(workItemArg.metadata.target_repo, 'staqsIO/optimus-private');
     });
 
     it('should fail-fast when no label, project, or team matches', async () => {
@@ -569,7 +569,7 @@ describe('handleLinearWebhook', () => {
       assert.equal(arg.priority, 3); // Linear 1 (urgent) maps to 3
       assert.equal(arg.metadata.linear_issue_id, 'issue-uuid-001');
       assert.equal(arg.metadata.source, 'linear-webhook');
-      assert.equal(arg.metadata.target_repo, 'staqsIO/optimus');
+      assert.equal(arg.metadata.target_repo, 'staqsIO/optimus-private');
       assert.equal(arg.metadata.linear_priority, 1);
     });
   });

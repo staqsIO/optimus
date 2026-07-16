@@ -55,7 +55,7 @@ mock.module('../src/linear/client.js', {
 });
 
 // Configured repo from config/github-bot.json — pick anything in the list.
-const REPO = 'staqsIO/optimus';
+const REPO = 'staqsIO/optimus-private';
 
 const prPayload = (action, prNumber) => ({
   action,

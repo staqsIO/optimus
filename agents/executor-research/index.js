@@ -59,7 +59,7 @@ Rules:
 - Keep the analysis focused and practical — this feeds into board decisions`;
 
 const REPO_OWNER = 'staqsIO';
-const REPO_NAME = 'optimus';
+const REPO_NAME = 'optimus-private';
 
 async function fetchGitHubFile(filePath) {
   const token = process.env.GITHUB_PAT || process.env.GITHUB_TOKEN;

@@ -79,7 +79,7 @@ describe('API query integration tests', () => {
         id, action_type, work_item_id, campaign_id, body, version,
         target_repo, github_pr_url, github_pr_number
       ) VALUES ($1, 'code_fix_pr', $2, $3, 'test body', 1,
-        'staqsIO/optimus', 'https://github.com/staqsIO/optimus/pull/99', 99)
+        'staqsIO/optimus-private', 'https://github.com/staqsIO/optimus-private/pull/99', 99)
       ON CONFLICT (id) DO NOTHING
     `, [PROPOSAL_ID, WORK_ITEM_ID, CAMPAIGN_ID]);
 
