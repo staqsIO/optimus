@@ -1,0 +1,14 @@
+{
+  "name": "optimus-cli",
+  "version": "1.0.0",
+  "description": "Optimus CLI — push your work into the shared brain + passive Claude Code session capture",
+  "type": "module",
+  "main": "index.js",
+  "license": "Apache-2.0",
+  "bin": {
+    "optimus": "./index.js"
+  },
+  "scripts": {
+    "test": "node --test"
+  }
+}

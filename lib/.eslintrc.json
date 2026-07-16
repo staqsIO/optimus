@@ -1,0 +1,31 @@
+{
+  "root": true,
+  "env": {
+    "node": true,
+    "es2022": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "module"
+  },
+  "extends": ["eslint:recommended"],
+  "ignorePatterns": ["node_modules/", "**/node_modules/"],
+  "rules": {
+    "no-undef": "error",
+    "no-unused-vars": "warn",
+    "no-useless-escape": "warn",
+    "no-empty": "warn",
+    "no-constant-condition": "warn",
+    "no-control-regex": "warn",
+    "no-async-promise-executor": "warn",
+    "no-inner-declarations": "warn"
+  },
+  "overrides": [
+    {
+      "files": ["scrapers/**/*.js"],
+      "env": {
+        "browser": true
+      }
+    }
+  ]
+}

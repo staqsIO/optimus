@@ -1,0 +1,57 @@
+name: Voice Retrain
+
+# Re-runs bootstrap-voice on the production Sent corpus weekly so the
+# voice profile stays current with Eric's evolving style. Replaces the
+# old "edit deltas accumulate from board edits" assumption — empirically
+# (audit 2026-05-07) board edits don't happen, so the corpus IS the truth.
+#
+# Manual trigger via workflow_dispatch is supported for ad-hoc retraining.
+
+on:
+  schedule:
+    # Sundays 06:00 UTC = Saturday 23:00 PT — quiet window for the user.
+    - cron: '0 6 * * 0'
+  workflow_dispatch: {}
+
+jobs:
+  retrain:
+    # Org-only: this cron needs PROD_DATABASE_URL/GMAIL_REFRESH_TOKEN/
+    # GOOGLE_SERVICE_ACCOUNT_KEY (org secrets, unavailable to forks) and
+    # writes into production voice-profile state. See signatures-sweep.yml
+    # for the same rationale.
+    if: github.repository == 'staqsIO/optimus'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: autobot-inbox
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: autobot-inbox/package-lock.json
+
+      - run: npm ci
+
+      - name: Install lib dependencies
+        working-directory: lib
+        run: npm ci
+
+      - name: Bootstrap voice profile
+        run: npm run bootstrap-voice
+        env:
+          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          VOYAGE_API_KEY: ${{ secrets.VOYAGE_API_KEY }}
+          GOOGLE_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
+          # OAuth path used by gmail/auth.js → bootstrapSentEmails. The cron
+          # was firing weekly but failing instantly because these three were
+          # never wired (STAQPRO-306, audit 2026-05-10).
+          GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
+          GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
+          GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
+          # Embedding provider — bootstrap reads this to choose the embedder
+          EMBEDDING_PROVIDER: openai

@@ -1,0 +1,36 @@
+{
+  "hitl": {
+    "name": "Jordan Rivera",
+    "company": "Acme Confections",
+    "email": "jordan.rivera@example.com",
+    "role": "Founder & CEO",
+    "industry": "Confectionery & wholesale gummy manufacturer",
+    "discord": "jrivera_afk",
+    "linkedin": "/jordan-rivera-example123",
+    "context": "Runs a gummy manufacturing operation. Manages supplier relationships, retail/brand partnerships, compliance, and production scheduling."
+  },
+  "senders": [
+    {
+      "id": "steve",
+      "name": "Steve White",
+      "company": "Ingredient Majors",
+      "email": "steve.white@example.com",
+      "role": "Sales Director",
+      "relationship": "supplier",
+      "discord": "steve_ingredients99",
+      "linkedin": "/steve-white-example456",
+      "context": "Supplies bulk ingredients (gelatin, sweeteners, flavoring, cocoa) to Acme Confections. Long-standing supplier relationship. Reliable but occasionally has supply chain issues."
+    },
+    {
+      "id": "bob",
+      "name": "Bob Johnson",
+      "company": "CPG Brand Co",
+      "email": "bob.johnson@example.com",
+      "role": "VP of Product",
+      "relationship": "customer",
+      "discord": "bobjohnson_cpg",
+      "linkedin": "/bob-johnson-example789",
+      "context": "White-label CPG brand that buys finished gummy products from Acme Confections for retail distribution. Demands quality, consistency, and on-time delivery. Growing account."
+    }
+  ]
+}

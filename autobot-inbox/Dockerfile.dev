@@ -1,0 +1,18 @@
+# Build context: repo root (.)
+# Dev mode — source mounted as volumes
+
+FROM node:20-alpine
+
+# Install product dependencies
+WORKDIR /app/autobot-inbox
+COPY autobot-inbox/package*.json ./
+RUN npm install
+
+# Install lib dependencies
+WORKDIR /app/lib
+COPY lib/package*.json ./
+RUN npm install
+
+WORKDIR /app/autobot-inbox
+# Mount autobot-inbox/ and lib/ as volumes at runtime
+CMD ["node", "--watch", "src/index.js"]

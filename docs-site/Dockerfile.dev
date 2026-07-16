@@ -1,0 +1,14 @@
+# Build context must be the repo root (.) — prebuild.sh reads from autobot-inbox/docs and autobot-spec
+# Volume mounts expected in compose:
+#   ./docs-site          → /repo/docs-site
+#   ./autobot-inbox/docs → /repo/autobot-inbox/docs (read-only)
+#   ./autobot-spec       → /repo/autobot-spec       (read-only)
+
+FROM node:20-alpine
+RUN apk add --no-cache bash
+WORKDIR /repo/docs-site
+COPY docs-site/package*.json ./
+RUN npm install
+# Source code and monorepo dirs are mounted as volumes at runtime
+EXPOSE 3000
+CMD ["bash", "-c", "bash scripts/prebuild.sh && npx next dev --hostname 0.0.0.0"]

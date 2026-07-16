@@ -1,0 +1,259 @@
+{
+  "specVersion": "1.0.0",
+  "generatedAt": "2026-03-29T19:41:49.422Z",
+  "sections": [
+    {
+      "id": "0",
+      "file": "00-design-principles.md",
+      "title": "Design Principles",
+      "tier": "core",
+      "description": "Six non-negotiable principles governing all architectural decisions (P1-P6)",
+      "lineRange": [
+        18,
+        35
+      ]
+    },
+    {
+      "id": "1",
+      "file": "01-the-core-idea.md",
+      "title": "The Core Idea",
+      "tier": "core",
+      "description": "Optimus as a governed agent organization and the path to AutoBot",
+      "lineRange": [
+        36,
+        47
+      ]
+    },
+    {
+      "id": "2",
+      "file": "02-architecture-overview.md",
+      "title": "Architecture Overview",
+      "tier": "core",
+      "description": "Optimus governed and AutoBot autonomous architecture diagrams and agent tiers",
+      "lineRange": [
+        48,
+        148
+      ]
+    },
+    {
+      "id": "3",
+      "file": "03-the-task-graph.md",
+      "title": "The Task Graph",
+      "tier": "core",
+      "description": "Postgres-based DAG task graph for agent coordination with typed edges and state machines",
+      "lineRange": [
+        149,
+        297
+      ]
+    },
+    {
+      "id": "4",
+      "file": "04-agent-runtime.md",
+      "title": "Agent Runtime",
+      "tier": "operations",
+      "description": "Agent execution model, tool sandboxing, context management, and behavioral contracts",
+      "lineRange": [
+        298,
+        534
+      ]
+    },
+    {
+      "id": "5",
+      "file": "05-guardrail-enforcement.md",
+      "title": "Guardrail Enforcement",
+      "tier": "core",
+      "description": "Constitutional gates, guardrail enforcement, and content sanitization",
+      "lineRange": [
+        535,
+        641
+      ]
+    },
+    {
+      "id": "5a",
+      "file": "5a-knowledge-graph-layer.md",
+      "title": "Knowledge Graph Layer",
+      "tier": "operations",
+      "description": "Neo4j knowledge graph for agent learning, pattern emergence, and relationship intelligence",
+      "lineRange": [
+        642,
+        733
+      ]
+    },
+    {
+      "id": "6",
+      "file": "06-tool-integrity-layer.md",
+      "title": "Tool Integrity Layer",
+      "tier": "operations",
+      "description": "Tool registry, hash verification, allow-lists, and integrity enforcement",
+      "lineRange": [
+        734,
+        835
+      ]
+    },
+    {
+      "id": "7",
+      "file": "07-communication-gateway.md",
+      "title": "Communication Gateway",
+      "tier": "operations",
+      "description": "Multi-channel adapter layer for inbound/outbound communication",
+      "lineRange": [
+        836,
+        892
+      ]
+    },
+    {
+      "id": "8",
+      "file": "08-audit-and-observability.md",
+      "title": "Audit and Observability",
+      "tier": "operations",
+      "description": "Append-only audit logging, hash chains, Merkle proofs, and observability",
+      "lineRange": [
+        893,
+        1088
+      ]
+    },
+    {
+      "id": "9",
+      "file": "09-kill-switch.md",
+      "title": "Kill Switch",
+      "tier": "operations",
+      "description": "Board-triggered emergency halt with cryptographic verification",
+      "lineRange": [
+        1089,
+        1119
+      ]
+    },
+    {
+      "id": "10",
+      "file": "10-cost-tracking.md",
+      "title": "Cost Tracking",
+      "tier": "operations",
+      "description": "Per-agent and per-task cost tracking with budget pre-authorization",
+      "lineRange": [
+        1120,
+        1162
+      ]
+    },
+    {
+      "id": "11",
+      "file": "11-failure-modes.md",
+      "title": "Failure Modes",
+      "tier": "operations",
+      "description": "Failure taxonomy, retry policies, escalation paths, and circuit breakers",
+      "lineRange": [
+        1163,
+        1213
+      ]
+    },
+    {
+      "id": "12",
+      "file": "12-database-architecture-autobot-extension.md",
+      "title": "Database Architecture (AutoBot Extension)",
+      "tier": "operations",
+      "description": "Schema isolation, database roles, RLS policies, and AutoBot extension architecture",
+      "lineRange": [
+        1214,
+        1271
+      ]
+    },
+    {
+      "id": "13",
+      "file": "13-autobot-constitution-summary.md",
+      "title": "AutoBot Constitution (Summary)",
+      "tier": "core",
+      "description": "Constitutional articles, amendment process, and autonomy prerequisites",
+      "lineRange": [
+        1272,
+        1306
+      ]
+    },
+    {
+      "id": "14",
+      "file": "14-phased-execution-plan.md",
+      "title": "Phased Execution Plan",
+      "tier": "planning",
+      "description": "Phase 1 through Phase 5 roadmap with exit criteria and deliverables",
+      "lineRange": [
+        1307,
+        1532
+      ]
+    },
+    {
+      "id": "15",
+      "file": "15-operating-cost-model.md",
+      "title": "Operating Cost Model",
+      "tier": "planning",
+      "description": "Monthly operating cost breakdown by agent tier and infrastructure",
+      "lineRange": [
+        1533,
+        1550
+      ]
+    },
+    {
+      "id": "16",
+      "file": "16-open-questions-resolved.md",
+      "title": "Open Questions Resolved",
+      "tier": "planning",
+      "description": "Previously open questions now resolved with decisions",
+      "lineRange": [
+        1551,
+        1565
+      ]
+    },
+    {
+      "id": "17",
+      "file": "17-legal-compliance-architecture.md",
+      "title": "Legal Compliance Architecture",
+      "tier": "core",
+      "description": "Tax, liability, IP, employment law, and custodian responsibilities",
+      "lineRange": [
+        1566,
+        1610
+      ]
+    },
+    {
+      "id": "18",
+      "file": "18-autonomous-software-composition.md",
+      "title": "Autonomous Software Composition",
+      "tier": "planning",
+      "description": "Autonomous code generation, PR pipelines, and software composition architecture",
+      "lineRange": [
+        1611,
+        1737
+      ]
+    },
+    {
+      "id": "19",
+      "file": "19-strategy-evaluation-protocol.md",
+      "title": "Strategy Evaluation Protocol",
+      "tier": "planning",
+      "description": "Strategist evaluation framework for market analysis and strategic recommendations",
+      "lineRange": [
+        1738,
+        1918
+      ]
+    },
+    {
+      "id": "20",
+      "file": "20-what-this-document-does-not-cover.md",
+      "title": "What This Document Does Not Cover",
+      "tier": "planning",
+      "description": "Explicit scope boundaries and excluded topics",
+      "lineRange": [
+        1919,
+        1942
+      ]
+    },
+    {
+      "id": "21",
+      "file": "21-changelog.md",
+      "title": "Changelog",
+      "tier": "planning",
+      "description": "Version history and changelog references",
+      "lineRange": [
+        1943,
+        1959
+      ]
+    }
+  ]
+}

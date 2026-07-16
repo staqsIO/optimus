@@ -1,0 +1,20 @@
+# GitHub Copilot Code Review configuration
+# Automatically reviews PRs to main and develop branches
+
+reviews:
+  # High priority: SQL injection, unused variables, type mismatches
+  high_severity:
+    - sql-injection
+    - unused-variables
+    - type-mismatch
+
+  # Focus areas for this codebase
+  path_instructions:
+    - path: "autobot-inbox/src/api-routes/**"
+      instructions: "Check for parameterized SQL queries (no string interpolation). Verify column names exist in the schema."
+    - path: "agents/**"
+      instructions: "Check for proper error handling and budget guard checks."
+    - path: "board/**"
+      instructions: "Check for XSS in dangerouslySetInnerHTML usage. Verify API calls use opsFetch/opsPost."
+    - path: "lib/runtime/**"
+      instructions: "Check for proper async/await patterns and error propagation."

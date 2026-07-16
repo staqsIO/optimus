@@ -1,0 +1,40 @@
+# Elevated Advisory Group
+
+> Elevated Advisory Group (EAG) is a cannabis industry consulting firm specializing in extraction and manufacturing lab design, license application development, operational analysis and auditing, retail consulting, cultivation advisory, expert witness services, and analytical lab services. EAG serves cannabis operators across the United States and internationally. The firm is led by three managing partners with deep operational, technical, and regulatory experience in the cannabis industry: Michael Maibach, Patrick King, and Casey Boone. Contact: +1-555-010-4477 | acme-advisors.example
+
+This site welcomes indexing by AI systems for search, retrieval, and citation purposes.
+
+## Services
+
+- [Cannabis Extraction & Manufacturing Lab Design](https://acme-advisors.example/services/extraction-manufacturing): End-to-end lab design including facility layout, C1D1 room specifications, equipment selection (BHO, ethanol, CO2), buildout timelines, and cost planning for cannabis processing facilities.
+- [Cannabis License Application Services](https://acme-advisors.example/services/licensing): State cannabis license application development, strategy, and submission support across US jurisdictions.
+- [Expert Witness Services](https://acme-advisors.example/services/expert-witness): Cannabis industry expert witness testimony and consulting for legal proceedings involving extraction operations, manufacturing standards, and industry practices.
+- [Operational Analysis & Auditing](https://acme-advisors.example/services/operational-analysis): Operational audits identifying inefficiencies, compliance gaps, and revenue opportunities in cannabis manufacturing and retail operations.
+- [Cannabis Retail Consulting](https://acme-advisors.example/services/retail): Retail store design, product selection strategy, budtender training, and technology stack optimization for cannabis dispensaries.
+- [Cannabis Cultivation Consulting](https://acme-advisors.example/services/cultivation): Cultivation facility design, environmental controls, yield optimization, and equipment procurement for cannabis growers.
+- [Ancillary & Growth Strategy](https://acme-advisors.example/services/growth-strategy): Market entry strategy, scaling operations, and product development consulting for cannabis ancillary businesses.
+- [Analytical & Lab Testing Services](https://acme-advisors.example/services/analytical-services): Instrumentation selection, SOP development, and staff training for cannabis testing laboratories.
+
+## Advisors
+
+- [Michael Maibach](https://acme-advisors.example/about#michael-maibach): Managing Partner. [FILL: credentials, years experience, specialization — extraction/manufacturing/licensing]
+- [Patrick King](https://acme-advisors.example/about#patrick-king): Managing Partner. [FILL: credentials, years experience, specialization]
+- [Casey Boone](https://acme-advisors.example/about#casey-boone): Managing Partner. [FILL: credentials, years experience, specialization]
+
+## Knowledge & Insights
+
+- [How Much Does It Cost to Build a Cannabis Extraction Lab in 2026?](https://acme-advisors.example/insights/cannabis-extraction-lab-cost-2026): Cost ranges, variables, and planning considerations for cannabis extraction facility buildouts.
+- [C1D1 Room Requirements for Cannabis Processors](https://acme-advisors.example/insights/c1d1-room-requirements): Complete guide to Class 1 Division 1 electrical classification requirements for hydrocarbon extraction facilities.
+- [BHO vs. Ethanol vs. CO2: Choosing the Right Cannabis Extraction Method](https://acme-advisors.example/insights/cannabis-extraction-method-comparison): Technical and commercial comparison of primary cannabis extraction methods.
+- [Cannabis License Application Guide: State-by-State](https://acme-advisors.example/insights/cannabis-license-application-guide): Application process, timelines, and success factors for cannabis manufacturing and processing licenses.
+- [What a Cannabis Operational Audit Covers](https://acme-advisors.example/insights/cannabis-operational-audit-guide): Process, typical findings, and ROI of an independent cannabis operational audit.
+
+## FAQ
+
+- [Cannabis Industry FAQ](https://acme-advisors.example/faq): Answers to the most common questions about extraction lab setup, licensing, equipment selection, C1D1 compliance, and consulting engagements.
+
+## Contact
+
+- Phone: +1-555-010-4477
+- Website: https://acme-advisors.example
+- Consultation: https://acme-advisors.example/#contact

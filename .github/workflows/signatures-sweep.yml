@@ -1,0 +1,73 @@
+name: Signatures sweep
+
+# Hourly tick that expires overdue signing requests and emails reminders
+# to signers whose deadline is within 48h. Idempotent — safe to re-run.
+#
+# Manual trigger is exposed via workflow_dispatch for on-demand sweeps
+# (e.g., after a backfill migration). No secrets are printed; failed
+# auth returns a 403 that surfaces in the workflow log.
+#
+# Required repository secrets:
+#   OPS_API_URL   — https://preview.staqs.io (or whichever env points at
+#                   the autobot-inbox API)
+#   CRON_SECRET   — same value configured on the Railway service as the
+#                   CRON_SECRET env var
+on:
+  schedule:
+    # Hourly at :05 to miss the top-of-the-hour cron storm. Cron docs are
+    # UTC; the reminder/expiry logic is timezone-agnostic so this is fine.
+    - cron: "5 * * * *"
+  workflow_dispatch: {}
+
+# Only one sweep at a time — if the previous tick is still running (slow
+# LLM call, network hang), skip rather than pile up.
+concurrency:
+  group: signatures-sweep
+  cancel-in-progress: false
+
+jobs:
+  sweep:
+    # Org-only: this cron hits prod (OPS_API_URL/CRON_SECRET) and must not
+    # fire in forks of this repo (which inherit the schedule trigger but
+    # have no access to these org secrets — a failing red cron on someone's
+    # fork is just noise, and a fork with its own copies of these secrets
+    # shouldn't be hitting our prod endpoint anyway).
+    if: github.repository == 'staqsIO/optimus'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Call signatures-sweep endpoint
+        env:
+          OPS_API_URL: ${{ secrets.OPS_API_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$OPS_API_URL" ] || [ -z "$CRON_SECRET" ]; then
+            echo "::error::OPS_API_URL or CRON_SECRET secret is not set"
+            exit 1
+          fi
+
+          # -f makes curl exit non-zero on HTTP >= 400, so failed auth
+          # or a 5xx surfaces in the job status.
+          # -sS keeps it quiet on success but still prints errors.
+          # --max-time caps the request at 90s so a stuck LLM call doesn't
+          # pin the runner.
+          http_code=$(curl -sS -f -X POST \
+            --max-time 90 \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            -o sweep-output.json \
+            -w "%{http_code}" \
+            "$OPS_API_URL/api/cron/signatures-sweep" \
+            || true)
+
+          echo "HTTP $http_code"
+          if [ -s sweep-output.json ]; then
+            echo "--- response ---"
+            cat sweep-output.json
+            echo
+          fi
+
+          if [ "$http_code" != "200" ]; then
+            echo "::error::signatures-sweep returned HTTP $http_code"
+            exit 1
+          fi

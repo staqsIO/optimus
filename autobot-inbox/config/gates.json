@@ -1,0 +1,162 @@
+{
+  "gates": {
+    "G1": {
+      "name": "Financial",
+      "description": "$20/day LLM ceiling, tracked in llm_invocations",
+      "checkPoint": "every_llm_call",
+      "implementation": "budget_check",
+      "params": {
+        "dailyCeilingUsd": 20.00,
+        "warningThresholdPct": 80
+      },
+      "onViolation": "halt_all_non_critical"
+    },
+    "G2": {
+      "name": "Legal",
+      "description": "Scan drafts for commitment/contract language",
+      "checkPoint": "reviewer",
+      "implementation": "commitment_scan",
+      "applicableTo": ["email_draft", "content_post", "ticket_create", "code_fix_pr"],
+      "params": {
+        "patterns": [
+          "\\b(commit|promise|guarantee|agree|contract|binding|warrant)\\b",
+          "\\b(by \\w+ \\d+|within \\d+ (days|weeks|months))\\b",
+          "\\$\\d+",
+          "\\b(we will|I will|we can|I can) (deliver|complete|ship|pay|refund)\\b"
+        ]
+      },
+      "onViolation": "flag_for_board"
+    },
+    "G3": {
+      "name": "Reputational",
+      "description": "Tone match score vs voice profile (min 0.55, formality-tolerance can lower by up to 0.10). Calibrated 2026-05-07 against the embedding distribution of 134 production drafts (median tone_score 0.485, p75 0.57); 0.80 was unreachable for ~80% of drafts. Behavior changed 2026-05-08 (STAQPRO-278): on violation we now flag for board review instead of destroying the draft, matching G2/G5/G7. The threshold itself is unchanged; only the consequence of failing it is.",
+      "checkPoint": "reviewer",
+      "implementation": "tone_match",
+      "applicableTo": ["email_draft"],
+      "params": {
+        "minScore": 0.55,
+        "dimensions": ["formality", "warmth", "directness", "vocabulary"]
+      },
+      "onViolation": "flag_for_board"
+    },
+    "G4": {
+      "name": "Autonomy",
+      "description": "L0: approve all. Track edit rate for L1 exit criteria.",
+      "checkPoint": "board_approval",
+      "implementation": "autonomy_level_check",
+      "params": {
+        "L0": {
+          "behavior": "require_approval_for_all",
+          "exitCriteria": {
+            "minDrafts": 50,
+            "maxEditRatePct": 10,
+            "minDays": 14,
+            "minSuccessRate": 0.90,
+            "noGuardFailures14d": true,
+            "maxCostRatio": 1.5
+          }
+        },
+        "L1": {
+          "behavior": "auto_send_routine",
+          "exitCriteria": {
+            "minDays": 90,
+            "maxErrorRatePct": 5,
+            "minSuccessRate": 0.95,
+            "noActiveFailures30d": true,
+            "minDelegationHealth": 0.85
+          }
+        },
+        "L2": {
+          "behavior": "auto_send_except_g2_flagged"
+        }
+      },
+      "onViolation": "require_board_approval"
+    },
+    "G5": {
+      "name": "Reversibility",
+      "description": "Prefer drafts over sends. Flag reply-all.",
+      "checkPoint": "reviewer",
+      "implementation": "reversibility_check",
+      "applicableTo": ["email_draft", "code_fix_pr"],
+      "params": {
+        "preferDraft": true,
+        "flagReplyAll": true,
+        "flagLargeRecipientList": 5
+      },
+      "onViolation": "flag_for_board"
+    },
+    "G6": {
+      "name": "Stakeholder",
+      "description": "No spam, no misleading content",
+      "checkPoint": "reviewer",
+      "implementation": "stakeholder_check",
+      "applicableTo": ["email_draft"],
+      "params": {
+        "maxEmailsPerRecipientPerDay": 3,
+        "requireAiDisclosure": true
+      },
+      "onViolation": "reject_draft"
+    },
+    "G7": {
+      "name": "Precedent",
+      "description": "Flag pricing/timeline/policy commitments",
+      "checkPoint": "reviewer_and_strategist",
+      "implementation": "precedent_check",
+      "applicableTo": ["email_draft", "content_post", "ticket_create"],
+      "params": {
+        "patterns": [
+          "\\b(price|pricing|cost|rate|fee|discount)\\b.*\\$?\\d+",
+          "\\b(deadline|timeline|eta|delivery date|launch date|ship by)\\b",
+          "\\b(policy|procedure|standard|requirement|rule)\\b.*(change|update|new)"
+        ]
+      },
+      "onViolation": "flag_for_board"
+    },
+    "G8": {
+      "name": "Prompt Injection",
+      "description": "Google Model Armor screening on email body. v1 enforcement: block mode quarantines work items on HIGH-confidence Model Armor matches. The Model Armor template, mode, and block threshold are ALL read from env vars at runtime (MODEL_ARMOR_TEMPLATE / MODEL_ARMOR_MODE / MODEL_ARMOR_BLOCK_THRESHOLD, default HIGH); the params below are documentation-only examples showing the expected shape and are never read.",
+      "checkPoint": "context_load",
+      "implementation": "model_armor",
+      "applicableTo": ["email_body", "document_content", "webhook_payload"],
+      "params": {
+        "template": "projects/YOUR_GCP_PROJECT/locations/us-central1/templates/optimus-email-guard",
+        "mode": "warn",
+        "minConfidence": "LOW_AND_ABOVE"
+      },
+      "onViolation": "flag_and_log"
+    },
+    "G10": {
+      "name": "Per-Agent Daily Spend Cap",
+      "description": "Blocks agent execution if cumulative daily spend exceeds configured cap. Advisory for subscription (cli) drivers; enforced for metered (managed/api) drivers.",
+      "enabled": true,
+      "mode": "warn",
+      "checkPoint": "pre_dispatch",
+      "default_daily_cap_usd": 5.00,
+      "parameters": {
+        "enforcement": "soft_cap_warn"
+      },
+      "onViolation": "warn_and_log"
+    },
+    "G11": {
+      "name": "Retrospective Completion",
+      "description": "Require retrospective capture before task completion. Configurable per agent. Default disabled.",
+      "enabled": false,
+      "checkPoint": "post_completion",
+      "implementation": "retrospective_check",
+      "params": {
+        "requiredAgents": [],
+        "mode": "warn"
+      },
+      "onViolation": "warn_and_log"
+    },
+    "delegation_depth": {
+      "name": "Delegation Depth",
+      "description": "Prevents unbounded task decomposition chains (spec §5)",
+      "checkPoint": "pre_execution",
+      "implementation": "depth_check",
+      "params": {},
+      "maxDepth": 5,
+      "onViolation": "block_task"
+    }
+  }
+}

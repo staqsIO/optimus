@@ -1,0 +1,36 @@
+name: Agent Identity Verification
+
+on:
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  verify-agent-identity:
+    if: startsWith(github.head_ref, 'autofix/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify agent PR author
+        run: |
+          ACTOR="${{ github.actor }}"
+          ALLOWED_BOTS="optimus-agent[bot] github-actions[bot]"
+          ALLOWED_OPERATORS="ecgang"
+
+          for bot in $ALLOWED_BOTS; do
+            if [ "$ACTOR" = "$bot" ]; then
+              echo "Agent identity verified: $ACTOR"
+              exit 0
+            fi
+          done
+
+          for op in $ALLOWED_OPERATORS; do
+            if [ "$ACTOR" = "$op" ]; then
+              echo "Board operator running local runner: $ACTOR"
+              exit 0
+            fi
+          done
+
+          echo "::error::PR from autofix/* branch by unauthorized actor: $ACTOR"
+          echo "Agent PRs must come from an authorized bot or board operator."
+          echo "Allowed bots: $ALLOWED_BOTS"
+          echo "Allowed operators: $ALLOWED_OPERATORS"
+          exit 1

@@ -1,0 +1,20 @@
+{
+  "_comment": "Channel/integration status registry (OPT-144). Metadata only — not yet consumed by code; seeds decommission planning + future status-driven route registration. Status reflects RUNTIME WIRING (scheduler/adapter/route registration in src/index.js + src/api.js), not source-dir commit recency. Verified 2026-06-14. Update when adding/retiring a channel.",
+  "_status_values": "LIVE = wired into the runtime AND carrying production traffic. BETA = wired into the runtime (scheduler/adapter/routes) but low-traffic / feature-incomplete / not production-validated — NOT a safe decommission candidate. ARCHIVE = present in the tree but NOT imported/scheduled/registered anywhere in index.js/api.js — safe decommission candidate. (No ARCHIVE channels currently — all 14 are runtime-wired.)",
+  "channels": [
+    { "name": "gmail",       "dir": "src/gmail",       "status": "LIVE", "note": "Core inbox channel — poller + primary product surface" },
+    { "name": "slack",       "dir": "src/slack",       "status": "LIVE", "note": "Active channel + board alerts" },
+    { "name": "telegram",    "dir": "src/telegram",    "status": "LIVE", "note": "Board alerts bot + commands" },
+    { "name": "drive",       "dir": "src/drive",       "status": "LIVE", "note": "Drive folder watcher (poller) + capture picker (OPT-101/102)" },
+    { "name": "calendar",    "dir": "src/calendar",    "status": "LIVE", "note": "Calendar poller + watches (OPT-126)" },
+    { "name": "github",      "dir": "src/github",      "status": "LIVE", "note": "Issue/PR webhooks + bot" },
+    { "name": "linear",      "dir": "src/linear",      "status": "LIVE", "note": "Linear mirror import (OPT-13)" },
+    { "name": "tldv",        "dir": "src/tldv",        "status": "LIVE", "note": "Meeting-transcript webhook (poller)" },
+    { "name": "research",    "dir": "src/research",    "status": "LIVE", "note": "Research-source pollers" },
+    { "name": "front-door",  "dir": "src/front-door",  "status": "LIVE", "note": "Visitor-intent classifier / serve-by-match" },
+    { "name": "webhooks",    "dir": "src/webhooks",    "status": "LIVE", "note": "Generic webhook-authed receiver infra" },
+    { "name": "finance",     "dir": "src/finance",     "status": "BETA", "note": "WIRED: scheduler.register('finance-sync', 6h) [index.js:510] + registerFinanceRoutes [api.js]. LLM-expense sync, runs in prod. Small surface (1 file), low-traffic. NOT a decommission candidate." },
+    { "name": "outlook",     "dir": "src/outlook",     "status": "BETA", "note": "WIRED: registerAdapter('outlook') [index.js:264] + client/sender. MS Graph adapter present; feature-complete but low/no active-account traffic. NOT a decommission candidate." },
+    { "name": "transcripts", "dir": "src/transcripts", "status": "BETA", "note": "WIRED: 'transcript-action-extractor' scheduled [index.js:808] + registerTranscriptRoutes [api.js]. Action extraction, low volume. NOT a decommission candidate." }
+  ]
+}

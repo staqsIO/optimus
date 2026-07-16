@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>ADR-007: Federation Thesis — Inter-Organizational Governance as Long Arc</title>
+<style>
+  :root {
+    --bg: #0b0f17;
+    --panel: #131a26;
+    --panel-2: #1a2333;
+    --ink: #e6ecf5;
+    --muted: #8a99b3;
+    --line: #2a3548;
+    --accent: #7c5cff;
+    --accent-2: #21c997;
+    --accent-3: #ff8a3d;
+    --danger: #ff5d8f;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: radial-gradient(1200px 800px at 20% -10%, #16223a 0%, var(--bg) 60%) fixed;
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+    line-height: 1.65;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 56px 32px 96px; }
+  header.doc { border-bottom: 1px solid var(--line); padding-bottom: 24px; margin-bottom: 32px; }
+  header.doc h1 { margin: 0 0 16px; font-size: 26px; font-weight: 600; letter-spacing: -0.015em; }
+  .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 500; background: var(--panel-2); color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; }
+  .badge.proposed { background: rgba(255, 209, 102, 0.15); color: #ffd166; }
+  .badge.accent { background: rgba(124, 92, 255, 0.18); color: var(--accent); }
+  h2 { font-size: 19px; margin: 40px 0 14px; letter-spacing: -0.01em; border-left: 3px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 15px; margin: 26px 0 10px; color: var(--accent-2); font-weight: 600; }
+  h4 { font-size: 14px; margin: 20px 0 8px; color: var(--accent-3); font-weight: 600; }
+  p { margin: 0 0 14px; }
+  strong { color: #fff; }
+  em { color: #cfd8e8; }
+  ul, ol { padding-left: 22px; margin: 0 0 16px; }
+  li { margin-bottom: 6px; }
+  hr { border: none; border-top: 1px solid var(--line); margin: 36px 0; }
+  code { background: var(--panel-2); padding: 2px 6px; border-radius: 4px; font-size: 13px; color: #ffd6a8; font-family: "SF Mono", Menlo, monospace; }
+  pre {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 14px 16px; overflow-x: auto; font-size: 12.5px; line-height: 1.55;
+    font-family: "SF Mono", Menlo, monospace; color: #e6ecf5; margin: 0 0 16px;
+  }
+  pre code { background: transparent; padding: 0; color: inherit; }
+  blockquote { border-left: 3px solid var(--accent-3); padding: 4px 16px; color: var(--muted); margin: 0 0 16px; }
+  .callout {
+    border: 1px solid var(--line); border-left: 3px solid var(--accent-2);
+    background: rgba(33, 201, 151, 0.06);
+    padding: 12px 16px; border-radius: 8px; margin: 16px 0;
+    font-size: 14px;
+  }
+  .callout.warn { border-left-color: var(--danger); background: rgba(255, 93, 143, 0.06); }
+  footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+  .companion { display: inline-block; margin-top: 8px; padding: 4px 10px; background: var(--panel-2); border-radius: 4px; color: var(--accent); text-decoration: none; font-size: 12px; }
+  .companion:hover { color: var(--accent-2); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="doc">
+  <h1>ADR-007: Federation Thesis — Inter-Organizational Governance as Long Arc</h1>
+  <div class="badge-row">
+    <span class="badge">Date: 2026-05-11</span>
+    <span class="badge proposed">Status: Proposed</span>
+    <span class="badge accent">Awaiting board review (Eric + Dustin)</span>
+  </div>
+  <p style="color: var(--muted); font-size: 14px; margin-top: 12px;"><strong>Issue:</strong> What is Optimus's second-act product motion, and what architectural constraints does that impose on current Phase 1 work?</p>
+  <a class="companion" href="../../autobot-inbox/docs/external/federation-vision.html">→ Companion board-facing vision doc</a>
+</header>
+
+<h2>Context</h2>
+<p>Optimus is currently a single-company governed agent organization. One product is live: <code>autobot-inbox</code>, running at UMB Advisors (N=1). The spec's endgame (SPEC §14, AutoBot) describes a constitutional autonomous organization. But between Phase 1 MVP and AutoBot lies a second-act product question that has not been recorded as an architectural decision: <strong>what does Optimus sell to its second and third customer, and does that shape what we build now?</strong></p>
+<p>This ADR records that strategic decision and the concrete pre-GA design constraints it imposes. It does not replace SPEC.md — it records the decision that federation is the destination and what that means for code shipping this quarter.</p>
+
+<h2>Decision</h2>
+<p>Three claims, stated plainly:</p>
+
+<h3>(a) Long-arc product: inter-organizational governance infrastructure</h3>
+<p>Optimus's durable product is governance infrastructure that works <em>across</em> organizational boundaries — verifiable records of what agents did, to whose data, under what policy, between organizations that do not share infrastructure. <code>autobot-inbox</code> is the wedge: it funds the runway, proves the operating model, and generates the first real-world trust record. It is not the destination.</p>
+<p>This is a strategic bet, not a feature plan. It does not change what ships in the next 90 days. It does change which architectural choices we tolerate versus which ones we treat as pre-GA blocking.</p>
+
+<h3>(b) The 10x primitive: portable verifiable capability receipts</h3>
+<p>The defensible primitive is not "mind-meld knowledge graphs." It is a <strong>portable, verifiable capability receipt</strong> — a signed, replayable proof that "Agent X at Org A read Document Y at Org B under Policy Z at time T." Hash-chained. Externally verifiable without Optimus running on the recipient side.</p>
+<p>This converts every cross-org agent interaction into a credential the receiving organization can audit independently. M&A diligence becomes "give me 90 days of receipts touching the data room." It is the SWIFT message of agent governance: boring, standardized, composable.</p>
+<p>This is built as a <strong>governance overlay on top of MCP/A2A transport</strong>, not as a competing wire protocol. Anthropic and Google are standardizing inter-agent protocols at the wire layer. Optimus's competitive position is the governance and audit layer on top of that standard — not a bespoke transport stack underneath it. Any hour spent on proprietary agent-to-agent RPC is a sunk cost the day MCP federation ships. See Counter-positions below.</p>
+<p>The existing infrastructure in <code>lib/runtime/agent-jwt.js</code>, <code>lib/rag/retriever.js</code> (STAQPRO-310, migration 108 <code>classification_level smallint</code>), and <code>lib/db.js</code> (<code>state_transitions</code> hash chain) is roughly 70% of this primitive. The missing 20%: receipts must be <strong>portable</strong> — verifiable by a recipient org without running Optimus. The missing 10%: an <code>origin_org</code> anchor so receipts can be attributed when they leave this installation.</p>
+
+<h3>(c) Adoption path: vertical roll-ups, not PE-firm mandates</h3>
+<p>The initial federation customer is not a PE firm mandating software across portcos — PE firms issue best-practice memos that get ignored. Portfolio CEOs guard autonomy. Finance/reporting tooling tied to value-creation plans is the one exception, and Optimus is not that yet.</p>
+<p>The defensible path is <strong>vertical roll-ups</strong>: HVAC chains, dental groups, MSP aggregators. Same ultimate owner, shared ontology across entities, frequent inter-company transactions (staff sharing, vendor contracts, referrals), and a single decision-maker who can mandate the install. Federation value is realizable within 90 days of a second install in the same vertical rather than two years into a PE relationship.</p>
+<p>UMB Advisors is N=1, not validation. It is a controlled environment where Eric controls deployment. The step after UMB is one external customer in the same vertical — financial advisory or professional services — where the federation value hypothesis can be tested with a real negotiated policy boundary.</p>
+
+<h2>Consequences — Design Constraints Imposed Now</h2>
+<div class="callout">These are pre-GA blocking items. Retrofitting them after a second customer is live requires painful migrations. Shipping them now costs essentially nothing.</div>
+
+<h3>1. JWT <code>iss</code> and <code>org</code> claims — extend ADR-018 immediately</h3>
+<p>Current ADR-018 token shape (<code>lib/runtime/agent-jwt.js</code>): <code>{ sub, tier, tools, iat, exp, jti }</code>. Issuer is currently pinned to the string <code>"optimus-agent"</code> (single-org assumption baked into the verify path).</p>
+<p><strong>Required change (pre-GA):</strong> Add <code>iss</code> and <code>org</code> to every token minted, defaulting to <code>"self"</code> for single-org installs:</p>
+<pre><code>// lib/runtime/agent-jwt.js — extend mintAgentToken()
+{
+  iss: process.env.OPTIMUS_ORG_ID ?? "self",  // NEW — federation issuer
+  org: process.env.OPTIMUS_ORG_ID ?? "self",  // NEW — org identity
+  sub: agentId,                                // unchanged
+  tier: agent.tier,                            // unchanged
+  tools: agent.allowed_tools,                  // unchanged
+  iat, exp, jti                               // unchanged
+}</code></pre>
+<p><code>verifyAgentToken()</code> in <code>lib/db.js</code> becomes issuer-aware: it accepts tokens from trusted remote issuers by looking up JWKS at <code>https://{iss}/.well-known/optimus-jwks.json</code> (cached 1h). Single-org tokens still verify against the local key — no behavior change until a second org is configured.</p>
+<p><strong>Why this must ship pre-GA:</strong> Adding <code>iss</code>/<code>org</code> later requires re-signing every cached token, updating <code>state_transitions</code> (which records <code>agent_id</code> from the verified JWT <code>sub</code>), and rewriting the RLS scaffolding that will gate on <code>current_org_id()</code>. Adding it now when all tokens are locally minted is a one-line change that costs nothing. This extends ADR-018 (STAQPRO-263); no new ADR needed.</p>
+<p><strong>Deferred:</strong> <code>aud</code> (target org), <code>fed_grant</code> (grant UUID), <code>act</code> delegation chain (RFC 8693). These are additive and only needed when a real federation request is issued.</p>
+
+<h3>2. <code>origin_org</code> property on all Neo4j nodes</h3>
+<p>ADR-019 adopted Neo4j for the knowledge graph. Currently nodes have no <code>origin_org</code> property — they are implicitly "this org."</p>
+<p><strong>Required change (pre-GA):</strong> All node creation in <code>lib/graph/</code> must include <code>origin_org: process.env.OPTIMUS_ORG_ID ?? "self"</code>. Set it at write time, not migration time — there is no retrofit path for existing nodes other than a full graph rewrite.</p>
+<p>When a second org's KG data arrives (export/import), nodes get label <code>External:{Type}</code> and <code>origin_org: "orgB"</code>. Cross-org <code>SAME_AS</code> edges are created only by Reviewer-tier agents, never auto-merged. Email/domain fields are hints, not identity keys.</p>
+<p><strong>Why this must ship pre-GA:</strong> A graph with no <code>origin_org</code> property cannot be partitioned after the fact without reading and rewriting every node. Adding it at write time when single-org is the only mode costs a single constant per write.</p>
+<p><strong>Neo4j as local cache, not federation substrate:</strong> Per Liotta's assessment (see Counter-positions), Neo4j is a local convenience. The authoritative KG export for federation is a signed JSON-LD blob stored in Postgres (<code>agent_graph.federated_kg_imports</code>). Neo4j is re-derivable from that blob. Expanding Neo4j investment — clustering, remote BOLT connections, shared graph across orgs — is explicitly halted until a federation customer exists.</p>
+
+<h3>3. <code>classification_level smallint</code> is the canonical classification primitive</h3>
+<p>STAQPRO-310 (migration 108) shipped the correct primitive. <code>lib/rag/retriever.js</code> exports <code>CLASSIFICATION_LEVELS</code> (PUBLIC=0, INTERNAL=1, CONFIDENTIAL=2, RESTRICTED=3) and <code>toClassificationLevel()</code>. The <code>&lt;=</code> comparison on the integer column is correct (P1).</p>
+<p><strong>No change required.</strong> When a federation grant is issued, it carries <code>max_classification smallint</code> that caps what a grantee org can receive. The existing ordinal is directly reusable as the cap field — no schema migration needed at federation time.</p>
+<div class="callout warn"><strong>Critical:</strong> Do not clone the deprecated <code>&lt;= 'INTERNAL'</code> lexicographic pattern from migration 017's <code>content.match_chunks()</code> into any new retriever code. The correct pattern is in <code>lib/rag/retriever.js:157</code>.</div>
+
+<h3>4. Capability receipt envelope — define the format now</h3>
+<p>Even though no receiving org exists, the receipt envelope format must be stable before the first federated query is issued. Retrofitting the format after a customer negotiates against it is a coordination problem.</p>
+<p><strong>Minimum viable receipt (to be formalized in <code>lib/audit/</code> before GA):</strong></p>
+<pre><code>{
+  "receipt_version": "1",
+  "origin_org": "orgA",
+  "grant_id": "uuid",
+  "agent_sub": "agent:executor-research",
+  "agent_tier": "executor",
+  "action": "rag_query",
+  "document_ids": ["uuid", ...],
+  "classification_ceiling": 1,
+  "issued_at": "ISO8601",
+  "transition_hash": "sha256:...",
+  "signature": "ed25519:..."
+}</code></pre>
+<p><code>transition_hash</code> is the hash-chain anchor from <code>state_transitions</code> (already computed). <code>signature</code> uses the org's signing key (same key pair as <code>AGENT_JWT_KEY_PEM</code>). Recipient re-verifies <code>classification_ceiling</code> against their own grant record — never trusts remote enforcement (P1).</p>
+
+<h2>Consequences — What Gets Killed or Redirected</h2>
+<p>These are Liotta's explicit "don't do" findings, incorporated honestly.</p>
+<p><strong>No second product before autobot-inbox lands at a second org.</strong> Federation needs N≥2 installs of the <em>same</em> product. A second product before the first product has a second customer fragments the surface area, delays the federation hypothesis test, and makes ontology stabilization impossible.</p>
+<p><strong>Halt Neo4j expansion beyond current product needs.</strong> Neo4j is a local query convenience for single-org graph traversal. It is not the federation substrate. Investing in Neo4j clustering, remote access, or shared-graph-across-orgs patterns before a federation customer exists builds the wrong thing. Track expansion against a specific federation customer requirement, not a roadmap assumption.</p>
+<p><strong>Migrate inter-agent comms to MCP transport; deprecate bespoke RPC.</strong> Any internal agent-to-agent call that invents a proprietary envelope or session format is a sunk cost when MCP federation ships. The correct posture is to ride MCP as transport and build the governance/audit layer on top. Current agent communication runs through the Postgres task graph (ADR-001) — this is fine and aligns with P4 (boring infrastructure). The risk is new agent-to-agent interfaces being added as proprietary HTTP/WebSocket rather than MCP-compatible.</p>
+<p><strong>No external federation pitch until N=2.</strong> The thesis requires a second install to be credible. Pitching federation with N=1 invites the reasonable objection that there is nothing to federate. The external narrative stays "governed agent organization for a single company" until UMB plus one external customer is demonstrably running.</p>
+
+<h2>Deferred — Do Not Build Yet</h2>
+<p>All of the following are additive and impose no migration cost when a federation customer arrives. Building them now without a customer wastes capacity and creates maintenance surface.</p>
+<ul>
+  <li><code>agent_graph.federation_grants</code> table (grant issuance, max_classification cap, scope_filter jsonb, contract_hash anchor, revocation)</li>
+  <li>JWKS publication endpoint (<code>/.well-known/optimus-jwks.json</code>)</li>
+  <li>Delegation token minting (cross-org JWT with <code>aud</code>, <code>fed_grant</code>, <code>act</code> claims)</li>
+  <li>KG export/import pipeline (signed JSON-LD blob generation and ingest into <code>federated_kg_imports</code>)</li>
+  <li>Cross-org audit join (walking both orgs' <code>state_transitions</code> chains, joining on <code>contract_hash</code>)</li>
+  <li>Dual-board grant approval UI in <code>/governance</code></li>
+  <li><code>pg_notify('fed_grant_revoked', grant_id)</code> grant revocation fanout</li>
+</ul>
+<p><strong>Trigger for de-deferral:</strong> a specific named prospective customer in a target vertical has agreed to a pilot conversation.</p>
+
+<h2>Open Questions</h2>
+<h4>(a) Which vertical roll-up is the test bed?</h4>
+<p>UMB Advisors is the first install. The second install should be in a vertical with shared ontology and frequent inter-entity transactions. Financial advisory RIAs (shared clients, shared vendors) and professional services MSPs (shared staff, shared tooling contracts) are the leading candidates. This is a go-to-market decision, not an engineering decision — but engineering needs the answer to know which entity schemas to stabilize.</p>
+
+<h4>(b) How does the receipt format interop with emerging MCP audit conventions?</h4>
+<p>MCP does not yet have a standardized audit/receipt convention. The format defined above is provisional. Before the first real federated query, this format should be checked against whatever audit primitives MCP/A2A has shipped by that point. If MCP defines a standard receipt, Optimus adopts it rather than maintaining a bespoke format. Track: Anthropic's MCP spec changelog.</p>
+
+<h4>(c) Postgres-as-SoT vs columnar event store for federation-grade graph.</h4>
+<p>Liotta flagged that federation-grade graph at scale wants a columnar event store with materialized views per consumer, not a shared graph database. The current Postgres task graph (ADR-001) is correct for Phase 1. The tension surfaces when Org A's Postgres and Org B's Postgres need to be joined across a trust boundary without sharing a connection pool. The receipt-based approach defers this: each org holds its own chain, and the contract_hash is the keystone that joins them. If query patterns require cross-org joins in real time rather than asynchronous receipt exchange, this architecture needs revisiting. No action now.</p>
+
+<h2>Counter-Positions Considered</h2>
+<p>These are Liotta's stress-test objections. They are surfaced here because a decision record is stronger for acknowledging the strongest case against it.</p>
+
+<h4>The MCP displacement risk.</h4>
+<p>Anthropic and Google are standardizing inter-agent protocols at the wire level. If federation becomes a commodity protocol (it will), a bespoke Optimus federation layer is the Lotus Notes of agent governance — over-engineered infrastructure for what becomes a handshake. This is a real existential threat. The response recorded in this ADR — ride MCP as transport, build governance overlay on top — is a direct answer to this objection. If the answer is wrong, this ADR needs to be revisited when MCP federation ships.</p>
+
+<h4>The frequency-of-use objection.</h4>
+<p>M&A diligence happens 1–3x per decade per company. JV ramps maybe once a year. Network effects require repeated transactions to compound. Two organizations that interact twice a year will never overcome the activation energy of negotiating a federation policy. This is why the adoption path is vertical roll-ups (frequent intra-portfolio transactions) rather than PE mandates or one-off M&A. Liotta's objection is valid against the original "M&A diligence" framing and is part of why that framing is not in this ADR's Decision section.</p>
+
+<h4>The CISO-buys-SOC2-not-hash-chains critique.</h4>
+<p>CISOs do not care that the audit log is hash-chained; they care that Optimus is on their approved vendor list. "Verifiable provenance" is an engineering aesthetic, not a buying criterion for enterprise procurement. Glean closes these deals without it. This objection is correct about enterprise procurement. The response: vertical roll-up buyers are owner-operators (roll-up CEOs, operating partners with a specific mandate), not enterprise CISOs. The buying criterion is "can I see what my agents did across all my entities" — and the receipt primitive answers that question directly for the right buyer profile.</p>
+
+<h4>The PE beachhead is not validation.</h4>
+<p>PE firms don't mandate software across portcos. UMB Advisors is a controlled environment (Eric controls deployment) and cannot be extrapolated to PE portfolio adoption. This is incorporated directly into Decision (c): UMB is N=1 stepping stone, not validation. The validation requires one external customer in a target vertical.</p>
+
+<h2>Affected Files</h2>
+<ul>
+  <li><code>lib/runtime/agent-jwt.js</code> — add <code>iss</code>, <code>org</code> claims to <code>mintAgentToken()</code>; extend <code>verifyAgentToken()</code> to be issuer-aware</li>
+  <li><code>lib/db.js</code> — <code>withAgentScope</code> signature stays stable; RLS gains <code>current_org_id()</code> GUC when federation is active</li>
+  <li><code>lib/rag/retriever.js</code> — no change; <code>classification_level smallint</code> is already correct (STAQPRO-310)</li>
+  <li><code>lib/graph/</code> — all node creation must include <code>origin_org</code> property (default <code>"self"</code>)</li>
+  <li><code>lib/audit/</code> — new: capability receipt format definition and signing utility (pre-GA, before first federation)</li>
+</ul>
+
+<h2>Cross-Project Impact</h2>
+<p>This ADR is scoped to <code>~/Optimus</code>. No other sub-project is currently affected. If <code>autobot-inbox</code> is deployed as a separate install at a second organization, that install becomes a distinct deployment with its own signing key and <code>OPTIMUS_ORG_ID</code> environment variable — not a separate codebase fork.</p>
+
+<footer>
+  ADR-007 · Optimus spec/decisions · 2026-05-11 · Awaiting board review.
+</footer>
+
+</div>
+</body>
+</html>

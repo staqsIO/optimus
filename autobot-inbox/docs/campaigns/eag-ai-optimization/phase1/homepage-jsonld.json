@@ -1,0 +1,163 @@
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Elevated Advisory Group",
+    "alternateName": "EAG",
+    "url": "https://acme-advisors.example",
+    "logo": "https://acme-advisors.example/logo.png",
+    "description": "Elevated Advisory Group is a cannabis industry consulting firm specializing in extraction and manufacturing lab design, license application support, retail consulting, cultivation advisory, expert witness services, and operational analysis. Operating nationally and internationally with three managing partners.",
+    "telephone": "+1-555-010-4477",
+    "email": "info@acme-advisors.example",
+    "areaServed": [
+      {
+        "@type": "Country",
+        "name": "United States"
+      },
+      {
+        "@type": "AdministrativeArea",
+        "name": "International"
+      }
+    ],
+    "knowsAbout": [
+      "Cannabis extraction lab design",
+      "BHO extraction",
+      "Ethanol extraction",
+      "CO2 extraction",
+      "C1D1 room requirements",
+      "Cannabis license applications",
+      "Cannabis manufacturing facility design",
+      "Cannabis retail consulting",
+      "Cannabis cultivation advisory",
+      "Cannabis operational analysis",
+      "Expert witness cannabis cases",
+      "Cannabis analytical services"
+    ],
+    "founders": [
+      {
+        "@type": "Person",
+        "name": "Michael Maibach",
+        "jobTitle": "Managing Partner",
+        "worksFor": {"@id": "https://acme-advisors.example"}
+      },
+      {
+        "@type": "Person",
+        "name": "Patrick King",
+        "jobTitle": "Managing Partner",
+        "worksFor": {"@id": "https://acme-advisors.example"}
+      },
+      {
+        "@type": "Person",
+        "name": "Casey Boone",
+        "jobTitle": "Managing Partner",
+        "worksFor": {"@id": "https://acme-advisors.example"}
+      }
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+1-555-010-4477",
+      "contactType": "sales",
+      "availableLanguage": "English"
+    }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "name": "Elevated Advisory Group — Cannabis Consulting",
+    "url": "https://acme-advisors.example",
+    "description": "Full-service cannabis industry consulting firm. Services include extraction and manufacturing lab design, license application development, expert witness services, operational audits, retail consulting, cultivation advisory, and analytical lab consulting.",
+    "provider": {
+      "@type": "Organization",
+      "name": "Elevated Advisory Group",
+      "url": "https://acme-advisors.example"
+    },
+    "serviceType": [
+      "Cannabis Extraction Lab Design",
+      "Cannabis Manufacturing Facility Design",
+      "Cannabis License Application Services",
+      "Cannabis Expert Witness Services",
+      "Cannabis Operational Analysis",
+      "Cannabis Retail Consulting",
+      "Cannabis Cultivation Consulting",
+      "Cannabis Analytical Services",
+      "Cannabis Business Growth Strategy"
+    ],
+    "areaServed": [
+      {
+        "@type": "Country",
+        "name": "United States"
+      },
+      {
+        "@type": "AdministrativeArea",
+        "name": "International"
+      }
+    ],
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "EAG Cannabis Consulting Services",
+      "itemListElement": [
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Cannabis Extraction & Manufacturing Lab Design",
+            "url": "https://acme-advisors.example/services/extraction-manufacturing",
+            "description": "End-to-end extraction facility design including C1D1 room specifications, equipment selection, layout planning, and buildout oversight for cannabis processors."
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Cannabis License Application Services",
+            "url": "https://acme-advisors.example/services/licensing",
+            "description": "State cannabis license application development, including application writing, supporting documentation, facility plans, and regulatory compliance strategy."
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Expert Witness Services",
+            "url": "https://acme-advisors.example/services/expert-witness",
+            "description": "Cannabis industry expert witness services for litigation, regulatory proceedings, and arbitration involving extraction operations, manufacturing, and compliance."
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Cannabis Operational Analysis & Auditing",
+            "url": "https://acme-advisors.example/services/operational-analysis",
+            "description": "Comprehensive operational audits of cannabis facilities covering compliance, efficiency, yield optimization, staffing, and cost reduction opportunities."
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Cannabis Retail Consulting",
+            "url": "https://acme-advisors.example/services/retail",
+            "description": "Cannabis retail store design, product assortment strategy, staff training, POS systems, compliance, and customer experience optimization."
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Cannabis Cultivation Consulting",
+            "url": "https://acme-advisors.example/services/cultivation",
+            "description": "Cannabis cultivation facility design, environmental control systems, yield optimization, equipment procurement, and operational SOPs."
+          }
+        }
+      ]
+    }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Elevated Advisory Group",
+    "url": "https://acme-advisors.example",
+    "description": "Cannabis industry consulting — extraction lab design, licensing, expert witness, operational analysis, retail and cultivation advisory."
+  }
+]

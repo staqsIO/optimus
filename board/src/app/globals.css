@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background: #0a0a0f;
+  color: #e4e4e7;
+}
+
+.prose-invert {
+  --tw-prose-body: #d4d4d8;
+  --tw-prose-headings: #e4e4e7;
+  --tw-prose-links: #818cf8;
+  --tw-prose-bold: #e4e4e7;
+  --tw-prose-code: #a5b4fc;
+  --tw-prose-pre-bg: #0d0d14;
+  --tw-prose-pre-code: #d4d4d8;
+  --tw-prose-th-borders: #27272a;
+  --tw-prose-td-borders: #27272a;
+}
+
+.prose-invert table {
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.prose-invert th,
+.prose-invert td {
+  padding: 0.5rem 0.75rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Contract bracket placeholder decoration (e.g. [CLIENT_NAME]) */
+.bracket-var {
+  background: rgb(245 158 11 / 0.15);
+  color: rgb(252 211 77);
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.9em;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+.bracket-var:hover {
+  background: rgb(245 158 11 / 0.28);
+}
+.bracket-var[data-bracket-active="true"] {
+  outline: 1px solid rgb(245 158 11 / 0.6);
+}

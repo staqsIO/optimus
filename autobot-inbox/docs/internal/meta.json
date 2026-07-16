@@ -1,0 +1,16 @@
+{
+  "title": "Engineering Reference",
+  "pages": [
+    "README",
+    "system-architecture",
+    "agent-pipeline",
+    "database-architecture",
+    "constitutional-gates",
+    "graduated-autonomy",
+    "voice-system",
+    "cost-model",
+    "---",
+    "adrs",
+    "runbooks"
+  ]
+}

@@ -1,0 +1,320 @@
+name: PR Auto-Retry
+
+on:
+  check_suite:
+    types: [completed]
+  pull_request_review:
+    types: [submitted]
+  pull_request_review_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: read
+
+jobs:
+  # When CI fails on an agent-created PR, trigger Jamie via Linear
+  retry-on-ci-failure:
+    if: >
+      github.event_name == 'check_suite' &&
+      github.event.check_suite.conclusion == 'failure' &&
+      github.event.check_suite.head_branch != 'main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Find PR, comment on GitHub, and trigger Jamie via Linear
+        uses: actions/github-script@v7
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+        with:
+          script: |
+            const suite = context.payload.check_suite;
+            const branch = suite.head_branch;
+
+            if (!branch.startsWith('autofix/') && !branch.startsWith('campaign/')) {
+              console.log(`Branch ${branch} is not agent-created — skipping`);
+              return;
+            }
+
+            const pulls = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:${branch}`,
+              state: 'open',
+            });
+
+            if (pulls.data.length === 0) {
+              console.log(`No open PR found for branch ${branch}`);
+              return;
+            }
+
+            const pr = pulls.data[0];
+
+            // Fork-PR guard: check_suite runs in THIS repo's Actions context
+            // regardless of whether the associated PR's head branch lives in a
+            // fork, so LINEAR_API_KEY *is* available here even for external
+            // contributors (unlike the plain `pull_request` trigger). Skip
+            // explicitly rather than let a fork-authored branch name/PR drive
+            // an org-secret-backed Linear mutation.
+            if (pr.head.repo.full_name !== `${context.repo.owner}/${context.repo.repo}`) {
+              console.log(`PR #${pr.number} is from a fork (${pr.head.repo.full_name}) — skipping to avoid using org secrets against external PR content`);
+              return;
+            }
+
+            // Dedup: check if we already posted for this commit
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              per_page: 10,
+            });
+            if (comments.data.some(c => c.body?.includes('CI failed') && c.body?.includes(suite.head_sha.slice(0, 7)))) {
+              console.log('Already posted failure comment for this commit');
+              return;
+            }
+
+            const issueMatch = branch.match(/staqpro-(\d+)/i);
+            const linearRef = issueMatch ? `STAQPRO-${issueMatch[1]}` : null;
+
+            const checkRuns = await github.rest.checks.listForSuite({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              check_suite_id: suite.id,
+            });
+            const failedChecks = checkRuns.data.check_runs
+              .filter(r => r.conclusion === 'failure')
+              .map(r => r.name);
+
+            // Comment on GitHub PR
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              body: `## CI failed on commit \`${suite.head_sha.slice(0, 7)}\`\n\n**Failed checks:** ${failedChecks.join(', ') || 'unknown'}\n\n${linearRef ? `Triggering retry via ${linearRef}.` : 'No Linear issue found.'}`,
+            });
+
+            // Post /retry on Linear
+            const linearKey = process.env.LINEAR_API_KEY;
+            if (!linearRef || !linearKey) return;
+
+            const gqlResponse = await fetch('https://api.linear.app/graphql', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': linearKey },
+              body: JSON.stringify({
+                query: `query { searchIssues(term: "STAQPRO-${issueMatch[1]}", first: 1) { nodes { id identifier } } }`,
+              }),
+            });
+            const linearIssue = (await gqlResponse.json())?.data?.searchIssues?.nodes?.[0];
+            if (!linearIssue) { console.log(`Linear issue ${linearRef} not found`); return; }
+
+            const retryBody = `/retry CI failed on PR #${pr.number} (commit ${suite.head_sha.slice(0, 7)}). Failed checks: ${failedChecks.join(', ')}. Please fix the test failures and push to the existing branch.`;
+            await fetch('https://api.linear.app/graphql', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': linearKey },
+              body: JSON.stringify({
+                query: `mutation($input: CommentCreateInput!) { commentCreate(input: $input) { success } }`,
+                variables: { input: { issueId: linearIssue.id, body: retryBody } },
+              }),
+            });
+            console.log(`Posted /retry on ${linearRef} for CI failure`);
+
+  # When Copilot (or any reviewer) leaves review feedback on an agent PR, forward to Linear for Jamie to address
+  # Triggers on both changes_requested AND commented (Copilot typically uses 'commented' with inline suggestions)
+  retry-on-review-feedback:
+    if: >
+      github.event_name == 'pull_request_review' &&
+      (github.event.review.state == 'changes_requested' || github.event.review.state == 'commented') &&
+      github.event.review.user.login != github.event.pull_request.user.login
+    runs-on: ubuntu-latest
+    steps:
+      - name: Forward review feedback to Linear
+        uses: actions/github-script@v7
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+        with:
+          script: |
+            const review = context.payload.review;
+            const pr = context.payload.pull_request;
+            const branch = pr.head.ref;
+            const reviewer = review.user.login;
+
+            // Fork-PR guard — see retry-on-ci-failure above for rationale.
+            if (pr.head.repo.full_name !== `${context.repo.owner}/${context.repo.repo}`) {
+              console.log(`PR #${pr.number} is from a fork (${pr.head.repo.full_name}) — skipping to avoid using org secrets against external PR content`);
+              return;
+            }
+
+            if (!branch.startsWith('autofix/') && !branch.startsWith('campaign/')) {
+              console.log(`Branch ${branch} is not agent-created — skipping`);
+              return;
+            }
+
+            const issueMatch = branch.match(/staqpro-(\d+)/i);
+            const linearRef = issueMatch ? `STAQPRO-${issueMatch[1]}` : null;
+            const linearKey = process.env.LINEAR_API_KEY;
+
+            if (!linearRef || !linearKey) {
+              console.log('No Linear issue or API key — skipping');
+              return;
+            }
+
+            // Collect review comments (inline code comments)
+            const reviewComments = await github.rest.pulls.listReviewComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number,
+              per_page: 50,
+            });
+
+            // Filter to comments from this review
+            const relevantComments = reviewComments.data
+              .filter(c => c.pull_request_review_id === review.id)
+              .map(c => `**${c.path}:${c.line || c.original_line}** — ${c.body}`)
+              .join('\n\n');
+
+            // Skip if no actionable feedback (empty 'commented' review with no inline comments)
+            if (!review.body && !relevantComments) {
+              console.log('Review has no body or inline comments — skipping');
+              return;
+            }
+
+            // Build the retry message with review feedback
+            const feedbackSummary = [
+              review.body ? `**Review summary:** ${review.body}` : null,
+              relevantComments ? `**Inline comments:**\n\n${relevantComments}` : null,
+            ].filter(Boolean).join('\n\n');
+
+            // Stuck loop detection: check if the same file+line has been flagged 3+ times
+            // by looking at ALL review comments on this PR (not just this review)
+            const allComments = reviewComments.data;
+            const currentFiles = reviewComments.data
+              .filter(c => c.pull_request_review_id === review.id)
+              .map(c => `${c.path}:${c.line || c.original_line || 0}`);
+
+            // Count how many times each file:line has been commented on across ALL reviews
+            const fileLineHits = {};
+            for (const c of allComments) {
+              const key = `${c.path}:${c.line || c.original_line || 0}`;
+              fileLineHits[key] = (fileLineHits[key] || 0) + 1;
+            }
+
+            // Check if any current comment targets a file:line that's been hit 3+ times
+            const stuckLines = currentFiles.filter(fl => fileLineHits[fl] >= 3);
+            const isStuckLoop = stuckLines.length > 0 && stuckLines.length === currentFiles.length;
+
+            if (isStuckLoop) {
+              console.log(`Stuck loop detected: ${stuckLines.join(', ')} flagged 3+ times — escalating to board`);
+            }
+
+            // Find Linear issue
+            const gqlResponse = await fetch('https://api.linear.app/graphql', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': linearKey },
+              body: JSON.stringify({
+                query: `query { searchIssues(term: "STAQPRO-${issueMatch[1]}", first: 1) { nodes { id identifier } } }`,
+              }),
+            });
+            const linearIssue = (await gqlResponse.json())?.data?.searchIssues?.nodes?.[0];
+            if (!linearIssue) { console.log(`Linear issue ${linearRef} not found`); return; }
+
+            // Decide: /retry (new feedback) or /update (stuck loop → escalate to board)
+            if (isStuckLoop) {
+              const escalateBody = `/update ⚠️ Stuck loop detected on PR #${pr.number}. The following locations have been flagged ${stuckLines.length > 1 ? '3+ times each' : '3+ times'} by ${reviewer} without resolution:\n\n${stuckLines.map(sl => '- `' + sl + '`').join('\n')}\n\n**Latest feedback:**\n${feedbackSummary}\n\nJamie could not resolve this automatically. Board review needed.`;
+
+              await fetch('https://api.linear.app/graphql', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': linearKey },
+                body: JSON.stringify({
+                  query: `mutation($input: CommentCreateInput!) { commentCreate(input: $input) { success } }`,
+                  variables: { input: { issueId: linearIssue.id, body: escalateBody } },
+                }),
+              });
+              console.log(`Escalated to board on ${linearRef} — stuck loop on ${stuckLines.join(', ')}`);
+            } else {
+              const retryBody = `/retry Review feedback from ${reviewer} on PR #${pr.number}:\n\n${feedbackSummary}\n\nPlease address the review comments and push fixes to the existing branch.`;
+
+              await fetch('https://api.linear.app/graphql', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': linearKey },
+                body: JSON.stringify({
+                  query: `mutation($input: CommentCreateInput!) { commentCreate(input: $input) { success } }`,
+                  variables: { input: { issueId: linearIssue.id, body: retryBody } },
+                }),
+              });
+              console.log(`Posted /retry on ${linearRef} with review feedback from ${reviewer}`);
+            }
+
+  # When Copilot leaves individual review comments (not a full review), collect and forward
+  forward-review-comment:
+    if: >
+      github.event_name == 'pull_request_review_comment' &&
+      github.event.comment.user.login == 'copilot-pull-request-reviewer[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Forward Copilot comment to Linear
+        uses: actions/github-script@v7
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+        with:
+          script: |
+            const comment = context.payload.comment;
+            const pr = context.payload.pull_request;
+            const branch = pr.head.ref;
+
+            // Fork-PR guard — see retry-on-ci-failure above for rationale.
+            if (pr.head.repo.full_name !== `${context.repo.owner}/${context.repo.repo}`) {
+              console.log(`PR #${pr.number} is from a fork (${pr.head.repo.full_name}) — skipping to avoid using org secrets against external PR content`);
+              return;
+            }
+
+            if (!branch.startsWith('autofix/') && !branch.startsWith('campaign/')) {
+              console.log(`Branch ${branch} is not agent-created — skipping`);
+              return;
+            }
+
+            const issueMatch = branch.match(/staqpro-(\d+)/i);
+            const linearRef = issueMatch ? `STAQPRO-${issueMatch[1]}` : null;
+            const linearKey = process.env.LINEAR_API_KEY;
+
+            if (!linearRef || !linearKey) return;
+
+            // Dedup: don't forward if we already posted about this comment
+            // Use a 5-minute window — Copilot may post multiple comments at once
+            // We'll batch them via the review-level handler instead
+            // Only forward individual comments if no full review was submitted
+            const reviews = await github.rest.pulls.listReviews({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number,
+            });
+            const hasChangesRequested = reviews.data.some(r =>
+              r.user.login === 'copilot-pull-request-reviewer[bot]' && r.state === 'CHANGES_REQUESTED'
+            );
+            if (hasChangesRequested) {
+              console.log('Full review with changes_requested exists — handled by retry-on-review-feedback job');
+              return;
+            }
+
+            // Find Linear issue
+            const gqlResponse = await fetch('https://api.linear.app/graphql', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': linearKey },
+              body: JSON.stringify({
+                query: `query { searchIssues(term: "STAQPRO-${issueMatch[1]}", first: 1) { nodes { id identifier } } }`,
+              }),
+            });
+            const linearIssue = (await gqlResponse.json())?.data?.searchIssues?.nodes?.[0];
+            if (!linearIssue) return;
+
+            // Post as an /update (not /retry) since it's a suggestion, not a block
+            const updateBody = `/update Copilot review comment on PR #${pr.number}:\n\n**${comment.path}:${comment.line || comment.original_line}**\n${comment.body}\n\nPlease address this feedback and push a fix.`;
+
+            await fetch('https://api.linear.app/graphql', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': linearKey },
+              body: JSON.stringify({
+                query: `mutation($input: CommentCreateInput!) { commentCreate(input: $input) { success } }`,
+                variables: { input: { issueId: linearIssue.id, body: updateBody } },
+              }),
+            });
+            console.log(`Forwarded Copilot comment to ${linearRef}`);

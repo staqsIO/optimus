@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "ExtractedDesignSystem",
+  "description": "Structured design system extracted from a website for use as an intermediate artifact in the executor-redesign pipeline.",
+  "type": "object",
+  "required": ["version", "source", "colors", "typography", "spacing", "components", "layout", "brand"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1.0.0",
+      "description": "Schema version for forward compatibility"
+    },
+    "source": {
+      "type": "object",
+      "required": ["url", "scrapedAt", "contentHash"],
+      "properties": {
+        "url": { "type": "string", "format": "uri" },
+        "scrapedAt": { "type": "string", "format": "date-time" },
+        "contentHash": { "type": "string", "description": "SHA-256 of scraped HTML for staleness detection" }
+      }
+    },
+    "colors": {
+      "type": "object",
+      "required": ["hasClearBranding", "primary"],
+      "properties": {
+        "hasClearBranding": { "type": "boolean" },
+        "primary": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Ranked brand colors (most prominent first)"
+        },
+        "secondary": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Supporting palette colors"
+        },
+        "neutral": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Grays and neutral tones (framework colors filtered out)"
+        },
+        "semantic": {
+          "type": "object",
+          "properties": {
+            "cta": { "type": "array", "items": { "type": "string" } },
+            "nav": { "type": "array", "items": { "type": "string" } },
+            "heading": { "type": "array", "items": { "type": "string" } },
+            "link": { "type": "array", "items": { "type": "string" } },
+            "background": { "type": "string" }
+          }
+        }
+      }
+    },
+    "typography": {
+      "type": "object",
+      "required": ["bodyFont"],
+      "properties": {
+        "bodyFont": { "type": "string" },
+        "bodyColor": { "type": "string" },
+        "headings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "tag": { "type": "string" },
+              "font": { "type": "string" },
+              "color": { "type": "string" },
+              "text": { "type": "string" }
+            }
+          }
+        },
+        "recommended": {
+          "type": "object",
+          "description": "Font pairing recommendation from design-system.json config",
+          "properties": {
+            "heading": { "type": "string" },
+            "body": { "type": "string" },
+            "weights": { "type": "object" },
+            "vibe": { "type": "string" }
+          }
+        }
+      }
+    },
+    "spacing": {
+      "type": "object",
+      "properties": {
+        "baseUnit": {
+          "type": "integer",
+          "description": "Base spacing unit in px (detected or default 8)"
+        },
+        "scale": {
+          "type": "array",
+          "items": { "type": "integer" },
+          "description": "Spacing scale derived from base unit"
+        }
+      }
+    },
+    "components": {
+      "type": "object",
+      "properties": {
+        "buttons": {
+          "type": "object",
+          "properties": {
+            "colors": { "type": "array", "items": { "type": "string" } },
+            "style": { "type": "string", "description": "fill | outline | ghost" }
+          }
+        },
+        "cards": {
+          "type": "object",
+          "properties": {
+            "shadowStyle": { "type": "string", "description": "hard | soft | none" },
+            "borderRadius": { "type": "string" }
+          }
+        },
+        "nav": {
+          "type": "object",
+          "properties": {
+            "colors": { "type": "array", "items": { "type": "string" } },
+            "style": { "type": "string", "description": "sticky | fixed | static" }
+          }
+        },
+        "borderRadius": {
+          "type": "string",
+          "description": "Dominant border-radius value across site"
+        }
+      }
+    },
+    "layout": {
+      "type": "object",
+      "properties": {
+        "style": { "type": "string", "description": "clean-grid | organic | editorial | archival" },
+        "description": { "type": "string" },
+        "responsive": {
+          "type": "object",
+          "properties": {
+            "mobileNav": { "type": "string", "description": "hamburger | bottom-nav | drawer | unknown" },
+            "breakpoints": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Detected CSS breakpoints"
+            }
+          }
+        }
+      }
+    },
+    "motion": {
+      "type": "object",
+      "properties": {
+        "hasAnimations": { "type": "boolean" },
+        "style": { "type": "string", "description": "none | minimal | moderate | rich" },
+        "speed": { "type": "string", "description": "fast | medium | slow" }
+      }
+    },
+    "brand": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "tone": { "type": "string" },
+        "emotion": {
+          "type": "object",
+          "properties": {
+            "primary": { "type": "string" },
+            "secondary": { "type": "string" }
+          }
+        },
+        "businessType": { "type": "string" },
+        "audience": { "type": "string" },
+        "primaryConversionGoal": { "type": "string" }
+      }
+    },
+    "patternGaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "pattern": { "type": "string" },
+          "description": { "type": "string" },
+          "priority": { "type": "string", "enum": ["high", "medium", "low"] }
+        }
+      },
+      "description": "2025-2026 design conventions missing from the original site"
+    },
+    "seo": {
+      "type": "object",
+      "properties": {
+        "lighthouse": {
+          "type": "object",
+          "properties": {
+            "performance": { "type": "integer" },
+            "accessibility": { "type": "integer" },
+            "seo": { "type": "integer" },
+            "bestPractices": { "type": "integer" }
+          }
+        },
+        "aeo": {
+          "type": "object",
+          "properties": {
+            "score": { "type": "integer" },
+            "breakdown": { "type": "object" }
+          }
+        }
+      }
+    },
+    "images": {
+      "type": "object",
+      "properties": {
+        "total": { "type": "integer" },
+        "logos": { "type": "array", "items": { "type": "object" } },
+        "heroes": { "type": "array", "items": { "type": "object" } }
+      }
+    }
+  }
+}

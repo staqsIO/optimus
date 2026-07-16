@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "optimus": {
+      "command": "node",
+      "args": ["tools/optimus-mcp/index.js"],
+      "env": {
+        "OPTIMUS_TOKEN": "${OPTIMUS_TOKEN}",
+        "OPTIMUS_API_URL": "https://preview.staqs.io"
+      }
+    },
+    "ideabrowser": { "disabled": true },
+    "claude_ai_Ideabrowser": { "disabled": true },
+    "claude_ai_Figma": { "disabled": true },
+    "figma": { "disabled": true },
+    "claude_ai_Google_Calendar": { "disabled": true },
+    "pencil": { "disabled": true },
+    "claude_ai_Gmail": { "disabled": true },
+    "claude_ai_Metrc_Docs": { "disabled": true },
+    "claude_ai_Vercel": { "disabled": true },
+    "illustrator": { "disabled": true }
+  }
+}

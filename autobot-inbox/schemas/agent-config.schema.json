@@ -1,0 +1,353 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://optimus.staqsio.com/schemas/agent-config.v3.json",
+  "title": "Optimus Agent Configuration v3.0",
+  "description": "Compiled agent configuration schema. Covers all 6 structural variants: base executor, Claude Code executor, orchestrator-campaign, orchestrator-workshop, exploration architect, and utility.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "config_hash",
+    "source_hash",
+    "compiler_version",
+    "id",
+    "type",
+    "enabled",
+    "model",
+    "maxTokens",
+    "temperature",
+    "tools"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "3.0",
+      "description": "Schema version identifier"
+    },
+    "config_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "SHA256 of the canonical JSON output (excluding this field itself)"
+    },
+    "source_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "SHA256 of the raw agents.md source file"
+    },
+    "compiler_version": {
+      "type": "string",
+      "description": "Version of the compiler that produced this output (from package.json)"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "description": "Unique agent identifier (kebab-case)"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["orchestrator", "strategist", "executor", "reviewer", "architect", "utility"],
+      "description": "Agent tier/type"
+    },
+    "enabled": {
+      "type": "boolean",
+      "description": "Whether the agent is active in the runtime"
+    },
+    "model": {
+      "type": "string",
+      "description": "LLM model identifier"
+    },
+    "llmEnabled": {
+      "type": "boolean",
+      "description": "Whether LLM invocation is enabled for this agent"
+    },
+    "maxTokens": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Maximum output tokens per LLM call"
+    },
+    "temperature": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 2,
+      "description": "LLM sampling temperature"
+    },
+    "tools": {
+      "type": "object",
+      "required": ["allowed", "forbidden"],
+      "properties": {
+        "allowed": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Explicitly allowed tool identifiers"
+        },
+        "forbidden": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Explicitly forbidden tool identifiers (empty array is valid, absent is not)"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Tool access control — both allowed and forbidden must be explicit (P1: deny by default)"
+    },
+    "pollInterval": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Poll interval in seconds (orchestrator)"
+    },
+    "guardrails": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^G[1-7]$"
+      },
+      "description": "Constitutional gate IDs (G1-G7) enforced for this agent"
+    },
+    "hierarchy": {
+      "type": "object",
+      "required": ["canDelegate", "reportsTo", "escalatesTo"],
+      "properties": {
+        "canDelegate": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Agent IDs this agent can assign work to (explicit list, no globs)"
+        },
+        "reportsTo": {
+          "type": "string",
+          "description": "Agent or entity this agent reports to"
+        },
+        "escalatesTo": {
+          "type": "string",
+          "description": "Agent or entity for escalation"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Agent hierarchy positioning"
+    },
+    "capabilities": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Declared capability identifiers"
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["suggest", "execute"],
+      "description": "Operating mode (strategist: suggest mode in Phase 1)"
+    },
+    "schedule": {
+      "type": "string",
+      "description": "Schedule type (e.g., 'daily', 'exploration')"
+    },
+    "scheduleTime": {
+      "type": "string",
+      "pattern": "^[0-9]{2}:[0-9]{2}$",
+      "description": "Time of day for scheduled execution (HH:MM)"
+    },
+    "scheduleInterval": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Schedule interval in milliseconds"
+    },
+    "skipFor": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Triage categories to skip for this agent"
+    },
+    "outputConstraints": {
+      "type": "object",
+      "properties": {
+        "format": {
+          "type": "string",
+          "enum": ["artifact-only", "review-report"],
+          "description": "Output format constraint"
+        },
+        "antiPatterns": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Behavioral anti-patterns the agent must avoid"
+        },
+        "reviewDimensions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Dimensions for review (reviewer only)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "chat": {
+      "type": "object",
+      "required": ["enabled"],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "maxCostPerSession": {
+          "type": "number",
+          "minimum": 0
+        },
+        "chatTools": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false,
+      "description": "Chat/interactive session configuration"
+    },
+    "claudeCode": {
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": "string",
+          "description": "Claude Code model override"
+        },
+        "maxBudgetUsd": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Maximum budget per Claude Code session in USD"
+        },
+        "maxTurns": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum conversation turns"
+        },
+        "sessionTimeoutMs": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Session timeout in milliseconds"
+        },
+        "allowedTools": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Tools allowed in Claude Code sessions"
+        },
+        "mcpServers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string" },
+              "command": { "type": "string" },
+              "args": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "env": { "type": "object" }
+            },
+            "required": ["type", "command", "args"]
+          },
+          "description": "MCP server configurations for Claude Code sessions"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Claude Code executor configuration"
+    },
+    "campaign": {
+      "type": "object",
+      "properties": {
+        "pollIntervalMs": { "type": "integer", "minimum": 1 },
+        "defaultIterationTimeBudget": { "type": "integer", "minimum": 1 },
+        "defaultPlateauWindow": { "type": "integer", "minimum": 1 },
+        "defaultPlateauThreshold": { "type": "number", "minimum": 0 },
+        "maxConcurrentCampaigns": { "type": "integer", "minimum": 1 },
+        "worktreeBaseDir": { "type": "string" }
+      },
+      "additionalProperties": false,
+      "description": "Campaign orchestration configuration (claw-campaigner)"
+    },
+    "workshop": {
+      "type": "object",
+      "properties": {
+        "pollIntervalMs": { "type": "integer", "minimum": 1 },
+        "maxConcurrentWorkshops": { "type": "integer", "minimum": 1 },
+        "defaultPlaybook": { "type": "string" },
+        "designPlaybook": { "type": "string" },
+        "autoApprove": { "type": "boolean" }
+      },
+      "additionalProperties": false,
+      "description": "Workshop orchestration configuration (claw-workshop)"
+    },
+    "exploration": {
+      "type": "object",
+      "properties": {
+        "maxCyclesPerDay": { "type": "integer", "minimum": 1 },
+        "maxIterationsPerDomain": { "type": "integer", "minimum": 1 },
+        "perCycleBudgetUsd": { "type": "number", "minimum": 0 },
+        "dailyBudgetUsd": { "type": "number", "minimum": 0 },
+        "cycleTimeoutMs": { "type": "integer", "minimum": 1 },
+        "domainTimeoutMs": { "type": "integer", "minimum": 1 },
+        "minCycleIntervalMs": { "type": "integer", "minimum": 1 },
+        "quietHoursStart": { "type": "integer", "minimum": 0, "maximum": 23 },
+        "quietHoursEnd": { "type": "integer", "minimum": 0, "maximum": 23 }
+      },
+      "additionalProperties": false,
+      "description": "Exploration configuration (claw-explorer)"
+    },
+    "research": {
+      "type": "object",
+      "properties": {
+        "maxIterationsPerSession": { "type": "integer", "minimum": 1 },
+        "maxCostPerResearchUsd": { "type": "number", "minimum": 0 },
+        "searchApiProvider": { "type": "string" },
+        "maxConcurrentSearches": { "type": "integer", "minimum": 1 },
+        "urlFetchTimeoutMs": { "type": "integer", "minimum": 1 },
+        "urlMaxChars": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false,
+      "description": "Research configuration (executor-research)"
+    },
+    "imagegen": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "maxImagesPerJob": { "type": "integer", "minimum": 1 },
+        "maxBudgetUsd": { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": false,
+      "description": "Image generation configuration (executor-redesign)"
+    },
+    "pipeline": {
+      "type": "object",
+      "properties": {
+        "generate": { "$ref": "#/$defs/pipelineStage" },
+        "review": { "$ref": "#/$defs/pipelineStage" },
+        "applyFixes": { "$ref": "#/$defs/pipelineStage" },
+        "fixRegressions": { "$ref": "#/$defs/pipelineStage" }
+      },
+      "additionalProperties": false,
+      "description": "Multi-stage pipeline configuration (executor-redesign)"
+    },
+    "context_budget": {
+      "type": "object",
+      "properties": {
+        "maxInputTokens": { "type": "integer", "minimum": 1 },
+        "maxOutputTokens": { "type": "integer", "minimum": 1 },
+        "reservedForSystem": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false,
+      "description": "Token budget allocation for context window management"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "pipelineStage": {
+      "type": "object",
+      "properties": {
+        "backend": { "type": "string" },
+        "model": { "type": "string" },
+        "maxTurns": { "type": "integer", "minimum": 1 },
+        "timeoutMs": { "type": "integer", "minimum": 1 },
+        "allowedTools": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "extensions": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "allowedMcpServers": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

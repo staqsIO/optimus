@@ -1,0 +1,413 @@
+{
+  "fontPairings": {
+    "authority": [
+      {
+        "heading": "Playfair Display",
+        "body": "Source Sans 3",
+        "weights": { "heading": [700, 900], "body": [400, 600] },
+        "vibe": "Traditional law firm meets modern precision"
+      },
+      {
+        "heading": "DM Serif Display",
+        "body": "Inter",
+        "weights": { "heading": [400], "body": [400, 500, 600] },
+        "vibe": "Editorial gravitas with Swiss clarity"
+      },
+      {
+        "heading": "Cormorant Garamond",
+        "body": "Outfit",
+        "weights": { "heading": [600, 700], "body": [400, 500] },
+        "vibe": "Old-world elegance, new-world readability"
+      }
+    ],
+    "trust": [
+      {
+        "heading": "Plus Jakarta Sans",
+        "body": "Inter",
+        "weights": { "heading": [600, 700], "body": [400, 500] },
+        "vibe": "Friendly professionalism, startup-clean"
+      },
+      {
+        "heading": "Instrument Serif",
+        "body": "DM Sans",
+        "weights": { "heading": [400], "body": [400, 500, 600] },
+        "vibe": "Calm authority with humanist warmth"
+      },
+      {
+        "heading": "Libre Baskerville",
+        "body": "Nunito Sans",
+        "weights": { "heading": [400, 700], "body": [400, 600] },
+        "vibe": "Established credibility, approachable body"
+      }
+    ],
+    "efficiency": [
+      {
+        "heading": "Space Grotesk",
+        "body": "Inter",
+        "weights": { "heading": [500, 700], "body": [400, 500] },
+        "vibe": "Technical precision, developer-friendly"
+      },
+      {
+        "heading": "Sora",
+        "body": "IBM Plex Sans",
+        "weights": { "heading": [600, 700], "body": [400, 500] },
+        "vibe": "Geometric efficiency, enterprise clarity"
+      },
+      {
+        "heading": "Outfit",
+        "body": "Work Sans",
+        "weights": { "heading": [600, 700], "body": [400, 500] },
+        "vibe": "Clean geometric, no-nonsense productivity"
+      }
+    ],
+    "clarity": [
+      {
+        "heading": "Inter",
+        "body": "Inter",
+        "weights": { "heading": [600, 700], "body": [400, 500] },
+        "vibe": "Maximum readability, UI-first"
+      },
+      {
+        "heading": "DM Sans",
+        "body": "Inter",
+        "weights": { "heading": [500, 700], "body": [400, 500] },
+        "vibe": "Geometric simplicity, friendly clarity"
+      }
+    ],
+    "creativity": [
+      {
+        "heading": "Urbanist",
+        "body": "Work Sans",
+        "accent": "Space Mono",
+        "weights": { "heading": [700, 800], "body": [400, 500], "accent": [400, 700] },
+        "vibe": "Bold geometric with monospace edge"
+      },
+      {
+        "heading": "Syne",
+        "body": "DM Sans",
+        "weights": { "heading": [600, 700, 800], "body": [400, 500] },
+        "vibe": "Art-forward, Bauhaus-inspired energy"
+      },
+      {
+        "heading": "Archivo Black",
+        "body": "Outfit",
+        "accent": "Fira Code",
+        "weights": { "heading": [400], "body": [400, 500], "accent": [400] },
+        "vibe": "Impact headlines, technical accent"
+      }
+    ],
+    "confidence": [
+      {
+        "heading": "Outfit",
+        "body": "Inter",
+        "weights": { "heading": [600, 700], "body": [400, 500] },
+        "vibe": "Modern confidence, clean authority"
+      },
+      {
+        "heading": "Plus Jakarta Sans",
+        "body": "DM Sans",
+        "weights": { "heading": [700, 800], "body": [400, 500] },
+        "vibe": "Assertive geometric, startup energy"
+      }
+    ],
+    "care": [
+      {
+        "heading": "Nunito",
+        "body": "Open Sans",
+        "weights": { "heading": [600, 700], "body": [400, 600] },
+        "vibe": "Soft, approachable, healthcare-friendly"
+      },
+      {
+        "heading": "Quicksand",
+        "body": "Lato",
+        "weights": { "heading": [500, 700], "body": [400, 700] },
+        "vibe": "Gentle rounded forms, warm readability"
+      },
+      {
+        "heading": "Poppins",
+        "body": "Mulish",
+        "weights": { "heading": [600, 700], "body": [400, 500] },
+        "vibe": "Friendly geometric, inclusive feel"
+      }
+    ],
+    "competence": [
+      {
+        "heading": "Source Sans 3",
+        "body": "Inter",
+        "weights": { "heading": [600, 700], "body": [400, 500] },
+        "vibe": "Adobe-grade professionalism"
+      },
+      {
+        "heading": "Outfit",
+        "body": "DM Sans",
+        "weights": { "heading": [600, 700], "body": [400, 500] },
+        "vibe": "Clean competence, modern enterprise"
+      }
+    ],
+    "desire": [
+      {
+        "heading": "Cormorant Garamond",
+        "body": "Montserrat",
+        "weights": { "heading": [500, 700], "body": [400, 500] },
+        "vibe": "Luxury editorial, high-fashion feel"
+      },
+      {
+        "heading": "Fraunces",
+        "body": "Outfit",
+        "weights": { "heading": [700, 900], "body": [400, 500] },
+        "vibe": "Playful luxury, variable optical sizing"
+      }
+    ],
+    "urgency": [
+      {
+        "heading": "Archivo Black",
+        "body": "Inter",
+        "weights": { "heading": [400], "body": [400, 500, 600] },
+        "vibe": "Impact-driven, action-demanding"
+      },
+      {
+        "heading": "Sora",
+        "body": "DM Sans",
+        "weights": { "heading": [700, 800], "body": [400, 500] },
+        "vibe": "High-energy geometric urgency"
+      }
+    ],
+    "expertise": [
+      {
+        "heading": "Instrument Serif",
+        "body": "Plus Jakarta Sans",
+        "weights": { "heading": [400], "body": [400, 500, 600] },
+        "vibe": "Thought leadership, editorial authority"
+      },
+      {
+        "heading": "Lora",
+        "body": "Source Sans 3",
+        "weights": { "heading": [500, 700], "body": [400, 600] },
+        "vibe": "Academic depth, professional readability"
+      }
+    ],
+    "results": [
+      {
+        "heading": "Plus Jakarta Sans",
+        "body": "Inter",
+        "weights": { "heading": [700, 800], "body": [400, 500] },
+        "vibe": "Data-driven confidence"
+      },
+      {
+        "heading": "Space Grotesk",
+        "body": "DM Sans",
+        "weights": { "heading": [600, 700], "body": [400, 500] },
+        "vibe": "Metric-forward, proof-driven"
+      }
+    ],
+    "empathy": [
+      {
+        "heading": "Nunito",
+        "body": "Lato",
+        "weights": { "heading": [600, 700], "body": [400, 700] },
+        "vibe": "Warm, human, community-focused"
+      },
+      {
+        "heading": "Quicksand",
+        "body": "Open Sans",
+        "weights": { "heading": [500, 700], "body": [400, 600] },
+        "vibe": "Gentle, inclusive, non-profit warmth"
+      }
+    ],
+    "impact": [
+      {
+        "heading": "Syne",
+        "body": "Inter",
+        "weights": { "heading": [700, 800], "body": [400, 500] },
+        "vibe": "Bold mission, measurable change"
+      },
+      {
+        "heading": "Outfit",
+        "body": "DM Sans",
+        "weights": { "heading": [700, 800], "body": [400, 500] },
+        "vibe": "Clean impact, modern non-profit"
+      }
+    ],
+    "warmth": [
+      {
+        "heading": "Fraunces",
+        "body": "Nunito",
+        "weights": { "heading": [700, 900], "body": [400, 600] },
+        "vibe": "Artisanal warmth, inviting character"
+      },
+      {
+        "heading": "Playfair Display",
+        "body": "Lato",
+        "weights": { "heading": [700], "body": [400, 700] },
+        "vibe": "Elegant warmth, bistro sophistication"
+      }
+    ],
+    "appetite": [
+      {
+        "heading": "Fraunces",
+        "body": "Outfit",
+        "weights": { "heading": [700, 900], "body": [400, 500] },
+        "vibe": "Rich, sensory, food-forward"
+      },
+      {
+        "heading": "Playfair Display",
+        "body": "Nunito",
+        "weights": { "heading": [700, 900], "body": [400, 600] },
+        "vibe": "Upscale dining, editorial food"
+      }
+    ],
+    "aspiration": [
+      {
+        "heading": "Cormorant Garamond",
+        "body": "Montserrat",
+        "weights": { "heading": [600, 700], "body": [400, 500] },
+        "vibe": "Luxury living, aspirational elegance"
+      },
+      {
+        "heading": "DM Serif Display",
+        "body": "Inter",
+        "weights": { "heading": [400], "body": [400, 500] },
+        "vibe": "Premium editorial, real estate prestige"
+      }
+    ],
+    "innovation": [
+      {
+        "heading": "Sora",
+        "body": "Inter",
+        "accent": "JetBrains Mono",
+        "weights": { "heading": [600, 700], "body": [400, 500], "accent": [400] },
+        "vibe": "Tech-forward, product-launch energy"
+      },
+      {
+        "heading": "Space Grotesk",
+        "body": "Outfit",
+        "accent": "Fira Code",
+        "weights": { "heading": [500, 700], "body": [400, 500], "accent": [400] },
+        "vibe": "Developer-native, API-first aesthetic"
+      }
+    ],
+    "reliability": [
+      {
+        "heading": "Inter",
+        "body": "Inter",
+        "weights": { "heading": [600, 700], "body": [400, 500] },
+        "vibe": "System font reliability, proven at scale"
+      },
+      {
+        "heading": "IBM Plex Sans",
+        "body": "Inter",
+        "weights": { "heading": [500, 700], "body": [400, 500] },
+        "vibe": "Enterprise-grade dependability"
+      }
+    ],
+    "security": [
+      {
+        "heading": "DM Sans",
+        "body": "Inter",
+        "weights": { "heading": [500, 700], "body": [400, 500] },
+        "vibe": "Quiet authority, institutional trust"
+      },
+      {
+        "heading": "Source Sans 3",
+        "body": "IBM Plex Sans",
+        "weights": { "heading": [600, 700], "body": [400, 500] },
+        "vibe": "Government-grade clarity"
+      }
+    ],
+    "growth": [
+      {
+        "heading": "Poppins",
+        "body": "Inter",
+        "weights": { "heading": [600, 700], "body": [400, 500] },
+        "vibe": "Friendly progression, learning-forward"
+      },
+      {
+        "heading": "Plus Jakarta Sans",
+        "body": "Nunito Sans",
+        "weights": { "heading": [700], "body": [400, 600] },
+        "vibe": "Modern education, accessible growth"
+      }
+    ]
+  },
+
+  "layoutStyles": {
+    "agency": ["organic", "editorial", "archival"],
+    "saas": ["clean-grid", "editorial"],
+    "consulting": ["editorial", "clean-grid"],
+    "restaurant": ["organic", "editorial"],
+    "legal": ["clean-grid", "archival"],
+    "finance": ["clean-grid", "archival"],
+    "healthcare": ["clean-grid", "editorial"],
+    "ecommerce": ["editorial", "organic"],
+    "nonprofit": ["editorial", "organic"],
+    "real-estate": ["editorial", "organic"],
+    "education": ["clean-grid", "editorial"],
+    "technology": ["clean-grid", "editorial"],
+    "default": ["clean-grid", "editorial"]
+  },
+
+  "layoutDescriptions": {
+    "clean-grid": "Structured CSS Grid layout with defined columns, consistent gutters (gap: 2rem), and predictable rhythm. Use repeat(auto-fit, minmax(300px, 1fr)) for responsive cards. Sections stack vertically with clear boundaries. Professional, organized, trustworthy.",
+    "organic": "Fluid asymmetrical layout with overlapping elements, clip-path section transitions, and magazine-style flow. Use grid-template-columns like '1fr 1.3fr' or '2fr 1fr' instead of equal columns. Sections flow into each other with wave dividers or diagonal cuts. Creative, dynamic, memorable.",
+    "editorial": "Typography-forward layout with varied column widths, pull quotes with oversized type, and publication-quality spacing. Mix full-width sections with constrained content columns (max-width: 65ch for reading). Use display fonts at 4-6rem for impact. Thoughtful, curated, authoritative.",
+    "archival": "Museum-catalog aesthetic with clean labeling, monospaced accents for data/categories, generous whitespace, and minimal decoration. Grid with precise alignment. Use subtle borders instead of background colors to define sections. Refined, intellectual, timeless."
+  },
+
+  "cssSnippets": {
+    "scrollAnimations": {
+      "keyframes": "@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }\n@keyframes slideInLeft { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: translateX(0); } }\n@keyframes slideInRight { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }\n@keyframes scaleReveal { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }",
+      "usage": ".animate-on-scroll { animation: fadeInUp 0.8s ease both; animation-timeline: view(); animation-range: entry 10% cover 40%; }\n.slide-left { animation: slideInLeft 0.8s ease both; animation-timeline: view(); animation-range: entry 10% cover 40%; }\n.slide-right { animation: slideInRight 0.8s ease both; animation-timeline: view(); animation-range: entry 10% cover 40%; }\n.scale-reveal { animation: scaleReveal 0.6s ease both; animation-timeline: view(); animation-range: entry 10% cover 35%; }",
+      "reducedMotion": "@media (prefers-reduced-motion: reduce) { .animate-on-scroll, .slide-left, .slide-right, .scale-reveal { animation: none !important; opacity: 1 !important; transform: none !important; } }"
+    },
+    "glassmorphism": {
+      "card": "background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 16px;",
+      "nav": "background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%); border-bottom: 1px solid rgba(0, 0, 0, 0.06);",
+      "navDark": "background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%); border-bottom: 1px solid rgba(255, 255, 255, 0.08);",
+      "heroOverlay": "background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.1)); backdrop-filter: blur(4px);"
+    },
+    "microInteractions": {
+      "magneticButton": "transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease; &:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 12px 24px rgba(0,0,0,0.15); }",
+      "cardReveal": "transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease; &:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,0.12); }",
+      "slidingUnderline": "position: relative; &::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 2px; background: currentColor; transition: width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); } &:hover::after { width: 100%; }",
+      "imageZoom": "overflow: hidden; & img { transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); } &:hover img { transform: scale(1.05); }",
+      "focusRing": ":focus-visible { outline: 2px solid var(--brand-primary, currentColor); outline-offset: 3px; border-radius: 4px; transition: outline-offset 0.2s ease; }"
+    },
+    "organicShapes": {
+      "waveDivider": "clip-path: ellipse(75% 100% at 50% 0%);",
+      "blobBackground": "border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;",
+      "diagonalSection": "clip-path: polygon(0 0, 100% 4%, 100% 96%, 0 100%);",
+      "curvedTop": "clip-path: ellipse(80% 100% at 50% 100%);"
+    },
+    "depthLayers": {
+      "elevatedCard": "box-shadow: 0 4px 6px rgba(0,0,0,0.04), 0 10px 24px rgba(0,0,0,0.08); border-radius: 12px;",
+      "floatingElement": "box-shadow: 0 8px 30px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06); border-radius: 16px; transform: translateZ(0);",
+      "sunkenInput": "box-shadow: inset 0 2px 4px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.1); border-radius: 8px;"
+    },
+    "antiAIMarkers": {
+      "imperfectGrid": "grid-template-columns: 1fr 1.3fr; /* or 2fr 1fr, 1fr 1.5fr 0.8fr — never equal columns */",
+      "mixedMediaSizing": "/* Vary image aspect ratios: 3:4 portrait, 16:9 landscape, 1:1 square in same grid */",
+      "editorialPullQuote": "font-size: clamp(1.5rem, 3vw, 2.5rem); font-style: italic; border-left: 4px solid var(--brand-primary); padding-left: 1.5rem; max-width: 50ch; margin: 3rem auto;",
+      "textWrap": "h1, h2, h3 { text-wrap: balance; } p { text-wrap: pretty; }",
+      "customScrollbar": "::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 4px; }"
+    }
+  },
+
+  "frameworkColors": {
+    "_description": "Common framework grays to filter from brand detection. These are default Bootstrap, Tailwind, and Material Design neutral colors that pollute brand color extraction.",
+    "bootstrap": [
+      "#212529", "#343a40", "#495057", "#6c757d",
+      "#adb5bd", "#ced4da", "#dee2e6", "#e9ecef", "#f8f9fa"
+    ],
+    "tailwind": [
+      "#030712", "#111827", "#1f2937", "#374151", "#4b5563",
+      "#6b7280", "#9ca3af", "#d1d5db", "#e5e7eb", "#f3f4f6",
+      "#f9fafb", "#0f172a", "#1e293b", "#334155", "#475569",
+      "#64748b", "#94a3b8", "#cbd5e1", "#e2e8f0", "#f1f5f9",
+      "#f8fafc"
+    ],
+    "material": [
+      "#212121", "#424242", "#616161", "#757575", "#9e9e9e",
+      "#bdbdbd", "#e0e0e0", "#eeeeee", "#f5f5f5", "#fafafa"
+    ]
+  }
+}

@@ -1,0 +1,122 @@
+/* React Flow overrides for Optimus dark theme */
+.react-flow__background {
+  background: #0a0a0f !important;
+}
+
+.react-flow__minimap {
+  background: #12121a !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 8px !important;
+}
+
+.react-flow__minimap-mask {
+  fill: rgba(99, 102, 241, 0.15) !important;
+}
+
+.react-flow__controls {
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+}
+
+.react-flow__controls-button {
+  background: #12121a !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  color: #a1a1aa !important;
+  fill: #a1a1aa !important;
+  width: 28px !important;
+  height: 28px !important;
+}
+
+.react-flow__controls-button:hover {
+  background: #1a1a25 !important;
+  color: #e4e4e7 !important;
+  fill: #e4e4e7 !important;
+}
+
+.react-flow__controls-button:last-child {
+  border-bottom: none !important;
+}
+
+.react-flow__edge-path {
+  stroke-width: 1.5;
+}
+
+.react-flow__panel {
+  margin: 12px !important;
+}
+
+/* Attribution removal — we'll add our own */
+.react-flow__attribution {
+  display: none !important;
+}
+
+/* ── Architecture View: Node type styles ──────────────── */
+
+.arch-system-node {
+  border: 1.5px solid rgba(99, 102, 241, 0.3);
+  background: linear-gradient(135deg, #12121a 0%, #14142a 100%);
+}
+
+.arch-system-node:hover {
+  border-color: rgba(99, 102, 241, 0.5);
+  box-shadow: 0 0 16px rgba(99, 102, 241, 0.1);
+}
+
+.arch-service-node {
+  background: linear-gradient(135deg, #12121a 0%, #0f1420 100%);
+}
+
+.arch-store-node {
+  border: 1.5px solid rgba(34, 211, 238, 0.2);
+  background: linear-gradient(135deg, #12121a 0%, #0f1a1f 100%);
+  border-radius: 16px;
+}
+
+.arch-store-node:hover {
+  border-color: rgba(34, 211, 238, 0.4);
+  box-shadow: 0 0 16px rgba(34, 211, 238, 0.08);
+}
+
+.arch-governance-node {
+  border: 2px solid rgba(251, 191, 36, 0.35);
+  background: linear-gradient(135deg, #12121a 0%, #1a1710 100%);
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.06);
+}
+
+.arch-governance-node:hover {
+  border-color: rgba(251, 191, 36, 0.55);
+  box-shadow: 0 0 24px rgba(251, 191, 36, 0.12);
+}
+
+.arch-integration-node {
+  background: #12121a;
+}
+
+/* ── Real-time agent activity animations ─────────────── */
+
+@keyframes agent-pulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
+  50% { box-shadow: 0 0 24px rgba(16, 185, 129, 0.5), inset 0 0 12px rgba(16, 185, 129, 0.1); }
+}
+
+.agent-node-processing {
+  animation: agent-pulse 1.5s ease-in-out infinite;
+  border-color: rgba(16, 185, 129, 0.6) !important;
+}
+
+.agent-node-idle {
+  transition: box-shadow 0.5s ease-out, border-color 0.5s ease-out;
+}
+
+@keyframes agent-claimed {
+  0% { box-shadow: 0 0 0 rgba(99, 102, 241, 0); }
+  30% { box-shadow: 0 0 30px rgba(99, 102, 241, 0.6); }
+  100% { box-shadow: 0 0 10px rgba(99, 102, 241, 0.1); }
+}
+
+.agent-node-claimed {
+  animation: agent-claimed 1s ease-out forwards;
+  border-color: rgba(99, 102, 241, 0.6) !important;
+}

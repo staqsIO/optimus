@@ -1,0 +1,135 @@
+{
+  "$comment": "Manifest of CHECK constraints on tables that agents UPDATE/INSERT. Every entry should ideally have a verified property test in test/db-checks-property.test.js. Entries with status 'documented' are tracked but not yet verified — adding a producer + property test should be a follow-up. The CI ratchet uses this manifest to detect new CHECKs that ship without tests.",
+  "checks": [
+    {
+      "table": "agent_graph.action_proposals",
+      "column": "tone_score",
+      "check_expression": "tone_score IS NULL OR (tone_score >= 0 AND tone_score <= 1)",
+      "producer_file": "lib/runtime/guard-check.js",
+      "producer_function": "checkDraftGates (G3 cosine clamp)",
+      "raw_producer_domain": "[-1, 1]",
+      "expected_persisted_domain": "[0, 1] OR null",
+      "status": "verified",
+      "regression_pr": "#150"
+    },
+    {
+      "table": "agent_graph.action_proposals",
+      "column": "action_type",
+      "check_expression": "action_type IN ('email_draft','content_post','ticket_create','code_fix_pr','feedback_receipt','research_report')",
+      "producer_file": "various agents",
+      "producer_function": "executor handlers set on INSERT",
+      "expected_persisted_domain": "enumerated",
+      "status": "documented"
+    },
+    {
+      "table": "agent_graph.action_proposals",
+      "column": "reviewer_verdict",
+      "check_expression": "reviewer_verdict IN ('approved','rejected','flagged')",
+      "producer_file": "agents/reviewer/index.js",
+      "producer_function": "verdict assignment",
+      "expected_persisted_domain": "enumerated",
+      "status": "documented"
+    },
+    {
+      "table": "agent_graph.action_proposals",
+      "column": "send_state",
+      "check_expression": "send_state IN ('pending','reviewed','approved','staged','sending','sent','rejected','failed')",
+      "producer_file": "agents/reviewer + agents/comms-sender",
+      "producer_function": "state transitions",
+      "expected_persisted_domain": "enumerated",
+      "status": "documented"
+    },
+    {
+      "table": "agent_graph.action_proposals",
+      "column": "board_action",
+      "check_expression": "board_action IN ('approved','edited','rejected')",
+      "producer_file": "board approve/reject endpoints",
+      "producer_function": "human action via UI",
+      "expected_persisted_domain": "enumerated",
+      "status": "documented"
+    },
+    {
+      "table": "agent_graph.action_proposals",
+      "column": "channel",
+      "check_expression": "channel IS NULL OR channel IN ('email','slack','whatsapp','telegram','webhook')",
+      "producer_file": "agents/executor-responder/index.js",
+      "producer_function": "responder handler — propagates inbox.messages.channel into action_proposals.channel",
+      "raw_producer_domain": "matches inbox.messages.channel value set",
+      "expected_persisted_domain": "enumerated_or_null",
+      "status": "verified",
+      "note": "Migration 090 added 'webhook' after a real production CHECK violation (3 retry-exhausted failures in 24h on 2026-05-08). Property test asserts the producer's set is a subset of the persisted CHECK set — adding a new channel without expanding the CHECK fails CI."
+    },
+    {
+      "table": "agent_graph.action_proposals",
+      "column": "provider",
+      "check_expression": "provider IS NULL OR provider IN ('gmail','outlook','slack','telegram')",
+      "expected_persisted_domain": "enumerated_or_null",
+      "status": "documented"
+    },
+    {
+      "table": "agent_graph.action_proposals",
+      "column": "source",
+      "check_expression": "source IN ('pipeline','flow')",
+      "expected_persisted_domain": "enumerated",
+      "status": "documented"
+    },
+    {
+      "table": "agent_graph.action_proposals",
+      "column": "(composite)",
+      "check_expression": "action_type != 'email_draft' OR (to_addresses IS NOT NULL AND channel IS NOT NULL AND (source = 'flow' OR message_id IS NOT NULL))",
+      "expected_persisted_domain": "row-level invariant",
+      "status": "documented",
+      "note": "action_proposals_email_requires_fields — added in 061"
+    },
+    {
+      "table": "agent_graph.work_items",
+      "column": "type",
+      "check_expression": "type IN ('directive','workstream','task','subtask')",
+      "expected_persisted_domain": "enumerated",
+      "status": "documented"
+    },
+    {
+      "table": "agent_graph.work_items",
+      "column": "status",
+      "check_expression": "status IN ('created','assigned','in_progress','review','completed','failed','timed_out','blocked','cancelled')",
+      "expected_persisted_domain": "enumerated",
+      "status": "documented"
+    },
+    {
+      "table": "agent_graph.work_items",
+      "column": "data_classification",
+      "check_expression": "data_classification IN ('PUBLIC','INTERNAL','CONFIDENTIAL','RESTRICTED')",
+      "expected_persisted_domain": "enumerated",
+      "status": "documented"
+    },
+    {
+      "table": "agent_graph.work_items",
+      "column": "routing_class",
+      "check_expression": "routing_class IS NULL OR routing_class IN ('DETERMINISTIC','LIGHTWEIGHT','FULL')",
+      "expected_persisted_domain": "enumerated_or_null",
+      "status": "documented"
+    },
+    {
+      "table": "agent_graph.budgets",
+      "column": "(composite)",
+      "check_expression": "spent_usd + reserved_usd <= allocated_usd",
+      "expected_persisted_domain": "non-overspend invariant",
+      "status": "documented",
+      "note": "Enforced by reserve_budget() — not directly written by agents"
+    },
+    {
+      "table": "agent_graph.strategic_decisions",
+      "column": "confidence",
+      "check_expression": "confidence >= 1 AND confidence <= 5",
+      "expected_persisted_domain": "[1, 5]",
+      "status": "documented"
+    },
+    {
+      "table": "agent_graph.strategic_decisions",
+      "column": "recommendation",
+      "check_expression": "recommendation IN ('proceed','defer','reject','escalate')",
+      "expected_persisted_domain": "enumerated",
+      "status": "documented"
+    }
+  ]
+}

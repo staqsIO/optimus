@@ -1,0 +1,196 @@
+name: optimus
+
+# Development compose — hot reload enabled for all services.
+# All source dirs are bind-mounted; node_modules stay inside containers.
+#
+# Usage:
+#   cp autobot-inbox/.env.example autobot-inbox/.env   # fill in ANTHROPIC_API_KEY at minimum
+#   docker compose up -d        # start everything
+#   docker compose logs -f      # follow logs
+#
+# Ports:
+#   5432 — Postgres (pgvector)
+#   7474 — Neo4j HTTP browser
+#   7687 — Neo4j Bolt protocol
+#   6379 — Redis
+#   3001 — autobot-inbox API
+#   3100 — autobot-inbox dashboard
+#   3200 — board workstation
+#   3000 — docs site
+
+services:
+
+  # ── Database ─────────────────────────────────────────────────────────────────
+
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: autobot
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d autobot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  neo4j:
+    image: neo4j:5-community
+    environment:
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:-optimus-dev}
+    ports:
+      - "7474:7474"   # HTTP browser
+      - "7687:7687"   # Bolt protocol
+    volumes:
+      - neo4j_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:7474 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  # ── Agent Runtime ─────────────────────────────────────────────────────────────
+
+  autobot-inbox:
+    build:
+      # Dockerfile.dev COPYs autobot-inbox/package*.json AND lib/package*.json
+      # — needs repo root as context.
+      context: .
+      dockerfile: autobot-inbox/Dockerfile.dev
+    # Credentials (ANTHROPIC_API_KEY, GMAIL_*, SLACK_*, etc.) come from the project .env file.
+    # Infrastructure vars set here override anything in .env (DATABASE_URL must point to the
+    # Docker postgres service, not localhost).
+    env_file:
+      - path: ./autobot-inbox/.env
+        required: false
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/autobot
+      API_PORT: 3001
+      DAILY_BUDGET_USD: ${DAILY_BUDGET_USD:-20}
+      AUTONOMY_LEVEL: ${AUTONOMY_LEVEL:-0}
+      GMAIL_POLL_INTERVAL: ${GMAIL_POLL_INTERVAL:-60}
+      PROCESS_ROLE: ${PROCESS_ROLE:-full}
+      DEFAULT_REPO_OWNER: ${DEFAULT_REPO_OWNER:-staqsIO}
+      DEFAULT_REPO_NAME: ${DEFAULT_REPO_NAME:-optimus}
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD:-optimus-dev}
+    ports:
+      - "3001:3001"
+    volumes:
+      # Dockerfile WORKDIR=/app/autobot-inbox; mount sources to match so
+      # the npm-installed node_modules at /app/autobot-inbox/node_modules
+      # is preserved by the anonymous volume below.
+      - ./autobot-inbox:/app/autobot-inbox
+      - ./lib:/app/lib
+      # autobot-inbox/src imports from ../../agents/* (org-level agents).
+      - ./agents:/app/agents
+      - /app/autobot-inbox/node_modules
+      - /app/lib/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ── Inbox Dashboard (autobot-inbox/dashboard) ─────────────────────────────────
+
+  inbox-dashboard:
+    build:
+      context: ./autobot-inbox/dashboard
+      dockerfile: Dockerfile.dev
+    environment:
+      NEXT_PUBLIC_BASE_URL: http://localhost:3100
+      NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:-}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}
+      API_URL: http://autobot-inbox:3001
+      API_SECRET: ${API_SECRET:-dev-api-secret}
+      # Polling-based file watching — required on Windows/macOS Docker hosts
+      WATCHPACK_POLLING: "true"
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./autobot-inbox/dashboard:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - autobot-inbox
+    restart: unless-stopped
+
+  # ── Board Workstation (dashboard/) ────────────────────────────────────────────
+
+  board-workstation:
+    build:
+      # Renamed from ./dashboard to ./board (March 2026 subtree merge).
+      context: ./board
+      dockerfile: Dockerfile.dev
+    environment:
+      REDIS_URL: redis://redis:6379
+      NEXT_PUBLIC_BASE_URL: http://localhost:3200
+      OPS_API_URL: http://autobot-inbox:3001
+      OPS_API_SECRET: ${API_SECRET:-dev-api-secret}
+      # Dev-safe defaults — change in production
+      API_KEY_ENCRYPTION_SECRET: ${API_KEY_ENCRYPTION_SECRET:-dev-encryption-secret-change-in-production-00}
+      NEXTAUTH_URL: http://localhost:3200
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-dev-nextauth-secret-change-in-production-min32}
+      # GITHUB_ID: ${GITHUB_ID:-}
+      # GITHUB_SECRET: ${GITHUB_SECRET:-}
+      # BOARD_MEMBERS: ${BOARD_MEMBERS:-ecgang,ConsultingFuture4200}
+      WATCHPACK_POLLING: "true"
+    env_file:
+      - path: ./board/.env
+        required: false
+    ports:
+      - "3200:3200"
+    volumes:
+      - ./board:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ── Docs Site ─────────────────────────────────────────────────────────────────
+  # Build context is repo root — prebuild.sh syncs autobot-inbox/docs + autobot-spec
+
+  docs:
+    build:
+      context: .
+      dockerfile: docs-site/Dockerfile.dev
+    environment:
+      WATCHPACK_POLLING: "true"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./docs-site:/repo/docs-site
+      - /repo/docs-site/node_modules
+      - /repo/docs-site/.next
+      - ./autobot-inbox/docs:/repo/autobot-inbox/docs:ro
+      # Renamed dir: was ./autobot-spec, now ./spec. Mount at the same
+      # container path so prebuild.sh keeps working unchanged.
+      - ./spec:/repo/autobot-spec:ro
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  neo4j_data:
+  redis_data:

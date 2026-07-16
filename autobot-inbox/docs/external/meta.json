@@ -1,0 +1,13 @@
+{
+  "title": "Board & Operations",
+  "pages": [
+    "README",
+    "product-overview",
+    "getting-started",
+    "dashboard-guide",
+    "cli-guide",
+    "---",
+    "faq",
+    "changelog"
+  ]
+}

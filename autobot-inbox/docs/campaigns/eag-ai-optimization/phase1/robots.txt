@@ -1,0 +1,51 @@
+# robots.txt — Elevated Advisory Group
+# https://acme-advisors.example/robots.txt
+# Updated: 2026-04-01
+# Purpose: Explicitly permit AI crawlers for indexing and citation
+
+# Default: allow all crawlers
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# OpenAI
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+# Anthropic / Claude
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+
+# Google AI / Bard / Gemini
+User-agent: Google-Extended
+Allow: /
+
+# Apple
+User-agent: Applebot-Extended
+Allow: /
+
+# Common Crawl (training datasets)
+User-agent: CCBot
+Allow: /
+
+# Meta
+User-agent: FacebookBot
+Allow: /
+
+# Sitemaps
+Sitemap: https://acme-advisors.example/sitemap.xml
+Sitemap: https://acme-advisors.example/llms.txt

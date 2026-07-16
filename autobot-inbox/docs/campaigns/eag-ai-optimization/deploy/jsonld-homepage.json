@@ -1,0 +1,77 @@
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Elevated Advisory Group",
+    "alternateName": "EAG",
+    "url": "https://acme-advisors.example",
+    "logo": "https://acme-advisors.example/logo.png",
+    "description": "Elevated Advisory Group is a cannabis industry consulting firm specializing in extraction and manufacturing lab design, license application support, operational analysis, retail consulting, cultivation advisory, staffing, expert witness services, and analytical lab services. EAG operates internationally with managing partners Michael Maibach, Patrick King, and Casey Boone.",
+    "telephone": "+1-555-010-4477",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+1-555-010-4477",
+      "contactType": "customer service",
+      "areaServed": ["US", "CA", "international"],
+      "availableLanguage": "English"
+    },
+    "areaServed": {
+      "@type": "Place",
+      "name": "United States and International"
+    },
+    "foundingDate": "2019",
+    "employee": [
+      {
+        "@type": "Person",
+        "name": "Michael Maibach",
+        "jobTitle": "Managing Partner",
+        "worksFor": { "@type": "Organization", "name": "Elevated Advisory Group" }
+      },
+      {
+        "@type": "Person",
+        "name": "Patrick King",
+        "jobTitle": "Managing Partner",
+        "worksFor": { "@type": "Organization", "name": "Elevated Advisory Group" }
+      },
+      {
+        "@type": "Person",
+        "name": "Casey Boone",
+        "jobTitle": "Managing Partner",
+        "worksFor": { "@type": "Organization", "name": "Elevated Advisory Group" }
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "name": "Elevated Advisory Group — Cannabis Consulting",
+    "url": "https://acme-advisors.example",
+    "description": "Cannabis industry consulting firm offering extraction facility design, license applications, operational auditing, retail consulting, cultivation advisory, expert witness services, and analytical lab services.",
+    "provider": {
+      "@type": "Organization",
+      "name": "Elevated Advisory Group"
+    },
+    "serviceType": [
+      "Cannabis Extraction Lab Design",
+      "Cannabis License Application",
+      "Cannabis Operational Analysis",
+      "Cannabis Retail Consulting",
+      "Cannabis Cultivation Consulting",
+      "Expert Witness Services",
+      "Analytical Lab Advisory",
+      "Cannabis Growth Strategy"
+    ],
+    "areaServed": {
+      "@type": "Place",
+      "name": "United States and International"
+    },
+    "telephone": "+1-555-010-4477"
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Elevated Advisory Group",
+    "url": "https://acme-advisors.example",
+    "description": "Cannabis industry consulting — extraction lab design, license applications, operational analysis, retail, cultivation, expert witness, and analytical services."
+  }
+]

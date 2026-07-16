@@ -1,0 +1,35 @@
+{
+  "name": "@staqs/optimus-mcp",
+  "version": "1.2.0",
+  "description": "Optimus access tools — MCP server + CLI over the Board API (board + external customer tokens)",
+  "type": "module",
+  "main": "index.js",
+  "license": "Apache-2.0",
+  "bin": {
+    "optimus-mcp": "./index.js",
+    "optimus-cli": "./cli.js"
+  },
+  "files": [
+    "index.js",
+    "cli.js",
+    "client.js",
+    "generate-landing-page.js",
+    "issue-token.js",
+    "issue-customer-token.js",
+    "mcp.example.json",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "cli": "node cli.js",
+    "token": "node issue-token.js",
+    "customer-token": "node issue-customer-token.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "zod": "^3.23.8"
+  }
+}

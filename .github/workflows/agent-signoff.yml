@@ -1,0 +1,49 @@
+name: agent-signoff
+
+# OPT-153 — server-side merge gate: "less human approval, more agent sign-off".
+# A PR is mergeable only once a reviewer agent has signed off by applying the
+# `agent-approved` label (after an ACCEPT/SHIP review). This is the server-side
+# counterpart to the local PreToolUse hook (~/.claude/hooks/pr-merge-guard.py),
+# which catches `gh pr merge --admin` on dev machines. Together: front-door
+# merges are gated by this required check; admin merges are gated by the hook.
+#
+# Re-runs whenever a label changes, so applying/removing `agent-approved`
+# flips the check without a new commit.
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, labeled, unlabeled, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+# One run per PR; a newer event (e.g. a label change) cancels an older in-flight
+# run so the latest label state is the single source of truth for the check.
+concurrency:
+  group: agent-signoff-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  agent-signoff:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require agent sign-off label, block hard-stop labels
+        env:
+          LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+        run: |
+          echo "PR labels: $LABELS"
+          if echo "$LABELS" | grep -q '"do-not-merge"'; then
+            echo "::error::'do-not-merge' label present — merge hard-blocked."
+            exit 1
+          fi
+          if echo "$LABELS" | grep -q '"needs-human-review"'; then
+            echo "::error::'needs-human-review' label present — merge blocked pending human review."
+            exit 1
+          fi
+          if echo "$LABELS" | grep -q '"agent-approved"'; then
+            echo "✅ agent-approved sign-off present — cleared to merge."
+            exit 0
+          fi
+          echo "::error::Missing 'agent-approved' sign-off. A reviewer agent must sign off (apply the 'agent-approved' label after an ACCEPT/SHIP review) before this PR can merge. See OPT-153."
+          exit 1

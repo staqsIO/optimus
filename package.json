@@ -1,0 +1,25 @@
+{
+  "name": "optimus",
+  "version": "1.0.0",
+  "description": "Governed agent organization — AI agents handle operations under human board oversight",
+  "type": "module",
+  "private": true,
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "start": "cd autobot-inbox && npm start",
+    "test": "cd autobot-inbox && npm test",
+    "migrate": "cd autobot-inbox && npm run migrate",
+    "lint": "npm run lint --prefix lib && npm run lint --prefix agents",
+    "lint:lib": "npm run lint --prefix lib",
+    "lint:agents": "npm run lint --prefix agents",
+    "postinstall": "cd lib && npm install --silent"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "^0.4.2",
+    "chrome-launcher": "^1.2.1",
+    "playwright": "^1.58.2"
+  }
+}

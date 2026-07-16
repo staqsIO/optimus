@@ -1,0 +1,115 @@
+{
+  "_description": "2025-2026 design conventions for pattern gap analysis. Each pattern is checked against scraped site data to identify modernization opportunities.",
+  "patterns": [
+    {
+      "id": "bento-grid",
+      "name": "Bento Grid Layouts",
+      "description": "Asymmetric card grids replacing uniform icon+text rows. Size variation creates visual hierarchy.",
+      "detect": {
+        "cssPatterns": ["grid-template-columns", "grid-template-rows", "grid-area"],
+        "htmlPatterns": ["class*=\"bento\"", "class*=\"grid\""]
+      },
+      "priority": "high",
+      "directive": "Use CSS Grid with asymmetric column sizes (e.g., 2fr 1fr, 1fr 1.3fr) for feature sections instead of uniform card rows."
+    },
+    {
+      "id": "translucent-nav",
+      "name": "Translucent Navigation",
+      "description": "backdrop-blur + 8-12% background opacity on fixed/sticky navbars. Fully opaque navs read as dated.",
+      "detect": {
+        "cssPatterns": ["backdrop-filter", "backdrop-blur", "-webkit-backdrop-filter"],
+        "htmlPatterns": []
+      },
+      "priority": "high",
+      "directive": "Use backdrop-filter: blur(12px) with background-color at 80-90% opacity on the main navigation bar."
+    },
+    {
+      "id": "dark-mode",
+      "name": "Dark Mode Support",
+      "description": "prefers-color-scheme media query or theme toggle. Light-only sites miss ~30% user preference.",
+      "detect": {
+        "cssPatterns": ["prefers-color-scheme", "color-scheme", "data-theme"],
+        "htmlPatterns": ["class*=\"dark\"", "data-theme"]
+      },
+      "priority": "medium",
+      "directive": "Include CSS custom properties for colors and a prefers-color-scheme: dark media query with inverted palette."
+    },
+    {
+      "id": "gradient-text",
+      "name": "Gradient Text on Headlines",
+      "description": "Single accent gradient on one word/phrase in the hero headline. Overused but contemporary when restrained.",
+      "detect": {
+        "cssPatterns": ["background-clip: text", "-webkit-background-clip: text", "text-fill-color"],
+        "htmlPatterns": []
+      },
+      "priority": "low",
+      "directive": "Apply a restrained gradient (2 brand colors) to one key word in the hero headline using background-clip: text."
+    },
+    {
+      "id": "svg-separators",
+      "name": "SVG Section Separators",
+      "description": "Organic curves or diagonal clips replacing hard horizontal lines between sections.",
+      "detect": {
+        "cssPatterns": ["clip-path"],
+        "htmlPatterns": ["svg", "class*=\"separator\"", "class*=\"divider\"", "class*=\"wave\""]
+      },
+      "priority": "medium",
+      "directive": "Use SVG curve paths or clip-path: polygon() to create organic transitions between major sections."
+    },
+    {
+      "id": "large-number-callouts",
+      "name": "Large Number Social Proof",
+      "description": "Stats in 72-96px weight-900 type for social proof sections (10,000+ users, 99.9% uptime).",
+      "detect": {
+        "cssPatterns": [],
+        "htmlPatterns": []
+      },
+      "priority": "medium",
+      "directive": "Display key metrics in oversized (4-6rem) bold type with a brief label beneath each number."
+    },
+    {
+      "id": "scroll-animations",
+      "name": "Scroll-Triggered Animations",
+      "description": "IntersectionObserver-driven fade/slide animations on scroll. Static pages feel flat.",
+      "detect": {
+        "cssPatterns": ["@keyframes", "animation", "transition"],
+        "htmlPatterns": ["class*=\"animate\"", "data-aos", "class*=\"reveal\""]
+      },
+      "priority": "high",
+      "directive": "Add IntersectionObserver-based fade-in-up animations to section headings, cards, and images as they enter viewport."
+    },
+    {
+      "id": "glassmorphism",
+      "name": "Glassmorphism / Frosted Glass",
+      "description": "Semi-transparent backgrounds with blur for cards or overlays. Gives depth without heavy shadows.",
+      "detect": {
+        "cssPatterns": ["backdrop-filter", "backdrop-blur"],
+        "htmlPatterns": ["class*=\"glass\"", "class*=\"frosted\""]
+      },
+      "priority": "low",
+      "directive": "Use frosted glass effect (backdrop-filter: blur, semi-transparent bg) on feature cards or pricing tables for visual depth."
+    },
+    {
+      "id": "micro-interactions",
+      "name": "Micro-Interactions on CTAs",
+      "description": "Hover states with scale, shadow shift, or color transitions on buttons and interactive elements.",
+      "detect": {
+        "cssPatterns": ["transform", "transition", ":hover"],
+        "htmlPatterns": []
+      },
+      "priority": "medium",
+      "directive": "Add subtle hover transitions (transform: translateY(-2px), box-shadow increase) to buttons and interactive cards."
+    },
+    {
+      "id": "variable-fonts",
+      "name": "Variable Font Usage",
+      "description": "Single variable font file instead of multiple weights. Better performance and smoother transitions.",
+      "detect": {
+        "cssPatterns": ["font-variation-settings", "font-weight: var("],
+        "htmlPatterns": []
+      },
+      "priority": "low",
+      "directive": "Use variable fonts where available (Inter, DM Sans) for smoother weight transitions and smaller file sizes."
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+.DS_Store
+node_modules/
+.env
+.env.local
+.next/
+*.log
+tsconfig.tsbuildinfo
+next-env.d.ts
+autobot-inbox/keys/
+
+# MCP temp config — written to tmpdir by spawn-cli.js, but ignored here as defense-in-depth
+.mcp-workshop.json
+
+# Campaign worktree artifacts — ephemeral agent workspaces
+/campaigns/
+
+# Campaign-generated output files — stay local or go to DB, never to git
+# Root-level HTML artifacts produced by executor-blueprint, executor-redesign, claw-campaigner
+/*.html
+/blueprint.html
+/monstro-onepager.html
+
+# Campaign-generated directories (claw-campaigner stateless output)
+/umbrella-crew/
+/products/
+/data/
+/project-name.txt
+/delphi.md
+/goal.md
+
+# Claude Code local settings
+.claude/
+autobot-inbox/docs/eag-deliverables/
+
+# Supabase CLI local temp/state — never commit
+autobot-inbox/supabase/.temp/
+
+# Internal audit artifacts — never publish
+audit/

@@ -1,0 +1,58 @@
+{
+  "description": "Content gate configuration for Phase 1.5 unified content engine. Hard constraints from Dustin's voice guide enforced as infrastructure gates (P2).",
+  "forbidden_words": [
+    "game changer",
+    "unlock",
+    "journey",
+    "leverage",
+    "disrupt",
+    "synergy",
+    "empower",
+    "transformation",
+    "revolutionary",
+    "cutting-edge",
+    "next-level",
+    "deep dive",
+    "double down",
+    "move the needle",
+    "at the end of the day"
+  ],
+  "forbidden_patterns": [
+    {
+      "name": "em_dash",
+      "pattern": "[\u2014]|--",
+      "description": "No em dashes — use commas, periods, or parentheses"
+    },
+    {
+      "name": "contrastive_reframe",
+      "pattern": "it'?s not .{1,40},? it'?s ",
+      "flags": "i",
+      "description": "No 'It's not X, it's Y' constructions"
+    }
+  ],
+  "formatting_rules": {
+    "no_bullet_points_in_body": true,
+    "no_bold_in_body": true,
+    "no_numbered_lists_in_body": true,
+    "headers_h2_only": true,
+    "minimal_formatting": true
+  },
+  "quality_thresholds": {
+    "blog": {
+      "min_word_count": 600,
+      "max_word_count": 3000,
+      "min_reading_time_min": 3
+    },
+    "linkedin": {
+      "min_word_count": 100,
+      "max_word_count": 400
+    }
+  },
+  "g8_factual_accuracy": {
+    "flag_numeric_claims": true,
+    "flag_regulatory_references": true,
+    "flag_named_company_claims": true,
+    "flag_pricing_data": true,
+    "description": "Flags claims requiring human verification before publication"
+  }
+}

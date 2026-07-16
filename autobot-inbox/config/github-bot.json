@@ -1,0 +1,35 @@
+{
+  "copilotReview": true,
+  "repos": ["staqsIO/optimus", "f8ai/formul8-platform", "f8ai/formul8-metrc-platform", "f8ai/formul8-ai-dashboard", "staqsIO/staqs-splash", "staqsIO/ag-webapp"],
+  "autoFixLabels": ["auto-fix"],
+  "intentLabels": {
+    "spec-gap": { "agent": "executor-research", "tier": "strategic" },
+    "phase-1": { "agent": "executor-coder", "tier": "tactical" },
+    "architecture": { "agent": "architect", "tier": "strategic" },
+    "enhancement": { "agent": "executor-coder", "tier": "tactical" },
+    "documentation": { "agent": "executor-research", "tier": "tactical" },
+    "bug": { "agent": "executor-coder", "tier": "tactical" }
+  },
+  "watchedEvents": {
+    "pull_request": {
+      "actions": ["review_requested", "changes_requested"],
+      "signalType": "request"
+    },
+    "pull_request_review": {
+      "actions": ["submitted"],
+      "signalType": "info"
+    },
+    "issue_comment": {
+      "actions": ["created"],
+      "signalType": "info"
+    },
+    "check_suite": {
+      "actions": ["completed"],
+      "conclusionFilter": ["failure"],
+      "signalType": "request",
+      "createIntent": true
+    }
+  },
+  "defaultAgent": "executor-coder",
+  "defaultTier": "tactical"
+}

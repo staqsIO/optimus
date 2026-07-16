@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background: #0a0a0f;
+  color: #e4e4e7;
+}
+
+/* Electron macOS: pad nav for traffic lights and make it draggable */
+body.electron-mac nav.app-nav {
+  padding-left: 80px;
+  -webkit-app-region: drag;
+}
+body.electron-mac nav.app-nav a,
+body.electron-mac nav.app-nav button,
+body.electron-mac nav.app-nav [role="button"] {
+  -webkit-app-region: no-drag;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "name": "autobot-inbox",
+  "version": "0.5.2",
+  "description": "AutoBot Inbox — AI inbox management",
+  "main": "main.cjs",
+  "license": "Apache-2.0",
+  "scripts": {
+    "start": "electron .",
+    "start:demo": "electron . --demo",
+    "build": "npm run build:dashboard && electron-builder",
+    "build:dashboard": "cd ../dashboard && npm run build",
+    "build:mac": "npm run build:dashboard && electron-builder --mac",
+    "build:win": "npm run build:dashboard && electron-builder --win",
+    "build:linux": "npm run build:dashboard && electron-builder --linux"
+  },
+  "build": {
+    "appId": "ai.formul8.autobot-inbox",
+    "productName": "AutoBot Inbox",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.cjs",
+      "preload.cjs"
+    ],
+    "extraResources": [
+      {
+        "from": "../src",
+        "to": "src",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "../config",
+        "to": "config",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "../sql",
+        "to": "sql",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "../fixtures",
+        "to": "fixtures",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "../dashboard/.next",
+        "to": "dashboard/.next",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "../dashboard/public",
+        "to": "dashboard/public",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "../dashboard/package.json",
+        "to": "dashboard/package.json"
+      },
+      {
+        "from": "../dashboard/node_modules",
+        "to": "dashboard/node_modules",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "../node_modules",
+        "to": "node_modules",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "../package.json",
+        "to": "package.json"
+      },
+      {
+        "from": "../.env.example",
+        "to": ".env.example"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": ["dmg"],
+      "icon": "icon.icns"
+    },
+    "win": {
+      "target": ["nsis"],
+      "icon": "icon.ico"
+    },
+    "linux": {
+      "target": ["AppImage"],
+      "icon": "icon.png",
+      "category": "Office"
+    }
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "$comment": "Stream B — signal->action bridge tuning (ADR-008). Phase 0 ships with dryRun=true: the bridge computes routing + liveness and stamps signals.metadata.bridge_dryrun, but creates NO work_items and NO human_tasks. Flip dryRun=false only after the Phase 0 dry-run report over the 2,629-obligation backlog is reviewed by the board. Thresholds/tiers live here (not in code) so they can be tuned without a deploy and so retrospector-driven learning can rewrite them as data (ADR-008 §3).",
+
+  "dryRun": false,
+  "$comment_dryRun": "Flipped false 2026-06-13 (OPT-56) — board (Eric) signed off after dry-run report review. CANARY rollout: staleCleanupOnly stays true for the first live run, so this drains the stale ~47% (resolve-only, zero outbound) while SUPPRESSING routing of the 756 live obligations. Flip staleCleanupOnly=false next to open autonomous routing. Requires SIGNAL_BRIDGE_ENABLED=true on autobot-inbox-api (independent gate).",
+
+  "staleCleanupOnly": false,
+  "$comment_staleCleanupOnly": "Flipped false 2026-06-13 (OPT-56 second flip) — board (Eric) signed off after the canary held clean (stale drained, 0 outbound). The bridge now ROUTES live obligations: reversible ones (drafts-not-sends, tickets, internal tracking) spawn autonomous work_items; irreversible ones (external sends, money, legal, review-band) are alwaysGated → human_tasks card. All downstream irreversible steps still hit guardCheck/checkDraftGates (G1-G11). Paired with batchSize=5 for a controlled first live-routing run; raise back toward 25 once a few passes are verified clean.",
+
+  "confidenceThreshold": 0.70,
+  "$comment_confidenceThreshold": "Minimum inbox.signals.confidence to be eligible for bridging at all. Mirrors the signals_bridge_eligible index predicate (migration 127).",
+
+  "reviewBandFloor": 0.70,
+  "reviewBandCeiling": 0.85,
+  "$comment_reviewBand": "Confidence in [reviewBandFloor, reviewBandCeiling) is force-routed to 'gated' even when the obligation is otherwise reversible — a human reviews the classification itself. At/above reviewBandCeiling, an otherwise-reversible obligation routes 'autonomous'.",
+
+  "staleness": {
+    "occurredWithinDays": 45,
+    "dueWithinDays": 7
+  },
+  "$comment_staleness": "Recency FALLBACK for isStillLive(). Context (contact/engagement status) is PRIMARY; these windows only fire when context is inconclusive. occurredWithinDays: occurred_at older than this => not live. dueWithinDays: a due_date older than now()-this => not live.",
+
+  "notLiveContactTiers": ["automated"],
+  "$comment_notLiveContactTiers": "OPT-154 — signal.contacts.tier values that isStillLive()'s context-PRIMARY branch treats as NOT a live counterparty (this beats the recency fallback). The contact is resolved at signal-load time via a join on the message sender address. 'automated' = no-reply/system senders; an obligation 'from' such a contact is not a real two-way thread to act on, so it resolves not-live with reason 'contact_automated' instead of being routed. Must be a subset of the signal.contacts.tier CHECK values (inner_circle, active, inbound_only, newsletter, automated, unknown). Matched case-insensitively. Defaults to ['automated'] in code if this key is absent.",
+
+  "eligibleSignalTypes": ["commitment", "request", "action_item"],
+  "$comment_eligibleSignalTypes": "Must stay a subset of inbox.signals.signal_type CHECK values AND match the signals_bridge_eligible partial index (migration 127). Changing this list without re-creating that index silently disables index usage.",
+
+  "batchSize": 25,
+  "$comment_batchSize": "Raised 5→25 on 2026-06-13 after the OPT-56 second flip's first live-routing passes verified clean (correct autonomous/gated split, G5 holds — 0 sends, guardCheck firing 0 blocked, cost $0.04/$20). 25 = original design value; drains the ~756 autonomous backlog faster (~2.5h vs ~12h at 5). Still bounded per pass by perRunCostCapUsd (2.5) and per day by G1 ($20 LLM ceiling).",
+  "perRunCostCapUsd": 2.5,
+  "$comment_cost": "perRunCostCapUsd halts a reconciler run before exceeding the cap. Phase 0 (dryRun) cost is ~0 (no LLM calls in the bridge itself); the cap guards the live phase and any opt-in RAG supersede check.",
+
+  "reconcileIntervalMs": 300000,
+  "$comment_reconcileIntervalMs": "Cadence for the scheduled bridge reconciler when SIGNAL_BRIDGE_ENABLED=true (ADR-008 Phase 1, wired in autobot-inbox/src/index.js). Default 300000 = 5 min, mirroring the Gmail/TLDv/calendar safety-net polls. This only controls HOW OFTEN a pass runs; whether a pass creates anything is governed independently by dryRun above. The env flag and dryRun are two separate gates — both must be flipped to act in production.",
+
+  "ragSupersedeCheck": false,
+  "$comment_ragSupersedeCheck": "OFF by default (cost control). When true, isStillLive() may run a cheap RAG 'has this obligation been superseded?' probe. Stubbed in Phase 0 — see signal-action-bridge.js isStillLive().",
+
+  "routing": {
+    "$comment": "Deterministic reversibility classification (ADR-008 §2). Computed from (signal_type, direction, domain) plus derived booleans has_external_recipient / touches_money / touches_legal. This is the authoritative documentation of the rule table implemented in routeObligation(); the function is the source of truth, this section explains intent.",
+    "states": {
+      "autonomous": "Reversible. Spawns a status='created' work_item that an executor runs to completion immediately. No board card. The irreversible step (if any) still hits guardCheck/checkDraftGates downstream.",
+      "gated": "Irreversible class. Spawns the work_item AND a visible inbox.human_tasks card so a human sees it (a blocked work_item alone is NOT surfaced — guard-check.js only blocks agent CLAIM of it)."
+    },
+    "alwaysGated": [
+      "domain == 'legal' (legal commitment)",
+      "domain == 'financial' OR touches_money (money out the door)",
+      "has_external_recipient on an outbound send (external counterparty send)",
+      "confidence in the review band [0.70, 0.85)"
+    ],
+    "autonomousMap": {
+      "request_inbound": "executor-responder — draft a reply (not sent)",
+      "action_item": "executor-ticket — create a Linear/GitHub issue",
+      "commitment_outbound_internal": "internal work_item — track the obligation"
+    }
+  }
+}

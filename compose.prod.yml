@@ -1,0 +1,138 @@
+name: optimus-prod
+
+# Production compose — pre-built images, no source mounts, restart policies.
+# Postgres and Redis are not exposed to the host; only app ports are published.
+#
+# Usage:
+#   cp autobot-inbox/.env.example autobot-inbox/.env   # fill in all required values
+#   docker compose -f compose.prod.yml build
+#   docker compose -f compose.prod.yml up -d
+#
+# Required env vars for production (will error if missing):
+#   ANTHROPIC_API_KEY, POSTGRES_PASSWORD, API_KEY_ENCRYPTION_SECRET,
+#   NEXTAUTH_SECRET, GITHUB_ID, GITHUB_SECRET, API_SECRET
+
+services:
+
+  # ── Database ─────────────────────────────────────────────────────────────────
+
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-autobot}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required in production}
+      POSTGRES_DB: ${POSTGRES_DB:-autobot}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-autobot} -d ${POSTGRES_DB:-autobot}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    # Not exposed to host — accessed internally by autobot-inbox only
+
+  redis:
+    image: redis:7-alpine
+    command: >
+      sh -c "if [ -n '${REDIS_PASSWORD:-}' ]; then
+        redis-server --requirepass ${REDIS_PASSWORD};
+      else
+        redis-server;
+      fi"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+    # Not exposed to host — accessed internally by board-workstation only
+
+  # ── Agent Runtime ─────────────────────────────────────────────────────────────
+
+  autobot-inbox:
+    build:
+      context: ./autobot-inbox
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-autobot}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-autobot}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:?ANTHROPIC_API_KEY is required}
+      GMAIL_CLIENT_ID: ${GMAIL_CLIENT_ID:-}
+      GMAIL_CLIENT_SECRET: ${GMAIL_CLIENT_SECRET:-}
+      GMAIL_REFRESH_TOKEN: ${GMAIL_REFRESH_TOKEN:-}
+      GMAIL_USER_EMAIL: ${GMAIL_USER_EMAIL:-}
+      DAILY_BUDGET_USD: ${DAILY_BUDGET_USD:-20}
+      AUTONOMY_LEVEL: ${AUTONOMY_LEVEL:-0}
+      GMAIL_POLL_INTERVAL: ${GMAIL_POLL_INTERVAL:-60}
+      API_PORT: 3001
+      PROCESS_ROLE: ${PROCESS_ROLE:-full}
+      DEFAULT_REPO_OWNER: ${DEFAULT_REPO_OWNER:-staqsIO}
+      DEFAULT_REPO_NAME: ${DEFAULT_REPO_NAME:-optimus}
+      SLACK_BOT_TOKEN: ${SLACK_BOT_TOKEN:-}
+      SLACK_SIGNING_SECRET: ${SLACK_SIGNING_SECRET:-}
+      SLACK_APP_TOKEN: ${SLACK_APP_TOKEN:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    # Not exposed to host — accessed internally by dashboards only
+
+  # ── Inbox Dashboard ───────────────────────────────────────────────────────────
+
+  inbox-dashboard:
+    build:
+      context: ./autobot-inbox/dashboard
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_BASE_URL: ${INBOX_DASHBOARD_URL:-http://localhost:3100}
+      NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:-}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}
+      API_URL: http://autobot-inbox:3001
+      API_SECRET: ${API_SECRET:?API_SECRET is required in production}
+    ports:
+      - "3100:3100"
+    depends_on:
+      - autobot-inbox
+    restart: unless-stopped
+
+  # ── Board Workstation ─────────────────────────────────────────────────────────
+
+  board-workstation:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      REDIS_URL: redis://${REDIS_PASSWORD:+:${REDIS_PASSWORD}@}redis:6379
+      NEXT_PUBLIC_BASE_URL: ${BOARD_URL:-http://localhost:3200}
+      OPS_API_URL: http://autobot-inbox:3001
+      API_KEY_ENCRYPTION_SECRET: ${API_KEY_ENCRYPTION_SECRET:?API_KEY_ENCRYPTION_SECRET is required in production}
+      NEXTAUTH_URL: ${BOARD_URL:-http://localhost:3200}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:?NEXTAUTH_SECRET is required in production}
+      GITHUB_ID: ${GITHUB_ID:?GITHUB_ID is required}
+      GITHUB_SECRET: ${GITHUB_SECRET:?GITHUB_SECRET is required}
+      BOARD_MEMBERS: ${BOARD_MEMBERS:-ecgang,ConsultingFuture4200}
+    ports:
+      - "3200:3000"   # container runs on 3000 (Dockerfile ENV PORT=3000), host maps to 3200
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ── Docs Site ─────────────────────────────────────────────────────────────────
+
+  docs:
+    build:
+      context: .
+      dockerfile: docs-site/Dockerfile
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:

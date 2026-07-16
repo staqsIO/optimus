@@ -1,0 +1,37 @@
+# Curated mappings between spec sections, agents, gates, principles, and tables.
+# Used by src/graph/spec-seed.js to create semantic edges in Neo4j.
+# These links require human curation — auto-extraction only handles §N cross-refs.
+
+agent_sections:
+  orchestrator: ["3", "4"]
+  strategist: ["4", "19"]
+  executor-triage: ["4"]
+  executor-responder: ["4", "7"]
+  reviewer: ["5"]
+  architect: ["2", "8"]
+  executor-ticket: ["4"]
+  executor-coder: ["4", "6"]
+  executor-research: ["4"]
+  executor-redesign: ["4"]
+  executor-blueprint: ["4"]
+
+gate_principles:
+  G1: ["P1", "P2"]
+  G2: ["P1", "P2"]
+  G3: ["P6"]
+  G4: ["P5"]
+  G5: ["P2"]
+  G6: ["P6"]
+  G7: ["P1", "P5"]
+  G8: ["P3"]
+
+section_tables:
+  "3": ["work_items", "edges", "state_transitions", "task_events"]
+  "4": ["agent_configs", "agent_assignment_rules", "permission_grants"]
+  "5": ["guardrail_checks", "graduated_escalation_log"]
+  "6": ["tool_registry", "tool_invocations"]
+  "7": ["action_proposals"]
+  "8": ["state_transitions", "llm_invocations", "deploy_events"]
+  "9": ["kill_switch_events"]
+  "10": ["budgets", "llm_invocations"]
+  "12": ["_migrations"]

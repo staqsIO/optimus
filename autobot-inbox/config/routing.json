@@ -1,0 +1,46 @@
+{
+  "taskTypes": {
+    "email_triage": {
+      "agent": "executor-triage",
+      "description": "Classify incoming email and extract signals",
+      "estimatedCostUsd": 0.005,
+      "priority": 1
+    },
+    "email_strategy": {
+      "agent": "strategist",
+      "description": "Priority scoring and response strategy recommendation",
+      "estimatedCostUsd": 0.43,
+      "priority": 2,
+      "skipWhen": {
+        "triageCategory": ["fyi", "noise"]
+      }
+    },
+    "email_respond": {
+      "agent": "executor-responder",
+      "description": "Draft email reply in Eric's voice",
+      "estimatedCostUsd": 0.01,
+      "priority": 3,
+      "requiresPrior": ["email_triage"]
+    },
+    "draft_review": {
+      "agent": "reviewer",
+      "description": "Gate checks on draft before board review",
+      "estimatedCostUsd": 0.05,
+      "priority": 4,
+      "requiresPrior": ["email_respond"]
+    },
+    "daily_analysis": {
+      "agent": "architect",
+      "description": "Daily pipeline analysis and briefing generation",
+      "estimatedCostUsd": 0.10,
+      "priority": 5,
+      "schedule": "daily"
+    }
+  },
+  "pipeline": {
+    "actionRequired": ["email_triage", "email_strategy", "email_respond", "draft_review"],
+    "needsResponse": ["email_triage", "email_strategy", "email_respond", "draft_review"],
+    "fyi": ["email_triage"],
+    "noise": ["email_triage"]
+  }
+}

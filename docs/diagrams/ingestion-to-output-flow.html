@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Optimus — Ingestion → RAG → Knowledge → Output Flow</title>
+<style>
+  :root {
+    --bg: #0b0f17;
+    --panel: #131a26;
+    --panel-2: #1a2333;
+    --ink: #e6ecf5;
+    --muted: #8a99b3;
+    --line: #2a3548;
+    --accent-ingest: #4ea8ff;
+    --accent-rag: #7c5cff;
+    --accent-kb: #21c997;
+    --accent-graph: #ff8a3d;
+    --accent-context: #ffd166;
+    --accent-output: #ff5d8f;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: radial-gradient(1200px 800px at 20% -10%, #16223a 0%, var(--bg) 60%) fixed;
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+  }
+  header {
+    padding: 32px 48px 8px;
+  }
+  header h1 {
+    margin: 0 0 6px;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  header .sub {
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .legend {
+    display: flex; gap: 16px; flex-wrap: wrap;
+    padding: 12px 48px 24px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .legend .item { display: flex; align-items: center; gap: 6px; }
+  .legend .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    display: inline-block;
+  }
+  .canvas {
+    padding: 0 48px 48px;
+  }
+  .layer {
+    margin-bottom: 18px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0));
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 20px;
+  }
+  .layer h2 {
+    margin: 0 0 14px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .layer h2 .tag {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--panel-2);
+    color: var(--ink);
+    letter-spacing: 0.04em;
+    text-transform: none;
+  }
+  .row {
+    display: grid;
+    gap: 12px;
+  }
+  .row.cols-5 { grid-template-columns: repeat(5, minmax(0,1fr)); }
+  .row.cols-4 { grid-template-columns: repeat(4, minmax(0,1fr)); }
+  .row.cols-3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .row.cols-2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 14px;
+    position: relative;
+    transition: transform .15s ease, border-color .15s ease;
+  }
+  .card:hover { transform: translateY(-1px); border-color: rgba(255,255,255,0.18); }
+  .card .title {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .card .meta {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+  .card .pill {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: var(--panel-2);
+    color: var(--muted);
+    margin-left: 6px;
+  }
+  .arrow {
+    text-align: center;
+    color: var(--muted);
+    font-size: 18px;
+    line-height: 1;
+    padding: 4px 0 10px;
+    user-select: none;
+  }
+  /* Accents */
+  .ingest { border-left: 3px solid var(--accent-ingest); }
+  .rag { border-left: 3px solid var(--accent-rag); }
+  .kb { border-left: 3px solid var(--accent-kb); }
+  .graph { border-left: 3px solid var(--accent-graph); }
+  .context { border-left: 3px solid var(--accent-context); }
+  .output { border-left: 3px solid var(--accent-output); }
+
+  .dot.ingest { background: var(--accent-ingest); }
+  .dot.rag { background: var(--accent-rag); }
+  .dot.kb { background: var(--accent-kb); }
+  .dot.graph { background: var(--accent-graph); }
+  .dot.context { background: var(--accent-context); }
+  .dot.output { background: var(--accent-output); }
+
+  .split {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 16px;
+  }
+  .panel-note {
+    background: linear-gradient(180deg, rgba(124,92,255,0.08), rgba(124,92,255,0));
+    border: 1px solid rgba(124,92,255,0.25);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .panel-note b { color: var(--ink); }
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(33,201,151,0.15);
+    color: #6be7c0;
+    margin-right: 6px;
+  }
+  footer {
+    padding: 0 48px 48px;
+    color: var(--muted);
+    font-size: 11px;
+  }
+  code {
+    background: var(--panel-2);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    color: #cfe3ff;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Optimus — Ingestion → RAG → Knowledge → Output Flow</h1>
+  <div class="sub">From raw sources to actionable artifacts: how meetings, mail, and docs become Kanban tasks, proposals, and content.</div>
+</header>
+
+<div class="legend">
+  <div class="item"><span class="dot ingest"></span> Ingestion sources</div>
+  <div class="item"><span class="dot rag"></span> RAG pipeline</div>
+  <div class="item"><span class="dot kb"></span> Knowledge Base (Postgres + pgvector)</div>
+  <div class="item"><span class="dot graph"></span> Neo4j enrichment</div>
+  <div class="item"><span class="dot context"></span> Context assembly</div>
+  <div class="item"><span class="dot output"></span> Outputs</div>
+</div>
+
+<div class="canvas">
+
+  <!-- Layer 1: Ingestion -->
+  <section class="layer">
+    <h2><span class="dot ingest"></span> 1 · Ingestion Sources <span class="tag">863 docs · 6,663 chunks · 3.2M tokens</span></h2>
+    <div class="row cols-5">
+      <div class="card ingest">
+        <div class="title">Gmail <span class="pill">491</span></div>
+        <div class="meta">eric@ + jamie@staqs.io · 5-min reconciler · webhook ingest</div>
+      </div>
+      <div class="card ingest">
+        <div class="title">Google Drive <span class="pill">274</span></div>
+        <div class="meta">Service account, domain-wide delegation · folder watch</div>
+      </div>
+      <div class="card ingest">
+        <div class="title">TLDv Meetings <span class="pill">47</span></div>
+        <div class="meta">5-min poller + webhook · transcripts + summaries</div>
+      </div>
+      <div class="card ingest">
+        <div class="title">brain-rag (legacy) <span class="pill">51</span></div>
+        <div class="meta">Carlos's corpus, consolidated 2026-03-30</div>
+      </div>
+      <div class="card ingest">
+        <div class="title">Manual paste / upload</div>
+        <div class="meta"><code>POST /api/documents/ingest</code> · board KB admin</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="arrow">▼</div>
+
+  <!-- Layer 2: RAG Pipeline -->
+  <section class="layer">
+    <h2><span class="dot rag"></span> 2 · RAG Pipeline <code>lib/rag/</code></h2>
+    <div class="row cols-4">
+      <div class="card rag">
+        <div class="title">Normalizers</div>
+        <div class="meta">Per-source adapters strip into common envelope (text + metadata + ACL)</div>
+      </div>
+      <div class="card rag">
+        <div class="title">Chunker</div>
+        <div class="meta">Sliding window w/ overlap · token-aware · sentence boundary aware</div>
+      </div>
+      <div class="card rag">
+        <div class="title">Embedder</div>
+        <div class="meta">OpenAI <code>text-embedding-3-small</code> · 1536 dims · provider-swappable</div>
+      </div>
+      <div class="card rag">
+        <div class="title">Classifier (G9)</div>
+        <div class="meta">PUBLIC · INTERNAL · CONFIDENTIAL · RESTRICTED <span class="badge">smallint</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="arrow">▼</div>
+
+  <!-- Layer 3: Knowledge Base + Neo4j enrichment -->
+  <section class="layer">
+    <h2><span class="dot kb"></span> 3 · Knowledge Base &nbsp;+&nbsp; <span class="dot graph"></span> Neo4j Enrichment</h2>
+    <div class="split">
+      <div>
+        <div class="row cols-2">
+          <div class="card kb">
+            <div class="title">Postgres + pgvector</div>
+            <div class="meta">Supabase · transaction pooler :6543 · chunks table w/ vector index · classification_level filter applied at query</div>
+          </div>
+          <div class="card kb">
+            <div class="title">Retriever</div>
+            <div class="meta">Hybrid: vector + keyword · Voyage reranker (Cohere/Jina/cosine fallback) · 60s TTL cache</div>
+          </div>
+          <div class="card kb">
+            <div class="title">Search API</div>
+            <div class="meta"><code>POST /api/search</code> — Haiku synthesis w/ citations · <code>/api/documents/search</code> raw chunks</div>
+          </div>
+          <div class="card kb">
+            <div class="title">Embed worker</div>
+            <div class="meta"><code>POST /api/documents/embed-pending</code> · 100 chunks / batch · async</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="row cols-1" style="grid-template-columns: 1fr;">
+          <div class="card graph">
+            <div class="title">Neo4j Knowledge Graph <span class="pill">ADR-019</span></div>
+            <div class="meta">
+              Entities extracted from each doc → typed nodes &amp; edges:<br/>
+              <b>Person</b> · <b>Company</b> · <b>Topic</b> · <b>Project</b> · <b>Meeting</b> · <b>Thread</b><br/>
+              Relationships: <code>ATTENDED</code>, <code>MENTIONED</code>, <code>OWNS</code>, <code>REPLIED_TO</code>, <code>RELATES_TO</code>
+            </div>
+          </div>
+          <div class="card graph">
+            <div class="title">Cross-link writeback</div>
+            <div class="meta">Graph IDs stored on chunks → retriever can expand "people on this meeting" / "prior threads with this contact" at query time.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="arrow">▼</div>
+
+  <!-- Layer 4: Context Assembly -->
+  <section class="layer">
+    <h2><span class="dot context"></span> 4 · Context Assembly <code>loadContext()</code> · parallelized</h2>
+    <div class="row cols-4">
+      <div class="card context">
+        <div class="title">RAG retrieval</div>
+        <div class="meta">Top-K chunks w/ classification filter, reranked, citations preserved</div>
+      </div>
+      <div class="card context">
+        <div class="title">Calendar association</div>
+        <div class="meta">Meeting → attendees → upcoming/past events · TLDv summary joins on event ID</div>
+      </div>
+      <div class="card context">
+        <div class="title">Contacts fulfillment</div>
+        <div class="meta">Email/name → Neo4j Person → company, role, prior threads, last touchpoint, voice profile</div>
+      </div>
+      <div class="card context">
+        <div class="title">Agent memory + tick context</div>
+        <div class="meta"><code>lib/runtime/agent-memory.js</code> + <code>tick-context.js</code> · Q2/Q3/Q4 via <code>Promise.all</code></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="arrow">▼</div>
+
+  <!-- Layer 5: Outputs -->
+  <section class="layer">
+    <h2><span class="dot output"></span> 5 · Outputs — what the context becomes</h2>
+    <div class="row cols-3">
+      <div class="card output">
+        <div class="title">Kanban: Human Tasks</div>
+        <div class="meta">Meeting → action items → Linear issues + board lanes (Today / Drafts / Workstation). Human owner, agent assist.</div>
+      </div>
+      <div class="card output">
+        <div class="title">Kanban: Agent Tasks</div>
+        <div class="meta">Work items written to <code>agent_graph</code> · executor-coder / claw-workshop / executor-contract claim by tier</div>
+      </div>
+      <div class="card output">
+        <div class="title">Proposals &amp; Contracts</div>
+        <div class="meta">executor-contract pulls meeting context + RAG · fills <code>[BRACKET]</code> placeholders · multi-signer flow via <code>signatures</code> schema</div>
+      </div>
+      <div class="card output">
+        <div class="title">Blog posts</div>
+        <div class="meta">Meeting/topic → executor-writer → markdown · UMB Advisors site publishes via Optimus content engine</div>
+      </div>
+      <div class="card output">
+        <div class="title">LinkedIn posts</div>
+        <div class="meta">content-atomizer derives 2 posts per blog · personal profile auto-publish · voice profile applied</div>
+      </div>
+      <div class="card output">
+        <div class="title">Briefings &amp; Signals</div>
+        <div class="meta">architect agent: daily briefing · signal extraction → board <code>/signals</code> · strategist priority scoring</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="panel-note" style="margin-top: 18px;">
+    <b>How it ties together.</b> A single TLDv meeting fans out: transcript → normalize → chunk + embed → KB row + classification, while entities (attendees, mentioned companies, topics) land in Neo4j. When an agent later asks "what should we do about this meeting?", <code>loadContext()</code> joins the RAG hit, the calendar event, every contact's prior thread history, and the agent's own memory — then dispatches to the right output channel: a Kanban work item, a contract draft, a blog + LinkedIn pair, or a briefing card. <b>Postgres is the source of truth; Neo4j is the relationship index; the RAG layer is the semantic index.</b> All three are queried in parallel at context-load time.
+  </div>
+
+</div>
+
+<footer>
+  Generated for Optimus repo · aligns with SPEC §2–§5 · KB stats as of 2026-05-11
+</footer>
+</body>
+</html>

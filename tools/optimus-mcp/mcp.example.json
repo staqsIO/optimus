@@ -1,0 +1,21 @@
+{
+  "_comment": "Portable Optimus MCP config — copy the 'optimus' block into your .mcp.json. The relative path works from the repo root (Claude Code runs MCP servers with cwd=project root); no hardcoded /Users/... path. Set OPTIMUS_TOKEN + OPTIMUS_API_URL in your shell (source ~/.nemoclaw-env). A customer token (iss optimus-customer) auto-registers the customer-safe tool set only.",
+  "mcpServers": {
+    "optimus": {
+      "command": "node",
+      "args": ["tools/optimus-mcp/index.js"],
+      "env": {
+        "OPTIMUS_TOKEN": "${OPTIMUS_TOKEN}",
+        "OPTIMUS_API_URL": "${OPTIMUS_API_URL}"
+      }
+    },
+    "_optimus_via_npx_once_published": {
+      "command": "npx",
+      "args": ["-y", "@staqs/optimus-mcp"],
+      "env": {
+        "OPTIMUS_TOKEN": "${OPTIMUS_TOKEN}",
+        "OPTIMUS_API_URL": "${OPTIMUS_API_URL}"
+      }
+    }
+  }
+}

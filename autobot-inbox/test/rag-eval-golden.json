@@ -1,0 +1,102 @@
+[
+  {
+    "question": "What is Optimus and how is it different from AutoBot?",
+    "expected_keywords": ["governed agent organization", "board of directors", "autobot-inbox", "first product"],
+    "source_hint": "vault"
+  },
+  {
+    "question": "What are the design principles of Optimus?",
+    "expected_keywords": ["deny by default", "infrastructure enforces", "boring infrastructure", "P1", "P2", "P4"],
+    "source_hint": "vault"
+  },
+  {
+    "question": "What did we decide about NemoClaw?",
+    "expected_keywords": ["sandbox", "MCP server", "Level C", "Board API"],
+    "source_hint": "vault"
+  },
+  {
+    "question": "How does the campaign pipeline work?",
+    "expected_keywords": ["claw-campaigner", "iteration", "quality_score", "spawnCLI"],
+    "source_hint": "vault"
+  },
+  {
+    "question": "What are the constitutional gates?",
+    "expected_keywords": ["G1", "G2", "financial", "legal", "tone", "reversibility"],
+    "source_hint": "vault"
+  },
+  {
+    "question": "What is the Formul8 platform?",
+    "expected_keywords": ["cannabis", "Metrc", "compliance", "seed raise"],
+    "source_hint": "vault"
+  },
+  {
+    "question": "Who is Dustin Powers and what is his role?",
+    "expected_keywords": ["board", "co-founder", "strategy", "ConsultingFuture"],
+    "source_hint": "vault"
+  },
+  {
+    "question": "What database schemas does Optimus use?",
+    "expected_keywords": ["agent_graph", "inbox", "voice", "signal", "content"],
+    "source_hint": "vault"
+  },
+  {
+    "question": "How does the voice learning system work?",
+    "expected_keywords": ["pgvector", "sent email", "embeddings", "edit deltas", "tone"],
+    "source_hint": "vault"
+  },
+  {
+    "question": "What agents does Optimus have and what tiers are they in?",
+    "expected_keywords": ["orchestrator", "strategist", "executor", "reviewer", "architect", "tier"],
+    "source_hint": "vault"
+  },
+  {
+    "question": "What is the Umbrella Venture?",
+    "expected_keywords": ["Mike", "Eric", "Dustin", "consolidated", "venture"],
+    "source_hint": "vault"
+  },
+  {
+    "question": "How does the Board Workstation work?",
+    "expected_keywords": ["Next.js", "board.staqs.io", "CommandSurface", "EventStream"],
+    "source_hint": "vault"
+  },
+  {
+    "question": "What is the RAG knowledge base architecture?",
+    "expected_keywords": ["pgvector", "chunks", "embedder", "retriever", "content schema"],
+    "source_hint": "vault"
+  },
+  {
+    "question": "What happened in the Optimus Day 8 session?",
+    "expected_keywords": ["campaign", "pipeline", "Railway", "preview", "claw-code"],
+    "source_hint": "vault"
+  },
+  {
+    "question": "What is claurst and should we use it?",
+    "expected_keywords": ["Rust", "Claude Code", "rewrite", "Phase 2", "defer"],
+    "source_hint": "vault"
+  },
+  {
+    "question": "How does entity resolution work in Optimus?",
+    "expected_keywords": ["contact_identities", "merge_contacts", "GitHub", "migration 009"],
+    "source_hint": "vault"
+  },
+  {
+    "question": "What is the Altitude Guitar project?",
+    "expected_keywords": ["Mike Maibach", "Shopify", "guitar"],
+    "source_hint": "vault"
+  },
+  {
+    "question": "What model does the strategist agent use?",
+    "expected_keywords": ["Gemini", "2.5", "Pro"],
+    "source_hint": "vault"
+  },
+  {
+    "question": "How does the HITL system work?",
+    "expected_keywords": ["awaiting_input", "campaign_hitl_requests", "question", "answer", "pg_notify"],
+    "source_hint": "vault"
+  },
+  {
+    "question": "What is the daily budget limit for LLM spending?",
+    "expected_keywords": ["$20", "G1", "financial", "ceiling"],
+    "source_hint": "vault"
+  }
+]

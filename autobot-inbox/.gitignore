@@ -1,0 +1,21 @@
+node_modules/
+.env
+.env.local
+.env.sender
+*.log
+.DS_Store
+.next/
+dashboard/node_modules/
+dashboard/.next/
+dashboard/.env
+dashboard/.env.local
+dashboard/tsconfig.tsbuildinfo
+electron/node_modules/
+electron/dist/
+data/
+
+# Campaign-generated artifacts — output stays in DB, not in git
+*.html
+!dashboard/**/*.html
+umbrella-crew/
+guardrail/

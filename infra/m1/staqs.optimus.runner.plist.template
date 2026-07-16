@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Source-of-truth template for the M1 satellite runner LaunchAgent.
+  Do NOT load this file directly — install.sh renders %HOME% to the
+  current operator's home directory and copies the result to
+  ~/Library/LaunchAgents/staqs.optimus.runner.plist.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>staqs.optimus.runner</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>%HOME%/Optimus/infra/m1/runner.sh</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>%HOME%/Optimus/autobot-inbox</string>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+    <key>HOME</key>
+    <string>%HOME%</string>
+  </dict>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>KeepAlive</key>
+  <dict>
+    <key>SuccessfulExit</key>
+    <false/>
+    <key>Crashed</key>
+    <true/>
+  </dict>
+
+  <key>ThrottleInterval</key>
+  <integer>30</integer>
+
+  <key>StandardOutPath</key>
+  <string>%HOME%/Library/Logs/staqs-optimus-runner.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>%HOME%/Library/Logs/staqs-optimus-runner.err</string>
+
+  <key>ProcessType</key>
+  <string>Background</string>
+
+  <key>Nice</key>
+  <integer>5</integer>
+</dict>
+</plist>

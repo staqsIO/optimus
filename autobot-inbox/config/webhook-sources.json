@@ -1,0 +1,68 @@
+{
+  "sources": {
+    "github": {
+      "enabled": true,
+      "hmacHeader": "X-Hub-Signature-256",
+      "hmacAlgorithm": "sha256",
+      "hmacPrefix": "sha256=",
+      "channelHint": "CHANNEL: GitHub webhook event. Classify based on event type and action."
+    },
+    "stripe": {
+      "enabled": false,
+      "hmacHeader": "Stripe-Signature",
+      "hmacAlgorithm": "sha256",
+      "hmacPrefix": "",
+      "channelHint": "CHANNEL: Stripe payment event. Flag financial events as action_required.",
+      "_note": "Disabled: Stripe uses t=...,v1=... signature format requiring custom verification. Phase 2."
+    },
+    "tldv": {
+      "enabled": true,
+      "hmacHeader": "",
+      "hmacAlgorithm": "",
+      "hmacPrefix": "",
+      "_channelHintNote": "Built at runtime in lib/adapters/meeting-prompt.js (multi-speaker template)"
+    },
+    "gemini": {
+      "enabled": true,
+      "hmacHeader": "",
+      "hmacAlgorithm": "",
+      "hmacPrefix": "",
+      "_channelHintNote": "Built at runtime in lib/adapters/meeting-prompt.js (multi-speaker template — same as tldv)"
+    },
+    "voice_memo": {
+      "enabled": true,
+      "hmacHeader": "",
+      "hmacAlgorithm": "",
+      "hmacPrefix": "",
+      "_channelHintNote": "Built at runtime in lib/adapters/meeting-prompt.js (single-speaker template)"
+    },
+    "feedback": {
+      "enabled": true,
+      "hmacHeader": "X-Webhook-Signature",
+      "hmacAlgorithm": "sha256",
+      "hmacPrefix": "",
+      "channelHint": "CHANNEL: CLIENT FEEDBACK from a customer or user. Extract: BUG REPORTS (what's broken, repro steps, severity), FEATURE REQUESTS (what they want, why), QUESTIONS. Classify as 'action_required' for bugs, 'needs_response' for feature requests."
+    },
+    "imessage": {
+      "enabled": true,
+      "hmacHeader": "",
+      "hmacAlgorithm": "",
+      "hmacPrefix": "",
+      "channelHint": "CHANNEL: iMessage from a client/stakeholder. This is a direct text message, not email. Extract signals: requests, questions, bugs, commitments. Classify as action_required for bugs/requests, needs_response for questions."
+    },
+    "linear": {
+      "enabled": true,
+      "hmacHeader": "Linear-Signature",
+      "hmacAlgorithm": "sha256",
+      "hmacPrefix": "",
+      "channelHint": "CHANNEL: Linear issue event (assigned, status changed, commented). Extract: issue title, assignee, status change, comments. If assigned to Jamie Bot, treat as a task to execute. Route to executor-ticket or executor-coder based on content."
+    },
+    "generic": {
+      "enabled": true,
+      "hmacHeader": "X-Webhook-Signature",
+      "hmacAlgorithm": "sha256",
+      "hmacPrefix": "",
+      "channelHint": "CHANNEL: External webhook event."
+    }
+  }
+}

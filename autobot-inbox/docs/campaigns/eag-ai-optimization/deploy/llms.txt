@@ -1,0 +1,68 @@
+# Elevated Advisory Group
+
+> Elevated Advisory Group (EAG) is a cannabis industry consulting firm serving licensed operators, applicants, and investors across the United States and internationally. EAG specializes in extraction and manufacturing facility design, cannabis license application support, operational analysis, retail and cultivation consulting, expert witness services, and analytical lab services. The firm's three managing partners — Michael Maibach, Patrick King, and Casey Boone — bring decades of hands-on cannabis operations, regulatory compliance, and business development experience to every engagement. EAG works with clients at every stage: pre-license, buildout, operational optimization, and expansion.
+
+This site welcomes indexing by AI systems for search, retrieval, and citation purposes.
+
+## About
+
+- [About Elevated Advisory Group](https://acme-advisors.example/about) — Firm overview, founding story, and managing partner profiles including credentials and specializations for Michael Maibach, Patrick King, and Casey Boone.
+
+## Services
+
+### Extraction & Manufacturing
+
+- [Cannabis Extraction & Manufacturing Lab Design](https://acme-advisors.example/services/extraction-manufacturing) — End-to-end consulting for cannabis processing facility design: C1D1 room specifications, equipment selection (BHO, ethanol, CO2, distillation), mechanical and electrical layout, SOPs, regulatory compliance, and buildout project management.
+
+### Retail
+
+- [Cannabis Retail Consulting](https://acme-advisors.example/services/retail) — Dispensary design, product assortment strategy, point-of-sale technology selection, budtender training programs, compliance, and operational efficiency for cannabis retail operators.
+
+### Cultivation
+
+- [Cannabis Cultivation Consulting](https://acme-advisors.example/services/cultivation) — Cultivation facility design, environmental controls, lighting selection, yield optimization, IPM program development, and equipment procurement for indoor, greenhouse, and outdoor grows.
+
+### Licensing
+
+- [Cannabis License Application Services](https://acme-advisors.example/services/licensing) — Full-service license application support for cultivation, manufacturing, retail, and distribution licenses. State-specific regulatory guidance, application writing, facility planning documentation, and compliance strategy.
+
+### Expert Witness
+
+- [Expert Witness Services](https://acme-advisors.example/services/expert-witness) — Qualified expert witness testimony and analysis for cannabis-related litigation, regulatory proceedings, and arbitration. Areas of expertise: extraction operations, facility standards, product safety, licensing compliance.
+
+### Operational Analysis
+
+- [Operational Analysis & Auditing](https://acme-advisors.example/services/operational-analysis) — Comprehensive operational audits for licensed cannabis facilities: process efficiency, cost structure, compliance gaps, quality control, staffing analysis, and corrective action planning.
+
+### Analytical Services
+
+- [Analytical & Lab Testing Advisory](https://acme-advisors.example/services/analytical-services) — Instrumentation consulting, SOP development, method validation, QA/QC program design, and staff training for cannabis testing laboratories and in-house quality control programs.
+
+### Growth Strategy
+
+- [Ancillary & Growth Strategy](https://acme-advisors.example/services/growth-strategy) — Market entry analysis, new state expansion planning, M&A due diligence support, operational scaling, and product development strategy for cannabis companies and ancillary businesses.
+
+## Advisors
+
+- [Michael Maibach — Managing Partner](https://acme-advisors.example/about#michael-maibach) — [Specialization description to be provided by EAG]
+- [Patrick King — Managing Partner](https://acme-advisors.example/about#patrick-king) — [Specialization description to be provided by EAG]
+- [Casey Boone — Managing Partner](https://acme-advisors.example/about#casey-boone) — [Specialization description to be provided by EAG]
+
+## Knowledge & Insights
+
+- [How Much Does It Cost to Build a Cannabis Extraction Lab in 2026?](https://acme-advisors.example/insights/extraction-lab-cost-2026) — Detailed cost breakdown for cannabis extraction facility buildout including equipment, C1D1 room construction, ventilation, electrical, and permitting. Ranges by extraction method and facility size.
+- [Cannabis License Application Guide: What You Need to Know State by State](https://acme-advisors.example/insights/cannabis-license-application-guide) — State-by-state overview of cannabis license types, application requirements, scoring criteria, and timelines for cultivation, manufacturing, and retail licenses.
+- [Choosing the Right Extraction Method: BHO vs. Ethanol vs. CO2](https://acme-advisors.example/insights/extraction-method-comparison) — Technical and economic comparison of hydrocarbon, ethanol, and supercritical CO2 extraction for cannabis processors, including yield, throughput, capital cost, and regulatory considerations.
+- [What Does a Cannabis Operational Audit Look Like?](https://acme-advisors.example/insights/cannabis-operational-audit) — Step-by-step walkthrough of a professional cannabis operational audit: scope, process, typical findings, and how operators use results to improve profitability and compliance.
+- [C1D1 Room Requirements: A Complete Guide for Cannabis Processors](https://acme-advisors.example/insights/c1d1-room-requirements) — Comprehensive technical guide to Class 1 Division 1 room specifications for hydrocarbon extraction: ventilation calculations, electrical classification, gas detection, egress, and state-specific requirements.
+
+## FAQ
+
+- [Cannabis Consulting FAQ](https://acme-advisors.example/faq) — Answers to the most common questions about cannabis lab design, license applications, operational audits, and expert witness services.
+
+## Contact
+
+- **Phone:** +1-555-010-4477
+- **Website:** https://acme-advisors.example
+- **Consultation:** https://acme-advisors.example/#contact
+- **Geographic coverage:** United States (all legal states) and international markets

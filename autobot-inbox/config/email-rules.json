@@ -1,0 +1,38 @@
+{
+  "triageRules": {
+    "noise": {
+      "description": "Auto-archive: newsletters, automated notifications, marketing",
+      "patterns": [
+        { "field": "from_address", "match": "contains", "values": ["noreply@", "no-reply@", "notifications@", "marketing@", "newsletter@"] },
+        { "field": "subject", "match": "contains", "values": ["unsubscribe", "weekly digest", "newsletter"] },
+        { "field": "labels", "match": "includes", "values": ["CATEGORY_PROMOTIONS", "CATEGORY_SOCIAL", "CATEGORY_UPDATES"] }
+      ],
+      "action": "archive",
+      "autoApplyAt": "L1"
+    },
+    "fyi": {
+      "description": "Label and skip: calendar updates, ticket status changes, CI/CD",
+      "patterns": [
+        { "field": "from_address", "match": "contains", "values": ["calendar-notification@google.com", "github.com", "linear.app", "vercel.com", "railway.app"] },
+        { "field": "subject", "match": "contains", "values": ["invitation:", "accepted:", "updated invitation", "deployed to", "build"] }
+      ],
+      "action": "label",
+      "label": "FYI",
+      "autoApplyAt": "L1"
+    }
+  },
+  "vipOverrides": {
+    "description": "VIP contacts always get full pipeline treatment regardless of triage rules",
+    "behavior": "route_to_full_pipeline"
+  },
+  "replyAllPolicy": {
+    "description": "G5: Flag reply-all for board review even in L1+",
+    "action": "flag_for_review",
+    "gate": "G5"
+  },
+  "unknownSenders": {
+    "description": "New senders get extra scrutiny",
+    "action": "flag_new_contact",
+    "createContact": true
+  }
+}

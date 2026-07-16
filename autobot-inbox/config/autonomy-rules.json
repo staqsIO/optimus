@@ -1,0 +1,55 @@
+{
+  "_comment": "Autonomy rules for G9 auto-classifier (Claude Code YOLO pattern). REPLACE semantics: non-empty section replaces defaults.",
+  "L0": {
+    "_description": "Full review — all actions require human/reviewer approval",
+    "auto_allow": [],
+    "auto_deny": [],
+    "review_required": ["*"]
+  },
+  "L1": {
+    "_description": "Noise auto-allow — routine classification and signals bypass review",
+    "auto_allow": [
+      "email_triage",
+      "signal_extraction",
+      "status_query",
+      "classification",
+      "context_load",
+      "heartbeat"
+    ],
+    "auto_deny": [
+      "email_send",
+      "budget_modify",
+      "external_api_write",
+      "code_deploy",
+      "credential_access"
+    ],
+    "review_required": ["*"]
+  },
+  "L2": {
+    "_description": "Graduated autonomy — most actions auto-allowed except high-risk",
+    "auto_allow": [
+      "email_triage",
+      "signal_extraction",
+      "status_query",
+      "classification",
+      "context_load",
+      "heartbeat",
+      "email_draft",
+      "task_assignment",
+      "task_creation",
+      "linear_update",
+      "code_generation",
+      "research"
+    ],
+    "auto_deny": [
+      "budget_modify",
+      "credential_access"
+    ],
+    "review_required": [
+      "email_send",
+      "external_api_write",
+      "code_deploy",
+      "governance_submit"
+    ]
+  }
+}

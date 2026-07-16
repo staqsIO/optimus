@@ -1,0 +1,25 @@
+{
+  "env": {
+    "node": true,
+    "es2022": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "module"
+  },
+  "extends": ["eslint:recommended"],
+  "rules": {
+    "no-undef": "error",
+    "no-unused-vars": ["warn", {
+      "argsIgnorePattern": "^_",
+      "varsIgnorePattern": "^_",
+      "caughtErrorsIgnorePattern": "^_",
+      "destructuredArrayIgnorePattern": "^_"
+    }],
+    "no-useless-escape": "warn",
+    "no-empty": ["warn", { "allowEmptyCatch": true }],
+    "no-constant-condition": "warn",
+    "no-control-regex": "warn",
+    "no-async-promise-executor": "warn"
+  }
+}

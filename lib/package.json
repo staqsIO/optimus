@@ -1,0 +1,42 @@
+{
+  "name": "@optimus/lib",
+  "version": "1.0.0",
+  "description": "Optimus org-level infrastructure — runtime, adapters, graph, guardrails, RAG",
+  "type": "module",
+  "private": true,
+  "license": "Apache-2.0",
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.110.0",
+    "@aws-sdk/client-s3": "^3.1006.0",
+    "@azure/msal-node": "^5.0.5",
+    "@electric-sql/pglite": "^0.4.2",
+    "@huggingface/transformers": "^4.2.0",
+    "@picovoice/eagle-node": "^3.0.0",
+    "@slack/bolt": "^4.6.0",
+    "chalk": "^5.3.0",
+    "docx": "^9.6.1",
+    "dotenv": "^16.4.7",
+    "googleapis": "^144.0.0",
+    "mammoth": "^1.12.0",
+    "marked": "^18.0.3",
+    "neo4j-driver": "^5.28.3",
+    "node-telegram-bot-api": "^0.67.0",
+    "nodemailer": "^9.0.3",
+    "openai": "^6.32.0",
+    "pdf-parse": "^2.4.5",
+    "pg": "^8.19.0",
+    "playwright": "^1.52.0"
+  },
+  "overrides": {
+    "form-data": "^4.0.2",
+    "qs": "^6.14.1",
+    "tough-cookie": "^4.1.3"
+  }
+}

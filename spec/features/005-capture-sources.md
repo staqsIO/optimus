@@ -1,0 +1,182 @@
+# 005 — Capture Sources: selective folder watching + Optimus-authored artifacts
+
+> Feature spec for the next wave of auto-capture loops after Feature 004 (capture →
+> enrich → artifact registry, all shipped). Extends OPT-37 / the onboarding
+> round-out. Status: **DESIGN COMPLETE — decisions D1–D4 resolved 2026-06-03 (Eric ✓);
+> data model resolved by Liotta architecture pass 2026-06-03 (see "Resolved data
+> model"). Ready to implement (item 1 + the createArtifact extraction).**
+
+## Context
+
+Feature 004 made the loop work: capture (MCP / `optimus` CLI / Claude Code session
+hook) → `content.artifacts` → async enrichment (auto-link contacts/projects, pending
+review queue) → board surfaces. Today the only *passive* server-side capture is
+`src/drive/watcher.js` `pollSharedFolder()` — **one** `SHARED_DRIVE_FOLDER_ID`,
+ingesting transcripts straight to `content.documents` (raw KB, no artifact registry,
+no per-org ownership — everything lands Staqs).
+
+Eric's direction (2026-06-03): the team should **drop docs into Optimus and have
+them captured** from *selected* folders (plural, per-org), the MCP/CLI path stays the
+manual companion (shipped in OPT-95), and — looking forward — Optimus should
+**become self-sufficient at document *creation*** (proposals/PRDs/contracts it
+authors should be first-class registry artifacts too, not just captured ones).
+
+The 602 feed-poller storm is the cautionary tale: passive capture without an
+allowlist + stable dedup floods the KB. So every source here is **opt-in and
+allowlisted**.
+
+## User stories
+
+- **As a PM**, I drop a PRD/proposal into a designated Drive folder and it's
+  captured as a typed, enriched artifact owned by the right org — no manual step.
+- **As UMB vs Staqs**, my folder's captures land under *my* org (not silently
+  Staqs), because the folder is mapped to my org/owner.
+- **As an operator**, I enable/disable a capture source and set its allowlist
+  (file-types, size cap, default kind) from a board-managed list — no redeploy.
+- **As the org**, a proposal/contract Optimus *generates* shows up in the same
+  artifact registry (versioned, enriched, searchable) as captured docs — the system
+  tracks the work it produces, not just the work it ingests.
+
+## What to build
+
+### Layer 1 — `capture_sources` registry (board-managed, per-org)  [Decision D2]
+A small table (Liotta to finalize) — one row per capture source:
+`source_type` ('drive_folder' now; 'gmail_label'/'slack_channel' later),
+`external_id` (Drive folder id), `owner_org_id`, `owner_id` (optional personal),
+`default_kind` (prd/proposal/doc/…), `allowlist` (jsonb: mime/ext set, max bytes),
+`enabled`, audit. Board-managed via `GET/PATCH /api/capture-sources` (mirrors the
+619-A Linear-teams pattern: enable-with-org required, owner-stamped). This is what
+makes captures **per-org** instead of single-shared-Staqs.
+
+### Layer 2 — selective multi-folder Drive watcher  [Decisions D1, D4]
+Generalize `src/drive/watcher.js`: poll **every enabled `drive_folder` source**
+(not one env var). For each new/changed file that passes the source's **allowlist**
+(mime/ext + size cap), route through **`POST /api/artifacts`** (typed `kind` +
+`owner_org_id`/`owner_id` from the source row) — so it lands in the registry and
+triggers OPT-93 enrichment — instead of the raw `ingestDocument` path. Content-hash
+dedup (already server-side) makes re-polls idempotent. Keep the existing
+service-account auth + poll cadence; drop the single-folder env model (or keep it as
+a migration-compatibility default).
+
+### Layer 3 — Optimus-authored artifacts → registry  [forward direction]
+Wire the documents Optimus *generates* into `content.artifacts` with
+`source_system='optimus'`: `lib/contracts/*` (proposals/contracts) and
+`engagements.generated_proposals` register an artifact on generation (versioned via
+the existing content-hash lineage). So a generated proposal is tracked, enriched, and
+searchable exactly like a captured one — the first step toward self-sufficient
+document creation.
+
+### Deferred (separate issues / later)
+Scheduled daily-summary task (reuse the `/api/cron/*` + daily-digest scheduler);
+Gmail/Slack **attachment-content** capture (new; allowlist-gated); Notion transition
+webhook; **`wiki_ingest`** (Decision D3 — split to its own effort once the
+project-wiki vs compiled-`lib/wiki` question is settled).
+
+## Acceptance
+
+- [ ] An operator enables a Drive folder via `PATCH /api/capture-sources` with an
+  org; a file dropped there is captured as a `content.artifacts` row owned by that
+  org (NOT Staqs-by-default), passing the allowlist; a disallowed type/size is
+  skipped (logged, not ingested).
+- [ ] Two folders mapped to different orgs land their captures under the correct
+  org — verified by `verify-tenancy-live.mjs` (UMB folder → UMB-owned, invisible to
+  a Staqs viewer).
+- [ ] Re-polling the same file is an idempotent no-op (content-hash dedup).
+- [ ] A proposal generated by `lib/contracts`/engagements creates a
+  `source_system='optimus'` artifact retrievable via `optimus_search_kb` / the board
+  Artifacts browser.
+- [ ] `npm run test:ci` green. Linus on the new write path + tenancy + the allowlist.
+
+## Decisions (resolved 2026-06-03 — Eric ✓)
+
+- **D1. Selective multi-folder watching** (plural, opt-in) — not the single shared
+  folder. The MCP/CLI path (OPT-95) remains the manual companion.
+- **D2. Per-org/per-user mapping** via a board-managed `capture_sources` table — a
+  folder/source maps to an org/owner so captures attribute correctly (no
+  silent-Staqs).
+- **D3. Wiki deferred** to its own effort (avoid conflating project-wiki vs compiled
+  `lib/wiki`).
+- **D4. Allowlist / explicit opt-in per source** (mime/ext + size caps) — the 602
+  anti-flood lesson. Conservative, tunable up.
+- **Forward note (Eric):** become self-sufficient at document *creation* — Layer 3
+  registers Optimus-authored artifacts; expand over time.
+
+## Resolved data model (Liotta architecture pass, 2026-06-03)
+
+**`content.capture_sources` (migration 156)** — `id, source_type CHECK
+('drive_folder'|'gmail_label'|'slack_channel'), external_id, label, owner_org_id
+NOT NULL (no DEFAULT), owner_id, default_kind CHECK (artifact kinds), allowlist
+JSONB (`{mime:[],ext:[],max_bytes}`), enabled, cursor (Drive changes pageToken),
+last_poll_at, last_error, audit`. **`UNIQUE (source_type, external_id)` — GLOBAL,
+not per-org** (a folder has exactly one true owner; a second org claiming it = the
+mis-attribution bug → 409). Partial index `WHERE enabled=true`. `allowlist` is jsonb
+(per-source policy, never queried; future source_types need different knobs without a
+reshape) — shape-validated in the PATCH handler. Board surface `GET/PATCH
+/api/capture-sources` mirrors 619-A: `requireBoard`, PATCH-key allowlist, validate
+owner_org_id ∈ `tenancy.orgs`, **enable-with-org guard** (enabled && !org → 400);
+`source_type`/`external_id` create-only.
+
+**The trusted-owner mechanism (the crux).** The caller-ownership 400 lives on the
+HTTP **edge**, not in the write logic. So: **extract `createArtifact({raw, kind,
+title, source_system, ownerOrgId, ownerId, metadata})` into `lib/content/
+create-artifact.js`** — takes ownership as an explicit REQUIRED arg, trusts it
+(null org → throw, no silent Staqs). The `POST /api/artifacts` handler keeps its
+`OWNER_PARAMS → 400` guard, then derives owner from the token and calls the core.
+Trusted in-process callers (watcher, generate-hook) call the core directly with an
+owner from a **board-validated source row / engagement** — no token, no loopback
+HTTP. The leak class only exists where a request body sets the owner; the core fn is
+never reachable from a body. Mark it server-internal-only.
+
+**Watcher** — `pollCaptureSources()` parallel to the existing drive loop: select
+enabled `drive_folder` rows, reuse `getDriveClient`/`fetchDriveFileText`, apply the
+allowlist (mime/ext + max_bytes, skip+log on fail), call `createArtifact(...)` with
+the source's owner. **Change-detection = Drive `changes` API + per-source `cursor`
+pageToken (O(Δ), not O(N·M) full-list)** — ship from day one (the 602 poll-cost
+lesson; retrofitting cursor state into a live poller is a migration).
+
+**Layer 3 = pg_notify hook, not inline.** Generation (`lib/contracts` render /
+`engagements.generated_proposals` insert) emits `pg_notify('artifact_register',
+{id, owner_org_id})` in its own txn; a runtime-worker consumer calls
+`createArtifact({source_system:'optimus', kind:'proposal', ownerOrgId:<engagement
+org>, ...})`. Keeps generation decoupled (no contract-renderer → artifact-stack
+import; respects the CG-1 ratchet). Versioning is free: same title → same
+identity_key → new version.
+
+**CRITICAL must-fix (changes the OPT-92 path): `content_hash = sha256(owner | body)`
+— DROP `source` from the hash input.** As shipped, content_hash folds in `source`,
+so the same proposal via generate vs Drive would NOT collapse → spurious duplicate
+versions. Content-only hash makes same-bytes = same-version regardless of which door;
+`source_system` becomes pure row metadata. (Migration note: existing prod artifacts
+keep their old hashes; only new pushes use the new formula — a dedup key, not a
+stored integrity value, so the change is safe; a re-push of a pre-156 doc just mints
+one new version.)
+
+### Liotta risks (hold)
+1. The `content_hash` provenance-fold is the double-write fulcrum — one-line fix in
+   the extracted core; without it the registry silently duplicates every
+   Optimus-authored doc the team also files in Drive.
+2. `changes`-API vs list polling is the cost ceiling — decide at build (cursor is
+   ~20 lines; O(N·M) list polling re-incurs the 602 storm at folder scale).
+3. `createArtifact` is a new privileged surface — gate its CALLERS (watcher,
+   hook only), never wire it to a route that takes owner from a body; keep the HTTP
+   400 as the edge.
+
+### Deferred (separate issues / later)
+Scheduled daily-summary (reuse `/api/cron/*` + daily-digest scheduler); Gmail/Slack
+attachment-content capture (new, allowlist-gated); Notion transition webhook;
+`wiki_ingest` (Decision D3 — own effort).
+
+## Decomposition (Linear, under OPT-13 / extends OPT-37) — re-sequenced per Liotta
+
+1. **`capture_sources` registry** (mig 156) + `GET/PATCH /api/capture-sources`
+   (board-managed, enable-with-org, allowlist validation, 409 on dup folder).
+2. **`createArtifact` core extraction** (OPT-92 refactor — PREREQUISITE of item 3):
+   extract `lib/content/create-artifact.js`, HTTP handler calls it + keeps the 400
+   edge guard, **drop `source` from `content_hash`**. Tenancy unchanged.
+3. **Multi-folder Drive watcher** → `createArtifact`, allowlist-gated, per-source
+   org/owner, Drive `changes`-cursor. (depends on 1 + 2)
+4. **Optimus-authored artifact registration** — `pg_notify('artifact_register')`
+   from `lib/contracts`/engagements → worker consumer → `createArtifact`
+   (`source_system='optimus'`). (depends on 2)
+5. **(Later)** scheduled daily-summary; Gmail/Slack attachment capture; Notion
+   webhook; `wiki_ingest` (own effort).

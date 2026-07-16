@@ -1,0 +1,146 @@
+[
+  {
+    "id": "thread_steve_01",
+    "from": "steve",
+    "subject": "Q2 Ingredient Pricing — Need Commitment by Friday",
+    "body": "Hey Jordan,\n\nHeads up — our gelatin & sweetener supplier is raising prices 12% starting April 1. I can lock in current pricing for your Q2 order but I need a commitment by this Friday (March 7).\n\nHere's what I'm looking at for your usual volume:\n\n- Gelatin (250 bloom): $4,200/ton → holds at $3,750/ton if committed by Friday\n- Cane Sugar: $1,100/ton → holds at $950/ton\n- Corn Syrup: $2,800/ton → holds at $2,500/ton\n\nYour Q1 volume was 45 tons gelatin + 20 tons sugar. Want to match or increase for Q2?\n\nLet me know ASAP. Once Friday passes I can't hold these numbers.\n\nSteve",
+    "category": "action_required",
+    "priority": 92,
+    "signals": ["deadline:March 7", "commitment:pricing lock", "financial:$3,750/ton gelatin"]
+  },
+  {
+    "id": "thread_bob_01",
+    "from": "bob",
+    "subject": "PO #4471 — 50,000 units Tropical Blast gummies",
+    "body": "Jordan,\n\nPurchase Order #4471 attached. Summary:\n\n- Product: Tropical Blast Gummies 10-piece bag (your SKU TB-10-100ct)\n- Quantity: 50,000 units (500 cases)\n- Delivery: March 28 to our Denver distribution center\n- Price: $2.40/unit per our MSA\n- Payment: Net 30\n\nThis is our biggest single order yet — we're rolling into 340 new retail locations in Colorado and Oklahoma next month. Need to confirm you can hit the March 28 date. If there's any risk to that timeline, let me know now so I can adjust our retail launch.\n\nAlso — can you send updated QC certificates for the current batch? Two of our retail partners are asking.\n\nBob",
+    "category": "action_required",
+    "priority": 95,
+    "signals": ["commitment:PO #4471 50K units", "deadline:March 28 delivery", "financial:$2.40/unit $120K total", "action_item:send QC certificates"]
+  },
+  {
+    "id": "thread_steve_02",
+    "from": "steve",
+    "subject": "Gelatin shipment delayed — ETA pushed to March 10",
+    "body": "Jordan,\n\nBad news. The 200kg gelatin order (your PO IM-2026-0089) got held up at the port. Original ETA was March 5, now looking at March 10.\n\nI know you've got production scheduled for the 8th. Options:\n\n1. I can source 50kg from our secondary supplier (different grade, 240 bloom vs your usual 250) and overnight it. Gets there March 6. Cost bump is ~$800.\n2. Wait for the full shipment March 10. Push your production 2 days.\n3. I check if anyone in my network has 200kg of 250 bloom available for immediate ship. No guarantees.\n\nWhat do you want me to do?\n\nSteve",
+    "category": "action_required",
+    "priority": 88,
+    "signals": ["deadline:March 10 revised ETA", "decision:3 options for gelatin shortage", "action_item:choose resolution path"]
+  },
+  {
+    "id": "thread_bob_02",
+    "from": "bob",
+    "subject": "Re: New SKU discussion — Sugar-free line",
+    "body": "Hey Jordan,\n\nFollowing up on our call last week about the sugar-free line. My team ran the numbers and we think there's real demand here. The sugar-free gummy market is growing 23% YoY and none of the major national candy brands have a credible product yet.\n\nHere's what we'd need:\n- 3 flavors to start (suggest: Watermelon, Mango, Mixed Berry)\n- 5g and 10g pack options\n- Target retail price: $24.99 for 30ct\n- First production run: 10,000 units per SKU (60,000 total)\n- Timeline: ready for our Q3 retail push (July 1)\n\nCan Acme Confections handle the formulation? Do you need to bring in a food scientist or do you have that in-house?\n\nI'd like to get an LOI signed by end of March so we can lock in shelf space with our retail partners.\n\nBob",
+    "category": "needs_response",
+    "priority": 78,
+    "signals": ["commitment:LOI by end of March", "deadline:July 1 Q3 production", "decision:sugar-free line capacity", "financial:60K units new SKU"]
+  },
+  {
+    "id": "thread_steve_03",
+    "from": "steve",
+    "subject": "QC Report for Batch #IM-2026-GEL-0223",
+    "body": "Jordan,\n\nAttached is the internal QC report for your latest gelatin batch:\n\n- Batch: IM-2026-GEL-0223\n- Bloom Strength: 251\n- Moisture Content: 11.2%\n- pH: 5.4\n- Heavy Metals: All below LOQ\n- Pesticides: ND (full panel, 96 analytes)\n- Microbial: Pass\n\nThis batch tested clean across the board. Let me know if you need anything else for your records.\n\nSteve",
+    "category": "fyi",
+    "priority": 45,
+    "signals": ["action_item:file QC report for compliance records"]
+  },
+  {
+    "id": "thread_bob_03",
+    "from": "bob",
+    "subject": "Customer complaint — weight inconsistency in Blueberry SKU",
+    "body": "Jordan,\n\nGot a complaint from one of our Denver retail partners (Green Leaf Market on Colfax). They're saying the Blueberry Bliss gummies from the last shipment (lot BLU-0215) are testing below label weight.\n\nTheir in-house scale showed 7.2g per pack vs the 10g label claim. That's 28% below claim. Colorado weights-and-measures rules allow +/- 15% variance.\n\nI need:\n1. Your internal QC results for lot BLU-0215\n2. Third-party lab certificate if you have one\n3. A plan for the remaining inventory from that lot\n\nThis is time-sensitive. If the state gets involved it's a problem for both of us. Can you look into this today?\n\nBob",
+    "category": "action_required",
+    "priority": 96,
+    "signals": ["deadline:today — compliance risk", "action_item:pull QC results for lot BLU-0215", "action_item:third-party lab certificate", "decision:inventory plan for affected lot"]
+  },
+  {
+    "id": "thread_steve_04",
+    "from": "steve",
+    "subject": "New organic sweetener samples — try these?",
+    "body": "Hey Jordan,\n\nWe just got in a new organic erythritol + monk fruit blend from a supplier out of Thailand. Way better mouthfeel than the stevia blend you've been using for your low-sugar line.\n\nI'm sending you 5kg of samples next week. No charge — just want your team's feedback. If it works for your formulation, pricing would be about $18/kg vs the $22/kg you're paying for the stevia blend.\n\nNo rush on this one. Just thought of you when I tasted the samples.\n\nSteve",
+    "category": "fyi",
+    "priority": 35,
+    "signals": ["introduction:new organic sweetener option"]
+  },
+  {
+    "id": "thread_bob_04",
+    "from": "bob",
+    "subject": "Payment for January invoice #AC-2026-0112",
+    "body": "Jordan,\n\nJust a heads up — our AP team processed payment for invoice #AC-2026-0112 ($87,400) yesterday. Should hit your account in 2-3 business days.\n\nAlso, February invoice (#AC-2026-0215, $62,100) is approved and in the queue. Net 30 puts that at March 17.\n\nWe're current on everything. Let me know if your records don't match.\n\nBob",
+    "category": "fyi",
+    "priority": 40,
+    "signals": ["financial:$87,400 payment incoming", "financial:$62,100 due March 17"]
+  },
+  {
+    "id": "thread_steve_05",
+    "from": "steve",
+    "subject": "Re: Q2 Ingredient Pricing — Need Commitment by Friday",
+    "body": "Jordan,\n\nJust bumping this — Friday is tomorrow. If I don't hear back by 5pm ET I'll have to let the pricing expire.\n\nI'd hate for you to get hit with the 12% increase. Your Q2 at the new rate would be ~$5,400 more than the locked price.\n\nCall me if easier: (303) 555-0147\n\nSteve",
+    "category": "action_required",
+    "priority": 95,
+    "signals": ["deadline:Friday 5pm ET — tomorrow", "financial:$5,400 at stake"]
+  },
+  {
+    "id": "thread_bob_05",
+    "from": "bob",
+    "subject": "Retail partner intro — Rocky Mountain Retail Group",
+    "body": "Hey Jordan,\n\nI want to introduce you to Jake Martinez, the buyer at Rocky Mountain Retail Group. They're a 12-location chain in the Front Range and they've been asking if they can buy direct from you for their house brand.\n\nI told them about your white-label capabilities and they're interested. This wouldn't conflict with our MSA since their house brand is a different SKU.\n\nLooping Jake in on the next email. He's expecting to hear from you.\n\nBob",
+    "category": "needs_response",
+    "priority": 72,
+    "signals": ["introduction:Jake Martinez at Rocky Mountain Retail Group", "action_item:follow up with Jake"]
+  },
+  {
+    "id": "thread_steve_06",
+    "from": "steve",
+    "subject": "Shipment manifest #TR-2026-0891 — please confirm receipt",
+    "body": "Jordan,\n\nOur logistics portal is showing shipment #TR-2026-0891 as delivered to your facility but you haven't confirmed receipt yet. It's been 3 days — the portal flags unconfirmed shipments after 72 hours.\n\nCan you or your team confirm receipt today? The manifest covers:\n- 25 tons Gelatin (batch IM-2026-GEL-0223)\n- 10 tons Cane Sugar (batch IM-2026-SUG-0218)\n\nLot numbers are on the manifest. Let me know if anything doesn't match.\n\nSteve",
+    "category": "action_required",
+    "priority": 85,
+    "signals": ["deadline:today — 72hr confirmation window", "action_item:confirm shipment receipt", "logistics:shipment manifest TR-2026-0891"]
+  },
+  {
+    "id": "thread_bob_06",
+    "from": "bob",
+    "subject": "LinkedIn post about Acme Confections — want to tag you?",
+    "body": "Jordan,\n\nI'm putting together a LinkedIn post about our supply chain partners for National Candy Month. Want to highlight the quality of your operation.\n\nDraft:\n\"Proud to work with manufacturers who take quality seriously. @AcmeConfections's facility runs 99.7% weight accuracy across 2M+ units this year. That's the kind of partner you want when your brand is on the label.\"\n\nOkay to post? Want me to tag your company page or your personal profile?\n\nBob",
+    "category": "needs_response",
+    "priority": 55,
+    "signals": ["action_item:approve LinkedIn mention", "decision:company vs personal tag"]
+  },
+  {
+    "id": "noise_01",
+    "from": "steve",
+    "subject": "Fwd: Industry newsletter — Candy Industry Magazine March issue",
+    "body": "Thought you might find this interesting. The article on page 12 about production line efficiency is worth a read.\n\n---------- Forwarded message ----------\nCandy Industry Magazine — March 2026\nIn this issue: New production methods, state-by-state regulatory update, Q1 market pricing data...",
+    "category": "noise",
+    "priority": 5,
+    "signals": []
+  },
+  {
+    "id": "noise_02",
+    "from": "bob",
+    "subject": "Out of office: March 3-5",
+    "body": "I'll be at the National Confectionery Trade Show in Las Vegas March 3-5. Limited email access. For urgent PO issues contact my ops manager Sarah at sarah@cpgbrandco.com.\n\nBob",
+    "category": "noise",
+    "priority": 8,
+    "signals": ["fyi:Bob unavailable March 3-5", "introduction:Sarah as backup contact"]
+  },
+  {
+    "id": "thread_steve_07",
+    "from": "steve",
+    "subject": "Flavoring recall notice — batch FL-0198 (DOES NOT affect your orders)",
+    "body": "Jordan,\n\nJust want to get ahead of this — one of our flavoring batches (FL-0198, Strawberry Natural) was flagged in a voluntary recall for elevated lead levels. \n\nThis batch was NOT shipped to Acme Confections. Your last strawberry flavoring order was batch FL-0185, which is clean. I'm attaching the QC certificate for FL-0185 so you have it on file.\n\nNo action needed on your end. Just wanted you to hear it from me first in case it hits industry news.\n\nSteve",
+    "category": "fyi",
+    "priority": 65,
+    "signals": ["compliance:flavoring recall FL-0198 does not affect us", "action_item:file QC certificate for FL-0185"]
+  },
+  {
+    "id": "thread_bob_07",
+    "from": "bob",
+    "subject": "Q3 volume forecast — big numbers",
+    "body": "Jordan,\n\nWanted to give you early visibility on our Q3 forecast so you can plan production:\n\n- Tropical Blast 10-piece: 75,000 units/month (up from 50K)\n- Blueberry Bliss 10-piece: 40,000 units/month\n- Watermelon Wave 5-piece: 30,000 units/month\n- NEW Sugar-Free line (if we proceed): 20,000 units/month per SKU\n\nTotal: ~225,000 units/month if sugar-free goes through, ~145,000 without.\n\nCan your facility handle that volume? If we need to discuss capacity expansion or a second production run per week, let's get on a call next week.\n\nBob",
+    "category": "needs_response",
+    "priority": 82,
+    "signals": ["decision:capacity for 225K units/month", "financial:major volume increase Q3", "action_item:schedule capacity planning call"]
+  }
+]

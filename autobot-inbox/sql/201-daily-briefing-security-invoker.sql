@@ -1,0 +1,16 @@
+-- 201: signal.v_daily_briefing — execute with INVOKER privileges (OPT-166 P4).
+--
+-- The view is a global-aggregate rollup (scalar-subquery counts over
+-- inbox.messages, agent_graph.action_proposals, agent_graph.llm_invocations,
+-- agent_graph.budgets, inbox.signals) and has NO owner_org_id column. As a
+-- default (definer-style) view it runs with the view OWNER's row visibility,
+-- which bypasses the tenant RLS policies on the underlying tables — post-flip
+-- (STAQPRO-263) any principal selecting from it would read GLOBAL cross-org
+-- counts. security_invoker makes the underlying RLS apply to the CALLER, so
+-- the aggregates collapse to the caller's visible rows.
+--
+-- INERT pre-flip: the superuser pool bypasses RLS regardless of this setting.
+-- Requires PG >= 15 (prod is pg17; PGlite is modern).
+--
+-- Rollback: ALTER VIEW signal.v_daily_briefing SET (security_invoker = off);
+ALTER VIEW signal.v_daily_briefing SET (security_invoker = on);

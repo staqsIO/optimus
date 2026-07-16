@@ -1,0 +1,118 @@
+{
+  "version": "1.0.0",
+  "description": "Human-designed component library for executor-redesign. Hash-checked at startup, immutable at runtime.",
+  "components": [
+    {
+      "id": "hero-split",
+      "section": "hero",
+      "prompt": "Create a hero section with a two-column layout: left side has a large headline (font-size clamp(2.5rem, 5vw, 4.5rem)), a subtitle paragraph in muted text, and a primary CTA button with subtle hover scale transform. Right side has a product/hero image with a soft shadow and slight rotation (-2deg). Background uses a subtle gradient from the primary brand color at 5% opacity to transparent. Padding: 6rem top/bottom. The headline should use the brand's display font with tight letter-spacing (-0.02em). Add a small eyebrow text above the headline in uppercase, tracking-widest, using the accent color.",
+      "tags": ["hero", "above-fold", "split-layout"],
+      "businessTypes": ["saas", "technology", "professional-services", "ecommerce"],
+      "emotionFit": "confident"
+    },
+    {
+      "id": "hero-centered",
+      "section": "hero",
+      "prompt": "Create a centered hero section with a massive headline (clamp(3rem, 6vw, 5rem)) centered on the page, a subtitle below it (max-width: 640px, mx-auto), and two CTA buttons side by side (primary filled + secondary outline). Below the buttons, add a browser-mockup screenshot of the product floating with box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25) and a slight perspective transform. Background: subtle radial gradient circle at top center, from primary color at 8% opacity fading to transparent. Include a trust bar below the hero with 4-5 grayscale company logos in a flex row with gap-8.",
+      "tags": ["hero", "above-fold", "centered"],
+      "businessTypes": ["saas", "startup", "technology"],
+      "emotionFit": "bold"
+    },
+    {
+      "id": "features-grid",
+      "section": "features",
+      "prompt": "Create a features section with a centered section heading (eyebrow + h2 + subtitle), followed by a 3-column grid (gap-8, responsive: 1 col on mobile, 2 on tablet, 3 on desktop). Each feature card has: an icon container (48x48px, rounded-xl, brand primary at 10% opacity background, brand primary icon), a feature title (font-semibold, mt-4), and a description paragraph (text-muted, text-sm, line-clamp-3). Cards have no visible border but subtle hover effect: translateY(-2px) with shadow-lg transition-all duration-300. Section padding: 5rem top/bottom.",
+      "tags": ["features", "grid", "icons"],
+      "businessTypes": ["saas", "technology", "professional-services", "agency"],
+      "emotionFit": "organized"
+    },
+    {
+      "id": "features-alternating",
+      "section": "features",
+      "prompt": "Create a features section with alternating left-right layout. Each feature block is a two-column row (reversed on odd items). Left column: small badge/pill with feature category, large feature title, description paragraph, and a 'Learn more' link with arrow icon. Right column: a product screenshot or illustration in a rounded-2xl container with a soft colored background (brand color at 5% opacity, alternating between primary and secondary). Rows separated by 4rem gap. On mobile, stack vertically.",
+      "tags": ["features", "alternating", "screenshots"],
+      "businessTypes": ["saas", "technology", "ecommerce"],
+      "emotionFit": "detailed"
+    },
+    {
+      "id": "pricing-three-tier",
+      "section": "pricing",
+      "prompt": "Create a pricing section with centered heading, then a 3-card layout. Each card: rounded-2xl, border border-gray-200, p-8. The recommended/popular card is slightly larger (scale-105), has the brand primary border, and a 'Most Popular' badge absolutely positioned at top center (-translate-y-1/2). Each card has: plan name, price (large text with /mo suffix in smaller text), a divider, feature list with checkmark icons (brand color for included, gray for excluded), and a CTA button (primary filled for popular, outline for others). Cards have hover:shadow-xl transition. Toggle at top for monthly/annual with annual showing a 'Save 20%' badge.",
+      "tags": ["pricing", "conversion", "tiers"],
+      "businessTypes": ["saas", "technology", "professional-services"],
+      "emotionFit": "trustworthy"
+    },
+    {
+      "id": "testimonials-carousel",
+      "section": "testimonials",
+      "prompt": "Create a testimonials section with a large centered quote. Show one testimonial at a time: a large quotation mark icon (text-6xl, brand color at 20% opacity), the quote text in text-xl with italic, the person's name in font-semibold, their title/company in text-muted. Below, show navigation dots (small circles, filled for active). On either side, show subtle prev/next arrow buttons. Add small avatar images (w-12 h-12 rounded-full) next to the attribution. Background: subtle section-alternate background color. Padding: 5rem. The whole section should feel spacious and premium.",
+      "tags": ["testimonials", "social-proof", "carousel"],
+      "businessTypes": ["saas", "professional-services", "agency", "ecommerce"],
+      "emotionFit": "trustworthy"
+    },
+    {
+      "id": "testimonials-grid",
+      "section": "testimonials",
+      "prompt": "Create a testimonial grid (masonry-style using CSS columns: 3 on desktop, 2 tablet, 1 mobile). Each card: rounded-xl, p-6, bg-white, border border-gray-100, shadow-sm. Contains: 5-star rating row (brand color stars), quote text, horizontal divider, flex row with avatar (w-10 h-10 rounded-full), name, and company. Cards have varying content lengths for natural masonry flow. Section has centered heading above. hover:shadow-md transition on each card.",
+      "tags": ["testimonials", "social-proof", "grid", "masonry"],
+      "businessTypes": ["saas", "agency", "local-business", "ecommerce"],
+      "emotionFit": "authentic"
+    },
+    {
+      "id": "cta-gradient",
+      "section": "cta",
+      "prompt": "Create a full-width CTA section with a gradient background (from brand primary to a darker shade). Content is centered: a bold headline in white (text-3xl font-bold), a subtitle in white/80 opacity, and a white CTA button with the brand color text. Button has hover:scale-105 and shadow-xl. Add a subtle pattern overlay (dots or grid at 5% white opacity) for visual texture. Rounded-2xl container with mx-4 on mobile for breathing room. Padding: 4rem top/bottom.",
+      "tags": ["cta", "conversion", "bottom", "gradient"],
+      "businessTypes": ["saas", "technology", "agency", "ecommerce"],
+      "emotionFit": "urgent"
+    },
+    {
+      "id": "navbar-sticky",
+      "section": "navbar",
+      "prompt": "Create a sticky top navigation bar with: logo on the left, centered nav links (4-5 items, font-medium, hover:text-primary transition), and a CTA button on the right. Use backdrop-blur-xl and bg-white/80 for a frosted glass effect when scrolled. Border-b border-gray-100 when scrolled (toggle via scroll detection). Height: 64px. On mobile: hamburger menu icon that opens a slide-in drawer from the right with the same links stacked vertically. Logo should be max-h-8. Nav links have an active state with a small dot or underline indicator.",
+      "tags": ["navbar", "navigation", "sticky", "frosted"],
+      "businessTypes": ["saas", "technology", "professional-services", "agency", "ecommerce"],
+      "emotionFit": "clean"
+    },
+    {
+      "id": "footer-columns",
+      "section": "footer",
+      "prompt": "Create a footer with a dark background (gray-900 or brand dark color). Layout: 4-column grid on desktop (logo+description column wider, then 3 link columns). Logo column has logo, 2-line description in text-gray-400, and social media icon links. Link columns have uppercase category headings (text-xs tracking-wider text-gray-500) and lists of links (text-gray-400 hover:text-white transition). Below, a full-width border-t border-gray-800 with copyright text and legal links in a flex row. Padding: 4rem top, 2rem bottom.",
+      "tags": ["footer", "navigation", "links"],
+      "businessTypes": ["saas", "technology", "professional-services", "agency", "ecommerce"],
+      "emotionFit": "professional"
+    },
+    {
+      "id": "stats-counter",
+      "section": "stats",
+      "prompt": "Create a stats/metrics section with 4 large numbers in a row (flex, gap-8, centered). Each stat: large number (text-4xl font-bold, brand color) with a + or % suffix, a label below in text-muted text-sm. Add a subtle count-up animation using CSS @keyframes (from 0 to target via CSS custom properties). Section can have a light background or be inline. On mobile: 2x2 grid. Dividers between items on desktop (border-r border-gray-200, last:border-0).",
+      "tags": ["stats", "social-proof", "numbers"],
+      "businessTypes": ["saas", "technology", "professional-services", "agency"],
+      "emotionFit": "impressive"
+    },
+    {
+      "id": "faq-accordion",
+      "section": "faq",
+      "prompt": "Create an FAQ section with centered heading, then an accordion list (max-width: 768px, mx-auto). Each item: question in font-medium with a chevron/plus icon on the right that rotates on open. Answer expands with smooth height transition (grid-template-rows: 0fr to 1fr trick). Items separated by border-b border-gray-200. Active question has brand color text. Use details/summary HTML elements for native behavior, styled with CSS. Padding: 5rem section, 1rem per item.",
+      "tags": ["faq", "accordion", "support"],
+      "businessTypes": ["saas", "technology", "professional-services", "ecommerce", "local-business"],
+      "emotionFit": "helpful"
+    },
+    {
+      "id": "contact-split",
+      "section": "contact",
+      "prompt": "Create a contact section with two-column layout. Left column: heading, description, then contact details (email, phone, address) each with an icon prefix, plus social media links. Right column: a contact form with: name input, email input, subject dropdown, message textarea, and submit button. Inputs have: rounded-lg, border border-gray-300, focus:ring-2 focus:ring-primary/20 focus:border-primary transition. Form card has bg-white rounded-2xl shadow-lg p-8. On mobile: stack vertically.",
+      "tags": ["contact", "form", "split-layout"],
+      "businessTypes": ["professional-services", "agency", "local-business"],
+      "emotionFit": "approachable"
+    },
+    {
+      "id": "logo-cloud",
+      "section": "trust",
+      "prompt": "Create a logo cloud / trust bar section. Centered text above: 'Trusted by leading companies' in text-sm text-gray-500 uppercase tracking-wider. Below: a flex row of 5-6 company logos, all rendered in grayscale (filter: grayscale(100%)), opacity-60, with hover:opacity-100 hover:grayscale(0) transition. Logos are max-h-8 with consistent sizing. On mobile: wrap to 2 rows of 3. Section padding: 3rem, with subtle top/bottom borders.",
+      "tags": ["trust", "social-proof", "logos"],
+      "businessTypes": ["saas", "technology", "professional-services", "agency"],
+      "emotionFit": "trustworthy"
+    }
+  ]
+}

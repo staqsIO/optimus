@@ -1,0 +1,9 @@
+node_modules/
+.next/
+content/docs/
+.source/
+
+# Env files — never commit real secrets
+.env
+.env.*
+!.env.example

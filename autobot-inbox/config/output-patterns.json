@@ -1,0 +1,32 @@
+{
+  "version": "1.0.0",
+  "description": "Output sanitization patterns — strips diligence theater from executor output. Versioned alongside sanitizer.js rule sets.",
+  "categories": {
+    "selfAssessment": {
+      "description": "Self-assigned quality scores, confidence ratings, accuracy claims",
+      "patterns": [
+        { "regex": "Quality Score:\\s*\\d", "flags": "i", "description": "Explicit quality score" },
+        { "regex": "\\d+(\\.\\d+)?%\\s*(accuracy|quality|confidence)", "flags": "i", "description": "Percentage-based quality claim" },
+        { "regex": "^(Overall|Final)\\s+(Rating|Score|Grade)\\s*:", "flags": "im", "description": "Rating/grade header" },
+        { "regex": "\\b(excellent|outstanding|exceptional|superb)\\s+(quality|work|output|result)", "flags": "i", "description": "Evaluative superlative about own output" }
+      ]
+    },
+    "executionFraming": {
+      "description": "Report/summary wrappers, step-by-step narration of execution",
+      "patterns": [
+        { "regex": "^#{1,3}\\s*(Campaign |Execution |Task )?(Report|Summary)", "flags": "im", "description": "Report/summary heading" },
+        { "regex": "^Step \\d+:", "flags": "im", "description": "Step narration" },
+        { "regex": "^(Phase|Stage) \\d+\\s*[-:]", "flags": "im", "description": "Phase/stage narration" },
+        { "regex": "^(Process|Workflow|Pipeline)\\s+(Complete|Finished|Done)", "flags": "im", "description": "Process completion announcement" }
+      ]
+    },
+    "toolLogs": {
+      "description": "Narration of tool invocations as if writing a log",
+      "patterns": [
+        { "regex": "^(Calling|Invoked|Running|Executing)\\s+\\w+(\\.\\w+)?\\s*(\\.{3}|…)", "flags": "im", "description": "Tool invocation narration" },
+        { "regex": "^(Successfully|✓|✅)\\s+(called|invoked|ran|executed|completed)", "flags": "im", "description": "Tool success narration" },
+        { "regex": "^(Fetching|Querying|Loading|Retrieving)\\s+\\w+", "flags": "im", "description": "Data fetch narration" }
+      ]
+    }
+  }
+}

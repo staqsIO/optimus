@@ -1,0 +1,39 @@
+# Root .dockerignore — used when build context is . (repo root)
+# Applies to autobot-inbox and docs-site builds
+
+# Runtime artifacts
+node_modules/
+*.log
+.git/
+.github/
+.claude/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Data directories
+autobot-inbox/data/
+autobot-inbox/keys/
+campaigns/
+
+# Test/dev files
+autobot-inbox/test/
+autobot-inbox/electron/
+
+# autobot-inbox docs not needed inside the runtime container (docs-site
+# mounts them at runtime via a separate volume).
+autobot-inbox/docs/
+# docs-site/ is intentionally NOT ignored — the docs-site Docker build
+# COPYs docs-site/package*.json at build time.
+# autobot-spec/ was renamed to spec/ in the March 2026 subtree merge —
+# neither path is needed at build time for any service.
+
+# Dashboard (separate build; the empty leftover ./dashboard/ has nothing)
+dashboard/
+autobot-inbox/dashboard/
+
+# Spec and markdown (not needed in containers)
+*.md
+!autobot-inbox/config/*.md

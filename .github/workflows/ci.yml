@@ -1,0 +1,759 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [22]
+    defaults:
+      run:
+        working-directory: autobot-inbox
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+          cache-dependency-path: autobot-inbox/package-lock.json
+      - run: npm ci
+      - name: Install lib dependencies
+        working-directory: lib
+        run: npm ci
+      - run: npm run test:ci
+
+  # Note: a `db-checks-ratchet` job lived here briefly. It compared the
+  # agent-touched-checks manifest length to a grep count of `CHECK (` in
+  # baseline SQL — but the grep counted CHECKs across all tables, while
+  # the manifest only tracks agent-written ones. The job fired false
+  # positives on every PR. The real ratchet is in
+  # autobot-inbox/test/db-checks-property.test.js (manifest hygiene
+  # asserted as part of `npm run test:ci`).
+
+  migrate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: autobot-inbox
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: autobot-inbox/package-lock.json
+      - run: npm ci
+      - name: Install lib dependencies
+        working-directory: lib
+        run: npm ci
+      - run: npm run migrate
+
+  # ── Managed-Postgres permission gate ────────────────────────────────
+  # Regression guard for the 2026-05-30 SEV-1: PR #272's pgcrypto/auth
+  # bootstrap ran unwrapped and crash-looped prod with "permission denied
+  # for schema auth" on Supabase (managed Postgres) while CI was green on
+  # the vanilla superuser container.
+  #
+  # This job mirrors Supabase's permission model against the same pgvector
+  # image: the superuser pre-creates an `auth` schema it owns (so the
+  # role can't touch it), then `npm run migrate` runs as the `limited`
+  # role. init + migrations MUST complete without crashing (exit 0).
+  # Any unwrapped DDL throw against the locked schema will surface here
+  # instead of in production. See [[feedback_db_bootstrap_managed_pg]].
+  migrate-managed-pg:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: optimus_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    defaults:
+      run:
+        working-directory: autobot-inbox
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: autobot-inbox/package-lock.json
+      - run: npm ci
+      - name: Install lib dependencies
+        working-directory: lib
+        run: npm ci
+
+      - name: Install psql client
+        run: sudo apt-get install -y --no-install-recommends postgresql-client
+
+      - name: Set up managed-Postgres-like environment
+        # Mirror what Supabase ships: `auth` schema pre-exists and is
+        # owned by the superuser (not the connecting role). The `limited`
+        # role can connect and own its own objects but has zero access to
+        # the `auth` schema — exactly what triggered the SEV-1.
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h localhost -U postgres -d optimus_test <<'SQL'
+            -- Pre-install extensions the managed platform (e.g. Supabase/RDS) ships
+            -- pre-provisioned. Created here as superuser so the non-superuser `limited`
+            -- role's `CREATE EXTENSION IF NOT EXISTS` calls no-op instead of hitting
+            -- "permission denied to create extension" (which previously cascaded every
+            -- migration after 001-baseline).
+            CREATE EXTENSION IF NOT EXISTS pgcrypto;
+            CREATE EXTENSION IF NOT EXISTS pg_trgm;
+            CREATE EXTENSION IF NOT EXISTS "vector";
+
+            -- Pre-create auth schema as superuser (mirrors Supabase), plus the
+            -- auth.uid() stub Supabase ships — migration 054's RLS policies reference it.
+            CREATE SCHEMA auth;
+            CREATE OR REPLACE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS 'SELECT NULL::uuid';
+
+            -- App roles prod infrastructure pre-creates. Migrations GRANT to / reassign
+            -- ownership to these ~88x, and the non-superuser `limited` role lacks
+            -- CREATEROLE so it cannot make them itself (001 CREATE ROLE is skipped).
+            CREATE ROLE autobot_agent LOGIN NOINHERIT;
+            CREATE ROLE explorer_ro NOLOGIN;
+
+            -- Create limited role: can connect + create in public, no auth DDL access
+            CREATE ROLE limited LOGIN PASSWORD 'limited_pw';
+            GRANT CONNECT ON DATABASE optimus_test TO limited;
+            GRANT CREATE, USAGE ON SCHEMA public TO limited;
+            -- Managed app roles create their own schemas (agent_graph, inbox, signal,
+            -- content, ...); grant DB-level CREATE so migrations can build them, while
+            -- still withholding superuser and auth-schema DDL below.
+            GRANT CREATE ON DATABASE optimus_test TO limited;
+            -- Member of the app roles (WITH ADMIN OPTION) so the non-superuser
+            -- connection can `ALTER ... OWNER TO` them AND re-`GRANT autobot_agent TO ...`
+            -- onward (001-baseline grants role membership between the app roles).
+            GRANT autobot_agent TO limited WITH ADMIN OPTION;
+            GRANT explorer_ro TO limited WITH ADMIN OPTION;
+
+            -- Auth schema: revoke DDL/default access from limited + PUBLIC (the SEV-1
+            -- gate — a migration doing DDL in `auth` must still fail), but mirror Supabase
+            -- by letting the app role resolve + EXECUTE auth.uid() inside RLS policies.
+            REVOKE ALL ON SCHEMA auth FROM limited, PUBLIC;
+            GRANT USAGE ON SCHEMA auth TO limited;
+            GRANT EXECUTE ON FUNCTION auth.uid() TO limited;
+
+            -- Grant limited ownership of migration tracking table (created during init)
+            -- Nothing to grant yet — limited will CREATE TABLE IF NOT EXISTS itself.
+          SQL
+
+      - name: Run init + migrations as non-superuser (must not crash)
+        # This is the regression gate. If any bootstrap DDL is unwrapped
+        # and throws "permission denied for schema auth", this step fails
+        # and blocks the PR — reproducing the SEV-1 in CI before prod.
+        env:
+          DATABASE_URL: postgresql://limited:limited_pw@localhost:5432/optimus_test
+        run: npm run migrate
+
+  # ── Real-Postgres RLS / tenancy test lane (Plan 024) ─────────────────
+  # The RLS/tenancy suites gate every assertion on DATABASE_URL +
+  # AUTOBOT_AGENT_DB_PASSWORD and therefore SKIP on the PGlite `test` job:
+  # PGlite pre-creates its roles as SUPERUSER (lib/db.js:305), and SUPERUSER
+  # bypasses ROW LEVEL SECURITY, so those assertions would pass vacuously —
+  # masking exactly the cross-tenant isolation bug they exist to catch. A
+  # migration that drops a policy or a pool that connects as superuser would
+  # ship green.
+  #
+  # This lane stands up the same managed-Postgres-like environment as
+  # migrate-managed-pg (extensions, `auth` schema + auth.uid() stub, app
+  # roles, migrations run as the non-superuser `limited` role), then flips
+  # the query pool to the non-superuser `autobot_agent` role via
+  # AUTOBOT_AGENT_DB_PASSWORD (lib/db.js rewrites the pool userinfo). With a
+  # real non-superuser pool, FORCE ROW LEVEL SECURITY (sql/126, sql/190)
+  # actually enforces, so the tenancy suites EXECUTE instead of skipping.
+  # See plans/README.md Plan 024.
+  test-postgres:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: optimus_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    defaults:
+      run:
+        working-directory: autobot-inbox
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: autobot-inbox/package-lock.json
+      - run: npm ci
+      - name: Install lib dependencies
+        working-directory: lib
+        run: npm ci
+
+      - name: Install psql client
+        run: sudo apt-get install -y --no-install-recommends postgresql-client
+
+      - name: Set up managed-Postgres-like environment
+        # Identical to migrate-managed-pg's setup, with ONE delta: the
+        # `autobot_agent` role gets a LOGIN PASSWORD so the test pool can
+        # actually connect AS it (lib/db.js swaps the pool userinfo to
+        # autobot_agent + AUTOBOT_AGENT_DB_PASSWORD). It is NOT a superuser —
+        # the rls-tenancy suite asserts `rolsuper = false`, which is the whole
+        # point (superuser would bypass RLS and make the test vacuous).
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h localhost -U postgres -d optimus_test <<'SQL'
+            -- Extensions the managed platform ships pre-provisioned.
+            CREATE EXTENSION IF NOT EXISTS pgcrypto;
+            CREATE EXTENSION IF NOT EXISTS pg_trgm;
+            CREATE EXTENSION IF NOT EXISTS "vector";
+
+            -- auth schema + auth.uid() stub (mirrors Supabase; sql/054 + sql/190
+            -- RLS policies reference auth.uid()).
+            CREATE SCHEMA auth;
+            CREATE OR REPLACE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS 'SELECT NULL::uuid';
+
+            -- App roles prod infrastructure pre-creates. autobot_agent gets a
+            -- LOGIN PASSWORD here (the one delta vs migrate-managed-pg) so the
+            -- test pool can connect as the unprivileged role and exercise
+            -- FORCE RLS.
+            CREATE ROLE autobot_agent LOGIN NOINHERIT PASSWORD 'autobot_agent_pw';
+            CREATE ROLE explorer_ro NOLOGIN;
+
+            -- Non-superuser role that runs the migrations (mirrors managed PG).
+            CREATE ROLE limited LOGIN PASSWORD 'limited_pw';
+            GRANT CONNECT ON DATABASE optimus_test TO limited;
+            GRANT CREATE, USAGE ON SCHEMA public TO limited;
+            GRANT CREATE ON DATABASE optimus_test TO limited;
+            GRANT autobot_agent TO limited WITH ADMIN OPTION;
+            GRANT explorer_ro TO limited WITH ADMIN OPTION;
+
+            -- Auth schema stays locked to limited/PUBLIC (SEV-1 gate), but the
+            -- app role can resolve + EXECUTE auth.uid() inside RLS policies.
+            REVOKE ALL ON SCHEMA auth FROM limited, PUBLIC;
+            GRANT USAGE ON SCHEMA auth TO limited;
+            GRANT EXECUTE ON FUNCTION auth.uid() TO limited;
+          SQL
+
+      - name: Run migrations as non-superuser limited role
+        env:
+          DATABASE_URL: postgresql://limited:limited_pw@localhost:5432/optimus_test
+        run: npm run migrate
+
+      - name: Grant autobot_agent read access to public._migrations
+        # lib/db.js initializeDatabase() runs on first connect and does
+        # `CREATE TABLE IF NOT EXISTS public._migrations` + `SELECT filename
+        # FROM public._migrations` to compute pending migrations. Under the
+        # non-superuser autobot_agent pool that CREATE is NOT wrapped in
+        # try/catch (unlike the auth bootstrap), so without USAGE on `public`
+        # it throws `permission denied for schema public`. The `limited`
+        # migrate step above already applied every migration and populated
+        # `public._migrations`, so once autobot_agent can SEE the table the
+        # CREATE-IF-NOT-EXISTS short-circuits and the applied-set covers every
+        # file → zero pending → init is a clean no-op. This mirrors production,
+        # where the autobot_agent pool boots against an already-migrated DB.
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h localhost -U postgres -d optimus_test <<'SQL'
+            -- CREATE (not just USAGE): Postgres checks ACL_CREATE on the schema
+            -- for `CREATE TABLE IF NOT EXISTS` even when the table already
+            -- exists (the create-permission aclcheck runs before the existence
+            -- short-circuit). The `limited` migrate step already created
+            -- public._migrations, so with CREATE the IF-NOT-EXISTS skips and
+            -- init is a no-op. Prod's autobot_agent pool boots through this same
+            -- initializeDatabase() path, so it necessarily has this grant.
+            GRANT USAGE, CREATE ON SCHEMA public TO autobot_agent;
+            GRANT SELECT ON public._migrations TO autobot_agent;
+          SQL
+
+      - name: Run RLS / tenancy + escalation suites against real Postgres (pool flipped to autobot_agent)
+        # DATABASE_URL + AUTOBOT_AGENT_DB_PASSWORD flip RLS_TEST_ENABLED true in
+        # rls-tenancy.test.js and tenancy-gucs.test.js, so their FORCE-RLS
+        # assertions EXECUTE here (they SKIP on the PGlite `test` job). lib/db.js
+        # rewrites the pool userinfo to the non-superuser autobot_agent role
+        # using AUTOBOT_AGENT_DB_PASSWORD. --test-force-exit prevents a hang on
+        # the open pg pool handle at suite teardown. Each file runs in its own
+        # subprocess (node's test runner isolates per file).
+        #
+        # Plan 024: escalation.test.js also runs here (in ADDITION to the PGlite
+        # `test` job, where it passes too) so its threat_memory DELETE-immutability
+        # assertion exercises the REAL production enforcement path — the
+        # non-superuser autobot_agent role has no DELETE grant on threat_memory
+        # (sql/001-baseline.sql), so Postgres blocks at the ACL layer rather than
+        # via the BEFORE-DELETE trigger PGlite's superuser connection hits. This
+        # guards against a regression that silently grants that role DELETE.
+        # (meetings-api.test.js is intentionally NOT added — it is fully mocked
+        # [mock.fn()], zero DB dependency, so real PG exercises nothing beyond the
+        # coverage it already gets in the PGlite `test` job.)
+        #
+        # test/schema-contracts.test.js (issue #533 / Plan 024 residual): self-gates
+        # on DATABASE_URL presence (skips clean under PGlite in the `test` job) and
+        # PREPAREs every SQL query extracted from src/api-routes/*.js + agent-chat.js
+        # against this real, fully-migrated schema — the class of bug PGlite's
+        # partial-migration-rollback behavior was masking (five fixed: contracts.js
+        # table-name typo, counterparties.js lateral-subquery projection, search.js
+        # uuid/text cast, sql/194 audit-schema grant, agent-chat.js created_at
+        # projection).
+        env:
+          DATABASE_URL: postgresql://autobot_agent:autobot_agent_pw@localhost:5432/optimus_test
+          AUTOBOT_AGENT_DB_PASSWORD: autobot_agent_pw
+          # OPT-166: with the pool flipped to autobot_agent, boot-time migration
+          # DDL can no longer run over the runtime pool (autobot_agent has no
+          # CREATE on schema public). lib/db.js getMigrationDb() routes that DDL
+          # over DATABASE_URL_SUPERUSER instead, and fails closed if it is unset
+          # while flipped. Stage the migration-runner/table-owner (`limited`) role
+          # here — the same posture prod uses (DATABASE_URL_SUPERUSER always staged
+          # before AUTOBOT_AGENT_DB_PASSWORD is set). Migrations already ran in the
+          # prior step, so this is a clean no-op over an owner connection.
+          DATABASE_URL_SUPERUSER: postgresql://limited:limited_pw@localhost:5432/optimus_test
+          # issue #545: contracts-delete-rls.test.js seeds fixtures through a
+          # second connection as `limited` (the migration-runner/table-owner
+          # role) since autobot_agent has no INSERT policy on content.drafts /
+          # content.gate_log / content.send_overrides / signatures.signature_requests
+          # — owner-bypass, not a superuser escape hatch. The actual
+          # DELETE-behavior assertions still run through the real autobot_agent
+          # pool above.
+          LIMITED_DATABASE_URL: postgresql://limited:limited_pw@localhost:5432/optimus_test
+        run: |
+          node --test --test-force-exit \
+            test/rls-tenancy.test.js \
+            test/tenancy-gucs.test.js \
+            test/escalation.test.js \
+            test/schema-contracts.test.js \
+            test/contracts-delete-rls.test.js
+
+  flip-readiness-sensor:
+    # OPT-166 V-8: the real-Postgres flip-readiness sensor runs in CI so a green
+    # PGlite `test` job can never hide a post-flip RLS regression (PGlite skips
+    # RLS entirely, so the whole unit suite is blind to every RLS gap). The
+    # sensor (autobot-inbox/scripts/flip-readiness-smoke.mjs) is fully
+    # self-contained: it `docker run`s its own disposable pgvector Postgres,
+    # applies every migration as superuser, creates the non-superuser
+    # `autobot_agent` role, connects AS it (RLS enforced), and exercises every
+    # enforced-table path per principal (system/agent/board) plus the abuse
+    # cases — R1-R14 + tenant-isolation fuzz parts 0/2-6. It is never
+    # false-green: a live `SELECT rolsuper` self-check SKIPS (never passes) if
+    # the pool is a superuser, and it `process.exit(1)`s on any BLOCKER, failing
+    # the job. Docker is preinstalled on ubuntu-latest, so the script owns the
+    # whole container lifecycle — no `services:` block is needed. Secret-free, so
+    # it also runs cleanly on fork PRs.
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: autobot-inbox
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: autobot-inbox/package-lock.json
+      - run: npm ci
+      - name: Install lib dependencies
+        working-directory: lib
+        run: npm ci
+      - name: Run flip-readiness sensor against a disposable real Postgres
+        # The script spins pgvector/pgvector:pg16 itself, migrates, flips the
+        # pool to autobot_agent, and asserts zero black-hole / zero cross-org
+        # leak across R1-R14 + the non-HTTP fuzz parts AND PART 1 / live-HTTP
+        # route fuzz (PHASE B-FUZZ-HTTP boots the API as autobot_agent and runs
+        # the timeline abuse probe; the V-8 guard fails the lane if that probe
+        # is skipped rather than executed). Non-zero exit on any BLOCKER fails
+        # the lane.
+        run: node scripts/flip-readiness-smoke.mjs
+
+  config-isolation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check config isolation
+        run: |
+          # Belt-and-suspenders: skip on push events (job-level `if` should handle this,
+          # but GitHub Actions sometimes evaluates the job anyway)
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "Skipping config isolation check — not a pull_request event (event=${{ github.event_name }})"
+            exit 0
+          fi
+
+          # Board-tier paths from CODEOWNERS that agents must not mix with their own changes
+          BOARD_PATHS="autobot-inbox/config/ autobot-inbox/.env CODEOWNERS CLAUDE.md spec/ board/ .github/"
+
+          # Infrastructure files are tier-neutral — they naturally span board and agent
+          # tiers (e.g., Docker Compose references services from both tiers). These are
+          # excluded from isolation checks but still require standard review.
+          is_infra() {
+            case "$1" in
+              compose.yml|compose.prod.yml|compose.*.yml) return 0 ;;
+              .dockerignore|.env.example) return 0 ;;
+              */Dockerfile|*/Dockerfile.*) return 0 ;;
+              */.dockerignore) return 0 ;;
+              */.env.example) return 0 ;;
+              docs-site/*) return 0 ;;
+              lib/*) return 0 ;;
+              package.json|package-lock.json) return 0 ;;
+              */test/*|*/test-*|*test.js|*test.ts) return 0 ;;
+              board/src/components/*) return 0 ;;
+              # Monotonic ratchet COUNTER files (.github/*-baseline) are agent-
+              # maintained CI bookkeeping, NOT board policy. Any agent PR that
+              # adds/removes a tracked read/insert must bump these — so they are
+              # tier-neutral and never trigger board gating. (CODEOWNERS lives at
+              # repo root with its own BOARD_PATHS entry and stays board-gated.)
+              .github/*-baseline) return 0 ;;
+            esac
+            return 1
+          }
+
+          # Get changed files: use PR base ref when available, otherwise diff against previous commit
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          else
+            CHANGED=$(git diff --name-only HEAD^...HEAD)
+          fi
+
+          BOARD_FILES=""
+          OTHER_FILES=""
+          INFRA_FILES=""
+
+          for file in $CHANGED; do
+            if is_infra "$file"; then
+              INFRA_FILES="$INFRA_FILES $file"
+              continue
+            fi
+            is_board=false
+            for bp in $BOARD_PATHS; do
+              case "$file" in
+                ${bp}*) is_board=true; break ;;
+              esac
+            done
+            if [ "$is_board" = true ]; then
+              BOARD_FILES="$BOARD_FILES $file"
+            else
+              OTHER_FILES="$OTHER_FILES $file"
+            fi
+          done
+
+          if [ -n "$INFRA_FILES" ]; then
+            echo "Infrastructure files (tier-neutral):"
+            for f in $INFRA_FILES; do echo "  - $f"; done
+            echo ""
+          fi
+
+          if [ -n "$BOARD_FILES" ] && [ -n "$OTHER_FILES" ]; then
+            echo "::error::Config isolation violation: PR mixes board-tier and agent-tier files."
+            echo ""
+            echo "Board-tier files:"
+            for f in $BOARD_FILES; do echo "  - $f"; done
+            echo ""
+            echo "Other files:"
+            for f in $OTHER_FILES; do echo "  - $f"; done
+            echo ""
+            echo "Split into separate PRs: one for board-tier changes (requires board approval),"
+            echo "one for agent-tier changes."
+            exit 1
+          fi
+
+          if [ -n "$BOARD_FILES" ]; then
+            echo "PR touches board-tier paths only — CODEOWNERS will require board approval."
+          elif [ -n "$OTHER_FILES" ]; then
+            echo "PR touches agent-tier paths only — config isolation check passed."
+          else
+            echo "PR touches infrastructure files only — config isolation check passed."
+          fi
+
+  smoke:
+    # push-to-develop already can't be triggered by a fork (forks push to
+    # their own remote, never to this repo's develop ref), but add an
+    # explicit repository guard as belt-and-suspenders since this job waits
+    # on the Railway preview deploy and probes it with API_SECRET.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop' && github.repository == 'staqsIO/optimus'
+    needs: [test, migrate]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for Railway preview deploy
+        run: sleep 30
+      - name: Smoke test critical endpoints
+        run: |
+          BASE_URL="https://preview.staqs.io"
+          FAILED=0
+
+          for endpoint in /api/status /api/campaigns /api/stats /api/briefing; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$BASE_URL$endpoint" || echo "000")
+            if [ "$STATUS" = "200" ]; then
+              echo "✓ $endpoint → $STATUS"
+            else
+              echo "✗ $endpoint → $STATUS"
+              FAILED=1
+            fi
+          done
+
+          if [ "$FAILED" = "1" ]; then
+            echo ""
+            echo "::warning::Some endpoints failed smoke test. Railway preview may still be deploying."
+          fi
+      # STAQPRO-588 / ADR-012: HTTP-level tenancy gate. The data-layer exit gate
+      # (test/tenancy-leak.e2e.test.js) was green while GET /api/signals leaked
+      # cross-tenant in prod — only an HTTP probe as the victim principal catches a
+      # route-collision shadow. Hard-fails on a real leak; skips (warning) only when
+      # API_SECRET isn't configured, so it can't block unrelated deploys before the
+      # secret is set. Flip to a required check once Actions billing is restored.
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Tenancy boundary probe (/api/signals)
+        env:
+          API_SECRET: ${{ secrets.API_SECRET }}
+          SMOKE_BASE_URL: https://preview.staqs.io
+        run: |
+          if [ -z "$API_SECRET" ]; then
+            echo "::warning::API_SECRET secret not set — skipping tenancy boundary probe."
+            exit 0
+          fi
+          node autobot-inbox/scripts/verify-tenancy-live.mjs
+
+  secret-detection:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+
+  # ── Audit Ratchet Gates ──────────────────────────────────────────────
+  # Count-based checks that prevent regression. Counts can only go down.
+
+  cg1-cross-layer-imports:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: "CG-1: Cross-layer import ratchet"
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then exit 0; fi
+
+          # Count real cross-layer references from lib/ → autobot-inbox/ (imports, requires, runtime path strings).
+          # Earlier regex matched arbitrary mentions, including JSDoc comments, inflating the count.
+          COUNT=$(grep -rnE "(^|[^A-Za-z0-9_])(import[[:space:]]+[^;]*['\"][^'\"]*autobot-inbox|from[[:space:]]+['\"][^'\"]*autobot-inbox|require[[:space:]]*\([[:space:]]*['\"][^'\"]*autobot-inbox|new[[:space:]]+URL[[:space:]]*\([[:space:]]*['\"][^'\"]*autobot-inbox)" lib/ --include="*.js" | wc -l | tr -d ' ')
+
+          # Monotonic ratchet: count must not exceed the tracked baseline.
+          # The baseline lives in .github/cg1-baseline and only goes down.
+          BASELINE=$(cat .github/cg1-baseline 2>/dev/null | tr -d ' \n')
+          if [ -z "$BASELINE" ]; then
+            echo "::error::Missing or empty .github/cg1-baseline — cannot enforce CG-1 ratchet"
+            exit 1
+          fi
+
+          if [ "$COUNT" -gt "$BASELINE" ]; then
+            echo "::error::CG-1 ratchet broken: lib/ has $COUNT imports from autobot-inbox/ (baseline: $BASELINE). New cross-layer coupling is not allowed. If this PR genuinely cleaned up unrelated coupling, lower .github/cg1-baseline to match."
+            exit 1
+          fi
+
+          if [ "$COUNT" -lt "$BASELINE" ]; then
+            echo "::warning::CG-1 ratchet drift: lib/ has $COUNT imports from autobot-inbox/, baseline is $BASELINE. Lower .github/cg1-baseline to $COUNT in this PR to tighten the ratchet."
+          fi
+
+          echo "Cross-layer imports: $COUNT / $BASELINE — OK"
+
+  md-unscoped-tenant-reads:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: "M-D: Unscoped tenant-read ratchet (STAQPRO-589)"
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then exit 0; fi
+          # Monotonic ratchet: count of SELECT reads of a federated tenant table
+          # (lib/ + agents/ + autobot-inbox/src/) that don't append the tenancy
+          # chokepoint. Baseline lives in .github/md-baseline and only goes down.
+          node autobot-inbox/scripts/audit-unscoped-tenant-reads.mjs --check
+
+  cg2-silent-catch:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: "CG-2: Silent catch detector"
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then exit 0; fi
+
+          # Count silent catch patterns: .catch(() => {}), .catch(() => null), .catch(() => []), .catch(e => {})
+          COUNT=$(grep -rn '\.catch\s*(\s*(\(\)\s*=>|(\w+)\s*=>)\s*{?\s*\(?\s*}?\s*)\s*)' lib/ agents/ autobot-inbox/src/ --include="*.js" | grep -v 'node_modules\|\.test\.' | wc -l | tr -d ' ')
+          echo "Silent .catch() count: $COUNT"
+          echo "::warning::Silent catch count is $COUNT — should decrease over time"
+
+  cg3-fetch-timeout:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: "CG-3: Fetch timeout enforcement"
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then exit 0; fi
+
+          # Find fetch() calls without timeout/AbortController/signal
+          UNGUARDED=$(grep -rn 'fetch(' lib/ agents/ autobot-inbox/src/ --include="*.js" | grep -v 'node_modules\|\.test\.\|timeout\|AbortController\|signal\|AbortSignal\|fetchWithTimeout' | wc -l | tr -d ' ')
+          echo "Unguarded fetch() calls: $UNGUARDED"
+          if [ "$UNGUARDED" -gt 0 ]; then
+            echo "::warning::$UNGUARDED fetch() calls without timeout protection"
+          fi
+
+  cg4-npm-audit:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: "CG-4: npm audit high/critical vulnerabilities"
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then exit 0; fi
+
+          cd autobot-inbox
+          npm ci --ignore-scripts 2>/dev/null
+          # CG-4 ratchet: gate on high+critical (tightened from critical-only, #514).
+          # Pre-existing high advisories were cleared in the lockfile first (#514 part a,
+          # PR #556) so this does not red unrelated PRs; a NEW high/critical advisory now blocks.
+          VULN=$(npm audit --json 2>/dev/null | node -e "const d=require('fs').readFileSync('/dev/stdin','utf8');try{const j=JSON.parse(d);const v=j.metadata?.vulnerabilities||{};console.log((v.critical||0)+(v.high||0))}catch{console.log(0)}")
+          if [ "$VULN" -gt 0 ]; then
+            echo "::error::$VULN high/critical npm vulnerabilities found"
+            npm audit --audit-level=high 2>/dev/null || true
+            exit 1
+          fi
+          echo "No high/critical npm vulnerabilities — OK"
+
+  cg5-eslint-complexity:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: "CG-5: ESLint complexity"
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then exit 0; fi
+
+          cd autobot-inbox
+          npm ci --ignore-scripts 2>/dev/null
+          COUNT=$(npx eslint ../lib/ ../agents/ src/ --no-eslintrc --rule '{"complexity": ["error", 15]}' -f json 2>/dev/null | node -e "const d=require('fs').readFileSync('/dev/stdin','utf8');try{const j=JSON.parse(d);console.log(j.filter(f=>f.errorCount>0).length)}catch{console.log(0)}" || echo "0")
+          echo "Files exceeding complexity threshold: $COUNT"
+          if [ "$COUNT" -gt 0 ]; then
+            echo "::warning::$COUNT files exceed complexity threshold of 15"
+          fi
+
+  lint-and-typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install autobot-inbox deps
+        run: |
+          cd autobot-inbox
+          npm ci --ignore-scripts
+      - name: Install lib deps
+        run: |
+          cd lib
+          npm ci --ignore-scripts
+      - name: Install board deps
+        run: |
+          cd board
+          npm ci --ignore-scripts
+      - name: "Lint: eslint autobot-inbox"
+        run: |
+          cd autobot-inbox
+          npm run lint
+      - name: "Typecheck: tsc board"
+        run: |
+          cd board
+          npm run typecheck
+      - name: "Test: board (vitest)"
+        # Runs board/package.json "test" = "vitest run" (non-interactive).
+        # Suite = src/**/*.test.ts (board auth/JWT + artifacts/capture/calendar).
+        # Blocking: a failing board test fails the PR. Board deps already
+        # installed by the "Install board deps" step above.
+        # NOTE: the src/app/**/*.test.js node:test files (proxy/ops allowlist,
+        # issues/today helpers) are NOT part of vitest's include and are wired
+        # separately in a follow-up.
+        run: |
+          cd board
+          npm test
+
+  # ── lib/ + agents/ ESLint gate (Plan 027) ────────────────────────────
+  # Blocking lint for the org-level layers. PR #525 landed the eslint
+  # configs (lib/.eslintrc.json, agents/.eslintrc.json) + `lint` scripts;
+  # this job makes `npm run lint` a required check for both. `--ignore-scripts`
+  # skips postinstall (playwright browser download etc.) since lint only needs
+  # eslint from devDependencies.
+  lib-agents-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: lib/package-lock.json
+      - name: Install lib deps
+        working-directory: lib
+        run: npm ci --ignore-scripts
+      - name: "Lint: eslint lib"
+        working-directory: lib
+        run: npm run lint
+      - name: Install agents deps
+        working-directory: agents
+        run: npm ci --ignore-scripts
+      - name: "Lint: eslint agents"
+        working-directory: agents
+        run: npm run lint

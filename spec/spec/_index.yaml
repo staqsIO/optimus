@@ -1,0 +1,131 @@
+version: "1.0.0"
+generated_from: "SPEC.md"
+
+domains:
+  foundations:
+    color: "zinc"
+    label: "Foundations"
+  runtime:
+    color: "blue"
+    label: "Runtime"
+  infrastructure:
+    color: "teal"
+    label: "Infrastructure"
+  governance:
+    color: "amber"
+    label: "Governance"
+  strategy:
+    color: "purple"
+    label: "Strategy"
+
+sections:
+  - id: "0"
+    file: "00-design-principles.md"
+    domain: foundations
+    status: stable
+    phase: 1
+  - id: "1"
+    file: "01-core-idea.md"
+    domain: foundations
+    status: stable
+    phase: 0
+  - id: "2"
+    file: "02-architecture-overview.md"
+    domain: foundations
+    status: stable
+    phase: 1
+  - id: "3"
+    file: "03-task-graph.md"
+    domain: runtime
+    status: stable
+    phase: 1
+  - id: "4"
+    file: "04-agent-runtime.md"
+    domain: runtime
+    status: stable
+    phase: 1
+  - id: "5"
+    file: "05-guardrails.md"
+    domain: runtime
+    status: stable
+    phase: 1
+  - id: "6"
+    file: "06-tool-integrity.md"
+    domain: runtime
+    status: stable
+    phase: 1
+  - id: "7"
+    file: "07-communication-gateway.md"
+    domain: infrastructure
+    status: stable
+    phase: 1
+  - id: "8"
+    file: "08-audit-observability.md"
+    domain: infrastructure
+    status: stable
+    phase: 1
+  - id: "9"
+    file: "09-kill-switch.md"
+    domain: infrastructure
+    status: stable
+    phase: 1
+  - id: "10"
+    file: "10-cost-tracking.md"
+    domain: infrastructure
+    status: stable
+    phase: 1
+  - id: "11"
+    file: "11-failure-modes.md"
+    domain: infrastructure
+    status: stable
+    phase: 1
+  - id: "12"
+    file: "12-database-architecture.md"
+    domain: infrastructure
+    status: stable
+    phase: 1
+  - id: "13"
+    file: "13-constitution.md"
+    domain: governance
+    status: stable
+    phase: 3
+  - id: "14"
+    file: "14-phased-execution.md"
+    domain: governance
+    status: active
+    phase: 1
+  - id: "15"
+    file: "15-operating-cost-model.md"
+    domain: governance
+    status: stable
+    phase: 1
+  - id: "16"
+    file: "16-resolved-questions.md"
+    domain: governance
+    status: stable
+    phase: 1
+  - id: "17"
+    file: "17-legal-compliance.md"
+    domain: governance
+    status: stable
+    phase: 3
+  - id: "18"
+    file: "18-autonomous-composition.md"
+    domain: strategy
+    status: stable
+    phase: 3
+  - id: "19"
+    file: "19-strategy-evaluation.md"
+    domain: strategy
+    status: stable
+    phase: 2
+  - id: "20"
+    file: "20-not-covered.md"
+    domain: strategy
+    status: stable
+    phase: 0
+  - id: "21"
+    file: "21-changelog.md"
+    domain: strategy
+    status: stable
+    phase: 0

@@ -1,0 +1,71 @@
+# Auto-label rules for actions/labeler@v5
+# Adapted from spec/conversation/009 for monorepo paths.
+
+board-decision:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'autobot-inbox/config/**'
+      - 'autobot-inbox/.env*'
+      - 'autobot-inbox/electron/**'
+      - 'CODEOWNERS'
+      - 'CLAUDE.md'
+      - 'autobot-inbox/CLAUDE.md'
+      - 'spec/CLAUDE.md'
+
+security:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'autobot-inbox/config/gates.json'
+      - 'autobot-inbox/src/runtime/guard*'
+      - 'autobot-inbox/tools/**'
+
+spec-amendment:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'spec/**'
+
+cost-impact:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'autobot-inbox/config/agents*'
+      - 'autobot-inbox/src/finance/**'
+
+architecture:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'autobot-inbox/src/runtime/**'
+      - 'autobot-inbox/sql/**'
+      - 'autobot-inbox/tools/**'
+      - 'autobot-inbox/src/audit/**'
+
+agent-config:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'autobot-inbox/config/agents*'
+      - 'autobot-inbox/config/routing*'
+
+schema-migration:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'autobot-inbox/sql/**'
+
+tests-only:
+  - changed-files:
+    - all-globs-to-all-files:
+      - 'autobot-inbox/test/**'
+      - '**/*.test.*'
+      - '**/*.spec.*'
+
+docs:
+  - changed-files:
+    - all-globs-to-all-files:
+      - 'autobot-inbox/docs/**'
+      - '**/*.md'
+      - '!spec/**'
+
+infra:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/**'
+      - 'autobot-inbox/Dockerfile*'
+      - 'autobot-inbox/docker-compose*'

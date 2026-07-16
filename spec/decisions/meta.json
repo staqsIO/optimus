@@ -1,0 +1,4 @@
+{
+  "title": "Architecture Decisions",
+  "pages": ["001-email-vs-task-graph", "002-individual-install-over-multi-tenant"]
+}
