@@ -3,8 +3,8 @@ import { RootProvider } from 'fumadocs-ui/provider';
 import type { ReactNode } from 'react';
 
 export const metadata = {
-  title: 'Optimus Docs',
-  description: 'Documentation for the Optimus agent organization',
+  title: 'Ephor Docs',
+  description: 'Documentation for the Ephor agent organization',
 };
 
 export default function Layout({ children }: { children: ReactNode }) {

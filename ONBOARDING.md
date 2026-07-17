@@ -1,10 +1,10 @@
 # Contributor Onboarding
 
-Welcome to Optimus. This document tells you honestly what works, what doesn't, and where things are.
+Welcome to Ephor (formerly Optimus). This document tells you honestly what works, what doesn't, and where things are.
 
-## What Is Optimus
+## What Is Ephor
 
-Optimus is a **governed agent organization** — a fully agent-staffed technology company where AI agents handle operational roles, governed by a human board (Eric and Dustin). Agents coordinate through a Postgres task graph. Every action is logged to a public event archive.
+Ephor is a **governed agent organization** — a fully agent-staffed technology company where AI agents handle operational roles, governed by a human board (Eric and Dustin). Agents coordinate through a Postgres task graph. Every action is logged to a public event archive.
 
 The first product is **autobot-inbox**: an AI-powered inbox management system. The company also builds software products via campaigns (multi-step agent pipelines).
 
@@ -21,7 +21,7 @@ Six design principles govern all decisions (cite by number):
 
 Full spec: [`spec/SPEC.md`](spec/SPEC.md) (v1.1.0, canonical — there is no root `SPEC.md`; the spec lives in `spec/`). Constitution: [`CONSTITUTION.md`](CONSTITUTION.md) (repo root).
 
-> **Repo note:** as of March 2026 this is a single consolidated monorepo (`staqsIO/optimus`). It was previously two repos (`autobot-inbox` + `autobot-spec`), unified via subtree merge — so older docs/issues referencing an `autobot-spec/` path now mean `spec/`.
+> **Repo note:** as of March 2026 this is a single consolidated monorepo (`staqsIO/ephor`). It was previously two repos (`autobot-inbox` + `autobot-spec`), unified via subtree merge — so older docs/issues referencing an `autobot-spec/` path now mean `spec/`.
 
 ## Honest Status
 
@@ -121,8 +121,8 @@ optimus/
 
 ```bash
 # Clone and setup
-git clone https://github.com/staqsIO/optimus.git
-cd optimus/autobot-inbox
+git clone https://github.com/staqsIO/ephor.git
+cd ephor/autobot-inbox
 cp .env.example .env    # Fill in API keys + DATABASE_URL
 
 # Database
@@ -247,7 +247,7 @@ Channel I/O abstracted via `InputAdapter`/`OutputAdapter` interfaces. Adding a c
 - Branch from `main`, PR back into `main`
 - Atomic commits — one logical change per commit
 - No force-push to `main`
-- All work tracked on [Optimus Roadmap](https://github.com/orgs/staqsIO/projects/2) project board
+- All work tracked on [Ephor Roadmap](https://github.com/orgs/staqsIO/projects/2) project board
 
 ## What Needs Help
 

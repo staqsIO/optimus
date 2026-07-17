@@ -1,4 +1,7 @@
-name: optimus
+# Project renamed optimus -> ephor (2026-07). Pre-rename local volumes keep the
+# old namespace (optimus_postgres_data, ...) and are NOT attached automatically.
+# To keep old local data, run once with: COMPOSE_PROJECT_NAME=optimus docker compose up -d
+name: ephor
 
 # Development compose — hot reload enabled for all services.
 # All source dirs are bind-mounted; node_modules stay inside containers.
@@ -88,7 +91,7 @@ services:
       GMAIL_POLL_INTERVAL: ${GMAIL_POLL_INTERVAL:-60}
       PROCESS_ROLE: ${PROCESS_ROLE:-full}
       DEFAULT_REPO_OWNER: ${DEFAULT_REPO_OWNER:-staqsIO}
-      DEFAULT_REPO_NAME: ${DEFAULT_REPO_NAME:-optimus}
+      DEFAULT_REPO_NAME: ${DEFAULT_REPO_NAME:-ephor}
       NEO4J_URI: bolt://neo4j:7687
       NEO4J_USER: neo4j
       NEO4J_PASSWORD: ${NEO4J_PASSWORD:-optimus-dev}

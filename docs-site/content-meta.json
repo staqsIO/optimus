@@ -1,5 +1,5 @@
 {
-  "title": "Optimus Docs",
+  "title": "Ephor Docs",
   "root": true,
   "pages": ["external", "internal", "spec"]
 }

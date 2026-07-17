@@ -2,15 +2,15 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-**Repository:** [`staqsIO/optimus`](https://github.com/staqsIO/optimus) — consolidated monorepo (March 2026). Previously two separate repos (`staqsIO/autobot-inbox` and `staqsIO/autobot-spec`), unified via subtree merge.
+**Repository:** [`staqsIO/ephor`](https://github.com/staqsIO/ephor) — consolidated monorepo (March 2026). Previously two separate repos (`staqsIO/autobot-inbox` and `staqsIO/autobot-spec`), unified via subtree merge. **Renamed from Optimus to Ephor in July 2026** — `SPEC.md`, `CONSTITUTION.md`, ADRs, and historical records predate the rename and retain the original names (Optimus, AutoBot); they refer to this same system.
 
-## What Is Optimus
+## What Is Ephor
 
-Optimus is a **governed agent organization** — a fully agent-staffed technology company where every operational role is an AI agent, governed by a human board of directors (Dustin and Eric). Agents coordinate through a Postgres task graph. Every action is logged to a public event archive. The board sets strategy, defines ethical boundaries, controls budgets, and maintains legal accountability. Everything else is agents.
+Ephor (named for the Spartan officials empowered to check the kings; formerly **Optimus**) is a **governed agent organization** — a fully agent-staffed technology company where every operational role is an AI agent, governed by a human board of directors (Dustin and Eric). Agents coordinate through a Postgres task graph. Every action is logged to a public event archive. The board sets strategy, defines ethical boundaries, controls budgets, and maintains legal accountability. Everything else is agents.
 
-Optimus builds and operates software products. **autobot-inbox** is the first product — an AI-powered inbox management system. The distinction matters: Optimus is the company; autobot-inbox is a product the company builds.
+Ephor builds and operates software products. **autobot-inbox** is the first product — an AI-powered inbox management system. The distinction matters: Ephor is the company; autobot-inbox is a product the company builds.
 
-**AutoBot** is the long-term goal: an autonomous constitutional agent organization where the human board is replaced by a constitutional layer. AutoBot cannot exist until Optimus proves agent governance works under human supervision.
+**AutoBot** (spec name) is the long-term goal: an autonomous constitutional agent organization where the human board is replaced by a constitutional layer. That mode cannot exist until Ephor proves agent governance works under human supervision.
 
 ### Governing Documents
 

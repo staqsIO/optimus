@@ -2,9 +2,9 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in Optimus, please report it privately — do not open a public GitHub issue.
+If you discover a security vulnerability in Ephor, please report it privately — do not open a public GitHub issue.
 
-- **Preferred:** [GitHub Security Advisories](https://github.com/staqsIO/optimus/security/advisories/new) on `staqsIO/optimus`.
+- **Preferred:** [GitHub Security Advisories](https://github.com/staqsIO/ephor/security/advisories/new) on `staqsIO/ephor`.
 - **Alternative:** email [eric@staqs.io](mailto:eric@staqs.io) with details.
 
 Please include as much of the following as you can:

@@ -28,7 +28,7 @@ jobs:
   agent-signoff:
     # Private-repo gate only: the `agent-approved` label comes from the internal
     # reviewer-agent pipeline, which external fork PRs on the public mirror can
-    # never receive. On staqsIO/optimus, contributions go through standard human
+    # never receive. On staqsIO/ephor, contributions go through standard human
     # maintainer review (CONTRIBUTING.md) instead, so this check skips there.
     if: github.repository == 'staqsIO/optimus-private'
     runs-on: ubuntu-latest

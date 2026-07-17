@@ -12,8 +12,8 @@ import CommandPalette from "@/components/CommandPalette";
 import { ToastProvider } from "@/components/Toast";
 
 export const metadata: Metadata = {
-  title: "Optimus Board Workstation",
-  description: "Governance dashboard for the Optimus agent organization",
+  title: "Ephor Board Workstation",
+  description: "Governance dashboard for the Ephor agent organization",
 };
 
 export default function RootLayout({

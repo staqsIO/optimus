@@ -3,12 +3,12 @@
 **Version:** 1.0.0 · **Last updated:** 2026-05-30 · **Owner:** Board (Eric/Dustin)
 
 The canonical, versioned set of agents and skills used to build and operate
-Optimus. This is the onboarding reference: a new contributor should be able to
+Ephor. This is the onboarding reference: a new contributor should be able to
 read this file and know **which agent to reach for, and when**, with zero verbal
 explanation. The full routing/disambiguation table lives in
 `~/.claude/rules/agent-routing.md`; this file is the at-a-glance index.
 
-> These are *development-time* agents (the ones that write and review Optimus's
+> These are *development-time* agents (the ones that write and review Ephor's
 > code). They are distinct from the *runtime* agents that operate the
 > autobot-inbox product (orchestrator, intake, triage, responder, reviewer,
 > architect — see `autobot-inbox/config/agents.json` and SPEC §2).

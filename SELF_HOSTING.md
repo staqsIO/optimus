@@ -1,6 +1,6 @@
-# Self-Hosting Optimus
+# Self-Hosting Ephor
 
-This is a tiered guide for running a fork of Optimus, from a zero-config demo
+This is a tiered guide for running a fork of Ephor (formerly Optimus), from a zero-config demo
 boot up to the full multi-channel production configuration. Each tier is
 strictly additive — nothing in a lower tier stops working when you add a
 higher one.
@@ -18,8 +18,8 @@ No Gmail, Slack, Telegram, Linear, tl;dv, or OpenRouter credentials required.
 - An [Anthropic API key](https://console.anthropic.com/).
 
 ```bash
-git clone https://github.com/staqsIO/optimus.git
-cd optimus
+git clone https://github.com/staqsIO/ephor.git
+cd ephor
 npm install
 
 cd autobot-inbox
@@ -53,7 +53,7 @@ You can also force single-provider mode outside of `DEMO_MODE` by setting
 
 ## Integration matrix — every external service, at a glance
 
-Optimus talks to a lot of services in its full production configuration.
+Ephor talks to a lot of services in its full production configuration.
 **Almost all of them are optional.** Each integration detects missing
 credentials and skips itself (a log line, not a crash). Bring your own keys
 for whatever you actually want — nothing is bundled or shared.
@@ -134,7 +134,7 @@ campaign agents run on a Mac on a desk.
 Start a runner on any machine that can reach your Postgres:
 
 ```bash
-git clone https://github.com/staqsIO/optimus.git && cd optimus && npm install
+git clone https://github.com/staqsIO/ephor.git && cd ephor && npm install
 cd autobot-inbox
 cp .env.runner.example .env   # only DATABASE_URL is required
 bash scripts/setup-runner.sh  # prerequisite checker (node, git, gh, keys)

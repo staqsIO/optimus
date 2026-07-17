@@ -1,29 +1,34 @@
-# Optimus
+# Ephor
 
 **A governed agent organization — a technology company where every operational role is an AI agent, run under a human board and enforced by infrastructure, not prompts.**
+
+In Sparta, the *ephors* (pronounced "EFF-orz") were the elected officials with the power to check the kings. Here, a constitutional layer checks the agents.
 
 <p align="center">
   <img src="https://img.shields.io/badge/license-Apache--2.0-blue?style=flat-square" alt="License: Apache-2.0">
   <img src="https://img.shields.io/badge/node-%3E%3D20-339933?style=flat-square&logo=node.js&logoColor=white" alt="Node >= 20">
   <img src="https://img.shields.io/badge/database-PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL">
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square" alt="PRs welcome">
-  <img src="https://img.shields.io/github/stars/staqsIO/optimus?style=flat-square" alt="GitHub stars">
+  <img src="https://img.shields.io/github/stars/staqsIO/ephor?style=flat-square" alt="GitHub stars">
 </p>
 
 ---
 
-## What Is Optimus
+## What Is Ephor
 
-Optimus is a fully agent-staffed technology organization. Every operational role — strategy, architecture, orchestration, execution, review, and exploration — is performed by an AI agent. A human board of directors sets strategy, defines ethical boundaries, controls budgets, and holds legal accountability. Everything else is agents, coordinated through a Postgres task graph with no framework, no message queue, and no ORM.
+Ephor is a fully agent-staffed technology organization. Every operational role — strategy, architecture, orchestration, execution, review, and exploration — is performed by an AI agent. A human board of directors sets strategy, defines ethical boundaries, controls budgets, and holds legal accountability. Everything else is agents, coordinated through a Postgres task graph with no framework, no message queue, and no ORM.
 
 What makes it different from an "agent framework" is where the rules live. Capabilities are granted and constrained by **infrastructure** — database roles, row-level security, atomic state transitions, and hash-chained audit — not by system prompts an agent can be argued out of. A prompt advises; the database decides.
 
-The long-term trajectory is **AutoBot**: an autonomous constitutional agent organization where a constitutional layer replaces the human board for operational decisions. AutoBot cannot exist until Optimus has proven that agent governance works under human supervision. The transition is graduated and metric-gated — no capability is activated based on a calendar date.
+The long-term trajectory is the fully autonomous constitutional mode (called **AutoBot** in the spec): an agent organization where a constitutional layer replaces the human board for operational decisions. That mode cannot exist until Ephor has proven that agent governance works under human supervision. The transition is graduated and metric-gated — no capability is activated based on a calendar date.
 
-Optimus builds and operates software products. The first running product is **autobot-inbox** — an AI-powered inbox manager that keeps a work inbox at zero, drafts replies in the owner's learned voice, and never sends anything a constitutional gate hasn't cleared. The distinction matters: Optimus is the organization; products are what it builds.
+Ephor builds and operates software products. The first running product is **autobot-inbox** — an AI-powered inbox manager that keeps a work inbox at zero, drafts replies in the owner's learned voice, and never sends anything a constitutional gate hasn't cleared. The distinction matters: Ephor is the organization; products are what it builds.
 
 > [!NOTE]
 > This is a **reference implementation and working lab** published as proof-of-work — a real, running governed-agent system, not a product pitch. It is self-hostable, but expect to bring your own credentials and your own operational judgment.
+
+> [!NOTE]
+> **Naming:** the project was renamed from **Optimus** to **Ephor** in July 2026. `SPEC.md`, `CONSTITUTION.md`, and historical design records predate the rename and retain the original names (Optimus, AutoBot); they refer to the same system.
 
 ## Architecture
 
@@ -81,7 +86,7 @@ Optimus builds and operates software products. The first running product is **au
 
 ### Model Routing (Bring Your Own Keys)
 
-Optimus is model-agnostic and metered per agent. The LLM provider layer (`lib/llm/`) routes each tier to the cheapest model that can do its job reliably — reliability (tool-call and JSON adherence), not $/token alone, is the binding constraint, because failures compound down the task DAG. High-volume tiers default to open-weight models served over **OpenRouter**; the layer also speaks Anthropic, Google, and local **Ollama**.
+Ephor is model-agnostic and metered per agent. The LLM provider layer (`lib/llm/`) routes each tier to the cheapest model that can do its job reliably — reliability (tool-call and JSON adherence), not $/token alone, is the binding constraint, because failures compound down the task DAG. High-volume tiers default to open-weight models served over **OpenRouter**; the layer also speaks Anthropic, Google, and local **Ollama**.
 
 | Tier | Default model | Provider |
 |------|---------------|----------|
@@ -134,7 +139,7 @@ Gates run at the database/orchestration layer as part of the same atomic transac
 ## Repository Structure
 
 ```
-optimus/
+ephor/
   SPEC.md            Canonical architecture specification (source of truth)
   CONSTITUTION.md    Prescriptive governance constraints (audit reference)
   lib/               Org-level infrastructure (shared across products)
@@ -165,8 +170,8 @@ optimus/
 The minimum to boot the organization is a **Postgres database and one LLM key** — no Google, Slack, or GitHub credentials required. Optional integrations detect missing credentials and disable themselves cleanly.
 
 ```bash
-git clone https://github.com/staqsIO/optimus.git
-cd optimus
+git clone https://github.com/staqsIO/ephor.git
+cd ephor
 
 # Configure — set a database URL and at least one provider key
 cp autobot-inbox/.env.example autobot-inbox/.env
@@ -204,7 +209,7 @@ Postgres database.
 
 ## Specification
 
-The full architecture lives in `spec/SPEC.md`. It covers agent tiers and their constraints, the Postgres task graph as the single coordination source, the runtime loop with pre/post guardrail checks, constitutional gate enforcement, the risk-tiered Communication Gateway, the phased path from Optimus (governed) to AutoBot (autonomous), and the legal-compliance architecture. Changes to the spec require board review.
+The full architecture lives in `spec/SPEC.md`. It covers agent tiers and their constraints, the Postgres task graph as the single coordination source, the runtime loop with pre/post guardrail checks, constitutional gate enforcement, the risk-tiered Communication Gateway, the phased path from the governed organization (called *Optimus* in the spec) to the autonomous one (called *AutoBot*), and the legal-compliance architecture. Changes to the spec require board review.
 
 ## Status
 

@@ -2,7 +2,7 @@
 
 **Version:** 1.0.0 · **Last updated:** 2026-05-30
 
-Optimus captures raw signal (messages, meetings, documents) and *links* it into
+Ephor captures raw signal (messages, meetings, documents) and *links* it into
 actionable structure (work items, obligations, projects, drafts). The value is
 in the **seams** — the edges where one subsystem's output becomes another's
 input. This document maps each seam: its **source**, the **transform**, the

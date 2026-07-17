@@ -6,7 +6,7 @@ export default function Layout({ children }: { children: ReactNode }) {
   return (
     <DocsLayout
       tree={source.pageTree}
-      nav={{ title: 'Optimus Docs' }}
+      nav={{ title: 'Ephor Docs' }}
     >
       {children}
     </DocsLayout>
