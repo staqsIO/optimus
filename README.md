@@ -173,7 +173,11 @@ The minimum to boot the organization is a **Postgres database and one LLM key** 
 git clone https://github.com/staqsIO/ephor.git
 cd ephor
 
-# Configure — set a database URL and at least one provider key
+# Guided setup — walks you through every service account (with signup
+# links), writes autobot-inbox/.env, and generates internal secrets:
+npm install && npm run setup
+
+# …or configure by hand — set a database URL and at least one provider key
 cp autobot-inbox/.env.example autobot-inbox/.env
 #   DATABASE_URL=...           (Postgres with pgvector)
 #   ANTHROPIC_API_KEY=...      and/or OPENROUTER_API_KEY=...

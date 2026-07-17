@@ -5,6 +5,12 @@ boot up to the full multi-channel production configuration. Each tier is
 strictly additive — nothing in a lower tier stops working when you add a
 higher one.
 
+> **Shortcut:** `npm run setup` (from the repo root) is a guided wizard that
+> walks you through every service in this guide — with signup links — writes
+> `autobot-inbox/.env`, and generates the internal secrets. It is re-runnable:
+> existing values are kept unless you replace them. The sections below are the
+> reference for doing it by hand or going deeper.
+
 ## Minimum: zero-config demo boot
 
 Runs the **entire agent org** — intake → triage → responder → review pipeline

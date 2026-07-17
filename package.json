@@ -9,6 +9,7 @@
     "node": ">=20.0.0"
   },
   "scripts": {
+    "setup": "node scripts/setup.js",
     "start": "cd autobot-inbox && npm start",
     "test": "cd autobot-inbox && npm test",
     "migrate": "cd autobot-inbox && npm run migrate",
