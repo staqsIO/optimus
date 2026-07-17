@@ -181,6 +181,7 @@ docker compose logs -f
 **Demo mode** — synthetic mail, no Gmail or external credentials needed:
 
 ```bash
+npm install                # root install — also installs lib/ and agents/ deps
 cd autobot-inbox && npm install && npm run demo
 ```
 
@@ -189,7 +190,9 @@ cd autobot-inbox && npm install && npm run demo
 **Self-hosting a fork?** See [`SELF_HOSTING.md`](SELF_HOSTING.md) for a tiered
 guide — from a zero-config demo boot (just `ANTHROPIC_API_KEY` +
 `DEMO_MODE=1`, no other credentials) up to the full multi-channel production
-configuration.
+configuration, including **satellite runners** (`npm run runner`) for
+spreading heavy executor agents across machines that share only the
+Postgres database.
 
 | Port | Service |
 |------|---------|

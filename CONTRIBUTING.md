@@ -61,6 +61,8 @@ A few of these mechanics were built around an internal agent pipeline and curren
 
 ## CODEOWNERS Tiers
 
+> Note: the CODEOWNERS file itself lives in the private development repository and is not part of this public snapshot. The tiers below document how development is governed there.
+
 Two enforcement tiers govern who must approve changes. GitHub CODEOWNERS enforces this structurally (P2).
 
 ### Board Tier (requires board member approval)

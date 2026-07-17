@@ -1,4 +1,4 @@
-# Build context must be the repo root (.) — prebuild.sh reads from autobot-inbox/docs and autobot-spec
+# Build context must be the repo root (.) — prebuild.sh reads from autobot-inbox/docs and spec/
 
 FROM node:20-alpine AS deps
 WORKDIR /repo/docs-site
@@ -10,7 +10,7 @@ RUN apk add --no-cache bash
 WORKDIR /repo
 # Copy only the monorepo parts needed by docs-site/scripts/prebuild.sh
 COPY autobot-inbox/docs ./autobot-inbox/docs
-COPY autobot-spec ./autobot-spec
+COPY spec ./spec
 COPY docs-site ./docs-site
 COPY --from=deps /repo/docs-site/node_modules ./docs-site/node_modules
 WORKDIR /repo/docs-site

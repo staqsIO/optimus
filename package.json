@@ -15,7 +15,7 @@
     "lint": "npm run lint --prefix lib && npm run lint --prefix agents",
     "lint:lib": "npm run lint --prefix lib",
     "lint:agents": "npm run lint --prefix agents",
-    "postinstall": "cd lib && npm install --silent"
+    "postinstall": "npm install --silent --prefix lib && npm install --silent --prefix agents"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.4.2",
