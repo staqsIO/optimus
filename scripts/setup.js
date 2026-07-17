@@ -164,6 +164,165 @@ async function credential({ key, label, lines = [], secret = true, placeholder =
   return a;
 }
 
+// --- extra-service catalog -------------------------------------------------
+// Everything beyond the core six steps. Drives both the interactive
+// "additional integrations" step and the reference cheat-sheet, so the two
+// can never drift. A field is a secret unless `secret: false`.
+const EXTRA_SERVICES = [
+  {
+    id: 'outlook', label: 'Outlook (beta)',
+    blurb: 'A second email channel via Microsoft Graph.',
+    links: ['https://portal.azure.com — Azure AD → App registrations'],
+    fields: [
+      { key: 'OUTLOOK_CLIENT_ID', secret: false, placeholder: 'application (client) ID' },
+      { key: 'OUTLOOK_CLIENT_SECRET', placeholder: 'client secret value' },
+      { key: 'OUTLOOK_TENANT_ID', secret: false, placeholder: 'directory (tenant) ID' },
+    ],
+    after: 'npm --prefix autobot-inbox run setup-outlook  # browser OAuth — completes the Outlook connection',
+  },
+  {
+    id: 'google-workspace', label: 'Google Drive / Calendar',
+    blurb: 'Drive + Calendar via a Google service account with domain-wide delegation.',
+    links: ['https://console.cloud.google.com — create a service account, enable DWD'],
+    note: 'Paste the PATH to the downloaded service-account JSON (not the JSON itself).',
+    fields: [
+      { key: 'GOOGLE_SERVICE_ACCOUNT_KEY_PATH', secret: false, placeholder: '/abs/path/to/service-account.json' },
+      { key: 'GOOGLE_IMPERSONATE_EMAIL', secret: false, placeholder: 'user@yourdomain.com to impersonate' },
+    ],
+  },
+  {
+    id: 'brave', label: 'Brave Search',
+    blurb: 'Primary web-search provider for the research agents.',
+    links: ['https://brave.com/search/api'],
+    fields: [{ key: 'BRAVE_API_KEY', placeholder: 'BSA…' }],
+  },
+  {
+    id: 'firecrawl', label: 'Firecrawl',
+    blurb: 'Page scraping / crawling for research + URL capture.',
+    links: ['https://firecrawl.dev'],
+    fields: [{ key: 'FIRECRAWL_API_KEY', placeholder: 'fc-…' }],
+  },
+  {
+    id: 'resend', label: 'Resend (outbound email)',
+    blurb: 'Sends outbound email (proposals, notifications).',
+    links: ['https://resend.com/api-keys'],
+    fields: [
+      { key: 'RESEND_API_KEY', placeholder: 're_…' },
+      { key: 'RESEND_FROM', secret: false, placeholder: 'Your Name <you@yourdomain.com>' },
+    ],
+  },
+  {
+    id: 'boldsign', label: 'BoldSign (e-signature)',
+    blurb: 'E-signature for contracts and engagement documents.',
+    links: ['https://boldsign.com — Settings → API'],
+    fields: [{ key: 'BOLDSIGN_API_KEY', placeholder: 'paste key' }],
+  },
+  {
+    id: 'assemblyai', label: 'AssemblyAI (transcription)',
+    blurb: 'Speech-to-text for voice notes and audio.',
+    links: ['https://www.assemblyai.com'],
+    fields: [{ key: 'ASSEMBLYAI_API_KEY', placeholder: 'paste key' }],
+  },
+  {
+    id: 'picovoice', label: 'Picovoice (wake word)',
+    blurb: 'On-device wake-word / voice trigger.',
+    links: ['https://console.picovoice.ai'],
+    fields: [{ key: 'PICOVOICE_ACCESS_KEY', placeholder: 'paste access key' }],
+  },
+  {
+    id: 'tldv', label: 'tl;dv (meeting transcripts)',
+    blurb: 'Ingests meeting recordings and transcripts.',
+    links: ['https://tldv.io — Settings → API'],
+    fields: [{ key: 'TLDV_API_KEY', placeholder: 'paste key' }],
+  },
+  {
+    id: 'aws', label: 'File storage (S3 / R2)',
+    blurb: 'Object storage for generated artifacts (AWS S3 or Cloudflare R2).',
+    links: ['https://aws.amazon.com/s3  ·  https://developers.cloudflare.com/r2'],
+    fields: [
+      { key: 'AWS_ACCESS_KEY_ID', placeholder: 'AKIA… / R2 access key' },
+      { key: 'AWS_SECRET_ACCESS_KEY', placeholder: 'secret access key' },
+      { key: 'AWS_S3_BUCKET', secret: false, placeholder: 'bucket name' },
+      { key: 'AWS_S3_REGION', secret: false, placeholder: 'us-east-1 (or "auto" for R2)' },
+    ],
+  },
+  {
+    id: 'neo4j', label: 'Neo4j (knowledge graph)',
+    blurb: 'Graph store for entity/relationship memory. Docker Compose provides Neo4j — set a password to enable it.',
+    links: [],
+    fields: [{ key: 'NEO4J_PASSWORD', placeholder: 'choose a password' }],
+  },
+  {
+    id: 'model-armor', label: 'Model Armor (prompt-injection screening)',
+    blurb: 'Gate G8 — screens inbound content for prompt injection. Recommended for production; needs a GCP Model Armor template.',
+    links: ['https://cloud.google.com/security-command-center/docs/model-armor-overview'],
+    fields: [{ key: 'MODEL_ARMOR_TEMPLATE', secret: false, placeholder: 'projects/…/locations/…/templates/…' }],
+  },
+  {
+    id: 'railway', label: 'Railway (auto-deploy)',
+    blurb: 'Lets deploy agents ship services to Railway.',
+    links: ['https://railway.app — Account → Tokens'],
+    fields: [{ key: 'RAILWAY_TOKEN', placeholder: 'paste token' }],
+  },
+  {
+    id: 'vercel', label: 'Vercel (auto-deploy)',
+    blurb: 'Lets deploy agents ship front-ends to Vercel.',
+    links: ['https://vercel.com/account/tokens'],
+    fields: [{ key: 'VERCEL_TOKEN', placeholder: 'paste token' }],
+  },
+];
+
+// Configure one catalog service (possibly multi-field). Pushes exactly one
+// summary row; returns true if its primary (first) field ended up set.
+async function configureService(entry) {
+  console.log(`\n${c.bold(entry.label)}`);
+  if (entry.blurb) console.log(`  ${entry.blurb}`);
+  for (const link of entry.links || []) console.log(`  ${c.bold(link)}`);
+  if (entry.note) console.log(`  ${c.dim(entry.note)}`);
+  let primarySet = false;
+  for (let i = 0; i < entry.fields.length; i++) {
+    const f = entry.fields[i];
+    const secret = f.secret !== false;
+    const existing = getVar(env, f.key);
+    let val;
+    if (existing) {
+      const shown = secret ? redact(existing) : existing;
+      const a = await ask(`  ${f.key} ${c.dim(`already set (${shown}) — Enter to keep, or paste new:`)} `, { secret });
+      if (a) set(f.key, a);
+      val = a || existing;
+    } else {
+      const a = await ask(`  ${f.key} ${c.dim(`(${f.placeholder}, Enter to skip):`)} `, { secret });
+      if (a) set(f.key, a);
+      val = a;
+    }
+    if (i === 0) primarySet = Boolean(val);
+  }
+  summary.push([entry.label, primarySet ? c.green('configured') : c.dim('skipped')]);
+  if (primarySet && entry.after) afterSteps.push(entry.after);
+  return primarySet;
+}
+
+// Parse a pick-list like "1,3,5", "2-4", "all" into 0-based indices.
+function parseSelection(input, max) {
+  if (/^(a|all)$/i.test(input.trim())) return [...Array(max).keys()];
+  const out = new Set();
+  for (const part of input.split(',')) {
+    const p = part.trim();
+    if (!p) continue;
+    const range = p.match(/^(\d+)\s*-\s*(\d+)$/);
+    if (range) {
+      let lo = Number(range[1]);
+      let hi = Number(range[2]);
+      if (lo > hi) [lo, hi] = [hi, lo];
+      for (let n = lo; n <= hi; n++) if (n >= 1 && n <= max) out.add(n - 1);
+    } else if (/^\d+$/.test(p)) {
+      const n = Number(p);
+      if (n >= 1 && n <= max) out.add(n - 1);
+    }
+  }
+  return [...out].sort((a, b) => a - b);
+}
+
 // --- main ------------------------------------------------------------------
 async function main() {
   if (!existsSync(ENV_EXAMPLE)) {
@@ -183,7 +342,7 @@ themselves cleanly, and you can re-run ${c.bold('npm run setup')} any time.
 ${envExisted ? c.yellow('Found an existing .env — your current values are kept unless you replace them.') : ''}`);
 
   // ── Step 1: the brain ────────────────────────────────────────────────────
-  console.log(`\n${c.cyan('Step 1/6 — LLM provider (required)')}`);
+  console.log(`\n${c.cyan('Step 1/7 — LLM provider (required)')}`);
   const anthropic = await credential({
     key: 'ANTHROPIC_API_KEY',
     label: 'Anthropic API key',
@@ -207,7 +366,7 @@ ${envExisted ? c.yellow('Found an existing .env — your current values are kept
   }
 
   // ── Step 2: database ─────────────────────────────────────────────────────
-  console.log(`\n${c.cyan('Step 2/6 — Database')}`);
+  console.log(`\n${c.cyan('Step 2/7 — Database')}`);
   console.log(`  Ephor's task graph, audit log, and RAG store live in Postgres (with pgvector).
   1) ${c.bold('Docker')} — \`docker compose up -d\` provides Postgres for you  ${c.dim('(default)')}
   2) ${c.bold('Ephemeral')} — in-process PGlite, no persistence (fine for demo mode)
@@ -232,7 +391,7 @@ ${envExisted ? c.yellow('Found an existing .env — your current values are kept
   }
 
   // ── Step 3: more model providers ─────────────────────────────────────────
-  console.log(`\n${c.cyan('Step 3/6 — More model providers (recommended, all skippable)')}`);
+  console.log(`\n${c.cyan('Step 3/7 — More model providers (recommended, all skippable)')}`);
   const openrouter = await credential({
     key: 'OPENROUTER_API_KEY',
     label: 'OpenRouter',
@@ -266,7 +425,7 @@ ${envExisted ? c.yellow('Found an existing .env — your current values are kept
   });
 
   // ── Step 4: channels ─────────────────────────────────────────────────────
-  console.log(`\n${c.cyan('Step 4/6 — Channels (how work reaches the org)')}`);
+  console.log(`\n${c.cyan('Step 4/7 — Channels (how work reaches the org)')}`);
 
   if (await yesNo(`\n${c.bold('Gmail')} — the flagship channel: the org manages a real inbox.\n  Needs your own Google Cloud OAuth app (heaviest setup, ~15 min). Set up Gmail?`)) {
     await credential({
@@ -311,7 +470,7 @@ ${envExisted ? c.yellow('Found an existing .env — your current values are kept
   }
 
   // ── Step 5: work integrations ────────────────────────────────────────────
-  console.log(`\n${c.cyan('Step 5/6 — Work integrations')}`);
+  console.log(`\n${c.cyan('Step 5/7 — Work integrations')}`);
   await credential({
     key: 'GITHUB_TOKEN',
     label: 'GitHub',
@@ -333,7 +492,7 @@ ${envExisted ? c.yellow('Found an existing .env — your current values are kept
   });
 
   // ── Step 6: ops secrets ──────────────────────────────────────────────────
-  console.log(`\n${c.cyan('Step 6/6 — Internal secrets')}`);
+  console.log(`\n${c.cyan('Step 6/7 — Internal secrets')}`);
   console.log(`  Four random secrets Ephor uses internally (credential encryption at rest,
   agent action signing, ops/cron API auth). Nothing to sign up for.`);
   const OPS_KEYS = ['CREDENTIALS_ENCRYPTION_KEY', 'AGENT_SIGNING_KEY', 'API_SECRET', 'CRON_SECRET'];
@@ -348,6 +507,30 @@ ${envExisted ? c.yellow('Found an existing .env — your current values are kept
     summary.push(['Internal secrets', c.dim('skipped — see .env.example § Auth & Identity')]);
   }
 
+  // ── Step 7: additional integrations ──────────────────────────────────────
+  console.log(`\n${c.cyan('Step 7/7 — Additional integrations (all optional)')}`);
+  console.log(`  Ephor supports ${EXTRA_SERVICES.length} more services — web search, e-signature,
+  transcription, file storage, auto-deploy, and more. Step through all of them
+  now, pick just the ones you want, or skip and add them later by hand.`);
+  const extrasMode = (await ask(
+    `  ${c.bold('[a]')} all · ${c.bold('[p]')} pick from a list · ${c.bold('[s]')} skip ${c.dim('[a/p/s, Enter=s]')}: `,
+  )).trim().toLowerCase();
+  let chosen = [];
+  if (extrasMode === 'a' || extrasMode === 'all') {
+    chosen = EXTRA_SERVICES.map((_, i) => i);
+  } else if (extrasMode === 'p' || extrasMode === 'pick') {
+    console.log('');
+    EXTRA_SERVICES.forEach((s, i) =>
+      console.log(`  ${String(i + 1).padStart(2)}. ${c.bold(s.label)} ${c.dim('— ' + s.blurb)}`),
+    );
+    const sel = await ask(`\n  Which? ${c.dim("(e.g. 1,3,5 or 2-4 or 'all', Enter to skip):")} `);
+    chosen = parseSelection(sel, EXTRA_SERVICES.length);
+    if (!chosen.length) console.log(c.dim('  Nothing selected — skipping.'));
+  }
+  for (const i of chosen) {
+    await configureService(EXTRA_SERVICES[i]);
+  }
+
   // ── write ────────────────────────────────────────────────────────────────
   if (envExisted) copyFileSync(ENV_FILE, `${ENV_FILE}.bak`);
   writeFileSync(ENV_FILE, env);
@@ -359,23 +542,21 @@ ${envExisted ? c.yellow('Found an existing .env — your current values are kept
   const width = Math.max(...summary.map(([l]) => l.length));
   for (const [label, status] of summary) console.log(`  ${label.padEnd(width)}  ${status}`);
 
-  // ── everything else ──────────────────────────────────────────────────────
-  console.log(`\n${c.cyan(c.bold('More integrations'))} ${c.dim('— all optional, add any time in autobot-inbox/.env.example → .env')}`);
-  const extras = [
-    ['Outlook (beta)', 'cd autobot-inbox && npm run setup-outlook'],
-    ['Google Drive/Calendar', 'service account + domain-wide delegation — see SELF_HOSTING.md'],
-    ['Web search/scrape', 'BRAVE_API_KEY (https://brave.com/search/api), FIRECRAWL_API_KEY (https://firecrawl.dev)'],
-    ['Outbound email', 'RESEND_API_KEY (https://resend.com)'],
-    ['E-signature', 'BOLDSIGN_API_KEY (https://boldsign.com)'],
-    ['Voice/transcription', 'ASSEMBLYAI_API_KEY (https://assemblyai.com), PICOVOICE_ACCESS_KEY (https://console.picovoice.ai)'],
-    ['Meeting transcripts', 'TLDV_API_KEY (https://tldv.io)'],
-    ['File storage', 'AWS_* (S3 or Cloudflare R2)'],
-    ['Knowledge graph', 'Neo4j — Docker provides it; set NEO4J_PASSWORD to enable'],
-    ['Auto-deploys', 'RAILWAY_TOKEN (https://railway.app), VERCEL_TOKEN (https://vercel.com)'],
-    ['Prompt-injection screening', 'MODEL_ARMOR_TEMPLATE (GCP) — required for production, see .env.example'],
-  ];
-  const ew = Math.max(...extras.map(([l]) => l.length));
-  for (const [label, how] of extras) console.log(`  ${c.bold(label.padEnd(ew))}  ${c.dim(how)}`);
+  // ── still-unconfigured integrations (reference cheat-sheet) ───────────────
+  // Derive from actual .env state, not this run's choices — a service set in a
+  // prior run must not reappear here just because it wasn't revisited now.
+  const remaining = EXTRA_SERVICES.filter((s) => !getVar(env, s.fields[0].key));
+  if (remaining.length) {
+    console.log(`\n${c.cyan(c.bold('More integrations'))} ${c.dim('— not configured; add any time in autobot-inbox/.env')}`);
+    const ew = Math.max(...remaining.map((s) => s.label.length));
+    for (const s of remaining) {
+      const keys = s.fields.map((f) => f.key).join(', ');
+      const url = (s.links[0] || '').split(' — ')[0];
+      console.log(`  ${c.bold(s.label.padEnd(ew))}  ${c.dim(keys)}${url ? c.dim('  ' + url) : ''}`);
+    }
+  } else {
+    console.log(`\n${c.green('✓')} All optional integrations configured.`);
+  }
 
   // ── next steps ───────────────────────────────────────────────────────────
   console.log(`\n${c.cyan(c.bold('Next steps'))}`);
