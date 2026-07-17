@@ -81,7 +81,7 @@ services:
       - path: ./autobot-inbox/.env
         required: false
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/autobot
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/autobot?sslmode=disable
       API_PORT: 3001
       DAILY_BUDGET_USD: ${DAILY_BUDGET_USD:-20}
       AUTONOMY_LEVEL: ${AUTONOMY_LEVEL:-0}

@@ -6,7 +6,7 @@
 // unit test — no pg connection opened.
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { deriveQueryPoolUrl } from '../../lib/db.js';
+import { deriveQueryPoolUrl, sslOptionFor } from '../../lib/db.js';
 
 // Representative Supabase pooler URL (session pooler, port 5432). The username
 // carries the project-ref suffix per the PgBouncer convention.
@@ -94,5 +94,44 @@ describe('deriveQueryPoolUrl (Phase 2 query-pool split)', () => {
       'postgresql://postgres.proj:pw@aws-0-us-east-1.pooler.supabase.com/postgres';
     const out = deriveQueryPoolUrl(noPort, { isSupabase: true });
     assert.equal(new URL(out).port, '6543');
+  });
+});
+
+// Docker-compose fresh-clone regression (2026-07-16): DATABASE_URL host is the
+// compose service name "postgres" — not localhost — so the old inline isLocal
+// heuristic forced SSL against a Postgres with no TLS and boot died with
+// "The server does not support SSL connections". sslOptionFor() honors an
+// explicit sslmode=disable (libpq contract) as the escape hatch.
+describe('sslOptionFor (SSL decision for pg pools)', () => {
+  it('sslmode=disable wins even for a non-local hostname (compose service)', () => {
+    assert.deepEqual(
+      sslOptionFor('postgresql://postgres:postgres@postgres:5432/autobot?sslmode=disable'),
+      {}
+    );
+  });
+
+  it('non-local hostname without sslmode → SSL with rejectUnauthorized:false', () => {
+    assert.deepEqual(
+      sslOptionFor('postgresql://u:p@aws-0-us-east-1.pooler.supabase.com:5432/postgres'),
+      { ssl: { rejectUnauthorized: false } }
+    );
+  });
+
+  it('localhost / 127.0.0.1 / .railway.internal → no SSL', () => {
+    for (const host of ['localhost', '127.0.0.1', 'db.railway.internal']) {
+      assert.deepEqual(sslOptionFor(`postgresql://u:p@${host}:5432/db`), {});
+    }
+  });
+
+  it('compose service hostname WITHOUT sslmode=disable still gets SSL (unchanged default)', () => {
+    assert.deepEqual(
+      sslOptionFor('postgresql://postgres:postgres@postgres:5432/autobot'),
+      { ssl: { rejectUnauthorized: false } }
+    );
+  });
+
+  it('empty/undefined connection string → no SSL option', () => {
+    assert.deepEqual(sslOptionFor(undefined), {});
+    assert.deepEqual(sslOptionFor(''), {});
   });
 });

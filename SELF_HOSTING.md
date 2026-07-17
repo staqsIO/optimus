@@ -62,6 +62,7 @@ for whatever you actually want — nothing is bundled or shared.
 |---|---|---|---|---|
 | **Anthropic** | Baseline LLM provider for every agent tier | **Yes** (the only hard key) | `ANTHROPIC_API_KEY` | Nothing works — this is the one non-negotiable |
 | **Postgres** | Task graph, audit log, all state | Production yes; demo no | `DATABASE_URL` | Falls back to PGlite (in-process, ephemeral) |
+| | | | | TLS: any non-local hostname gets SSL by default. If your Postgres doesn't speak TLS (docker service name, LAN host), append `?sslmode=disable` to `DATABASE_URL` — the compose file already does this. |
 | **OpenRouter** | Routes non-Anthropic models (Gemini, DeepSeek, Qwen tiers in the default `agents.json`) | Production default config only | `OPENROUTER_API_KEY` | Set `LLM_SINGLE_PROVIDER=anthropic` and it's not needed at all |
 | **OpenAI** | RAG embeddings + Responses-API web search for the research pipeline | Optional | `OPENAI_API_KEY` | RAG indexing/search and research web-search degrade or skip |
 | **Google Gemini (direct)** | Direct Gemini API access (alternative to routing Gemini via OpenRouter) | Optional | `GEMINI_API_KEY` | Gemini-configured agents route via OpenRouter or get remapped |
